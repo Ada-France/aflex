@@ -1,0 +1,23 @@
+
+# Aflex build for GNAT (MinGW)
+
+# Rebuild of the parser
+#/mingw/bin/aflex_1.4a -is ../ascan.l
+aflex -is ../ascan.l
+#/mingw/bin/ayacc_1.4a ../parse.y
+ayacc ../parse.y
+
+# Renaming sources
+gnatchop -pqrw ../*.a
+
+# Overwriting the lexer (the parser is overwritten in ..)
+gnatchop -pqrw ascan.a ascan_dfa.a ascan_io.a
+#gnatchop -pqrw parse.a parse_*.a
+
+# Overwriting OS specific files
+gnatchop -pqrw ../gnat_unix/command_line[SB].a
+gnatchop -pqrw ../gnat_unix/misc_defsS.a
+
+#gnatmake -s -g -O2 -gnatofVa aflex -largs -s
+gnatmake -s -O2 -gnatVn aflex -largs -s
+

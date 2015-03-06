@@ -1,0 +1,65 @@
+----------------------------------------------------------------
+-- command file for Alsys
+--
+-------------------------
+-- # compile shell script for aflex
+-- # set the following to match the requirements of your system
+-- 
+-- setenv COMPILER "ada -e"
+-- setenv LINKER "a.ld"
+-- 
+-- #note: if you have a different suffix for Ada programs the script
+-- #change_suffix will do it automatically on a Unix system.
+-- 
+-- setenv ADA_SUFFIX ".a"
+-- 
+-- set verbose
+-- # compile the vstrings package
+COMPILE vstringS.ada
+COMPILE vstringB.ada
+
+-- # compile instantiations
+
+COMPILE tstrings.ada
+COMPILE file_strings.ada
+COMPILE int_io.ada
+-- 
+COMPILE misc_defsS.ada
+COMPILE parse_goto.ada  
+COMPILE nfaS.ada  
+COMPILE mainS.ada  
+COMPILE ascan_dfa.ada  
+COMPILE template_managerS.ada  
+COMPILE alsys_hp9000/file_managerS.ada                    -- *
+COMPILE parse_shift_reduce.ada  
+COMPILE ascan_io.ada
+COMPILE skeleton_managerS.ada
+COMPILE command_lineS.ada
+COMPILE alsys_hp9000/command_lineB.ada                    -- *
+COMPILE dfaS.ada
+COMPILE cclS.ada
+COMPILE parse_tokens.ada
+COMPILE genS.ada
+COMPILE miscS.ada
+COMPILE template_managerB.ada
+COMPILE alsys_hp9000/file_managerB.ada                    -- *
+COMPILE miscB.ada
+COMPILE alsys_hp9000/aflex.ada 			          -- *
+COMPILE cclB.ada
+COMPILE misc_defsB.ada
+COMPILE tblcmpS.ada
+COMPILE alsys_hp9000/skeleton_managerB.ada		  -- *
+COMPILE ecsS.ada
+COMPILE tblcmpB.ada
+COMPILE dfaB.ada
+COMPILE nfaB.ada
+COMPILE ecsB.ada
+COMPILE symS.ada
+COMPILE ascan.ada
+COMPILE aflex_scanner.ada
+COMPILE parse.ada
+COMPILE mainB.ada
+COMPILE genB.ada
+COMPILE symB.ada
+
+BIND aflex

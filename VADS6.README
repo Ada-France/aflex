@@ -1,0 +1,9 @@
+The Verdix Ada Development System version 6 optimizer causes problems
+for aflex.   I haven't been able to determine exactly what goes wrong,
+but you should compile aflex using the VADS6.compile script and always
+compile any aflex output files (for file.l these would be file_dfa.a,
+file_io.a, and file.a) with optimization turned off.  Use the -O0
+(that's dash-oh-zero) switch for this.  I suspect the optimizer is
+broken, but it is possible that aflex uses an eroneous construct.
+This bug also exists in SunAda 1.0, but is fixed in SunAda 1.1.
+

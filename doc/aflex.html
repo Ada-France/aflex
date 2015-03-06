@@ -1,0 +1,1243 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+        "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<meta name="GENERATOR" content="TtH 3.56">
+ <style type="text/css"> div.p { margin-top: 7pt;}</style>
+ <style type="text/css"><!--
+ td div.comp { margin-top: -0.6ex; margin-bottom: -1ex;}
+ td div.comb { margin-top: -0.6ex; margin-bottom: -.6ex;}
+ td div.hrcomp { line-height: 0.9; margin-top: -0.8ex; margin-bottom: -1ex;}
+ td div.norm {line-height:normal;}
+ span.roman {font-family: serif; font-style: normal; font-weight: normal;} 
+ span.overacc2 {position: relative;  left: .8em; top: -1.2ex;}
+ span.overacc1 {position: relative;  left: .6em; top: -1.2ex;} --></style>
+ 
+         
+<title> \vspace{2cm}\goodbreak 
+ { Aflex}  -- An Ada Lexical Analyzer Generator
+\ \vspace{1cm} Version 1.1 \vspace{1cm}
+</title>
+ 
+<h1 align="center"><br /><br /><br /><br /><br />
+<div class="p"><!----></div>
+ <b><i>Aflex</i> <span class="roman">- An Ada Lexical Analyzer Generator
+<br /><br /><br /> Version 1.1 <br /><br />
+</span></b> </h1>
+
+<h3 align="center"><font size="+1"><span class="roman">John Self <br />
+&nbsp;<br />
+Arcadia Environment Research Project <br />
+Department of Information and Computer Science<br />
+University of California, Irvine <br />
+<br />UCI-90-18
+<a href="#tthFtNtAAB" name="tthFrefAAB"><sup>1</sup></a>
+ </h3></span></font>
+
+<div class="p"><!----></div>
+
+<h3 align="center">May 1990 </h3>
+
+<div class="p"><!----></div>
+ <h2><a name="tth_sEc1">
+1</a>&nbsp;&nbsp;Introduction</h2>
+<a name="intro">
+</a>
+<i>Aflex</i> is a lexical analyzer generating tool written in Ada
+designed for lexical 
+processing of character input streams.
+It is a successor to the <i>Alex</i>[] tool from UCI.  <i>Aflex</i>
+is upwardly compatible with <i>alex 1.0</i>, but is significantly
+faster at generating scanners, and produces smaller scanners for
+equivalent specifications.  Internally <i>aflex</i> is patterned after the
+<i>flex</i> tool from the GNU project.
+<i>Aflex</i> accepts high level rules  written in regular expressions
+for character string matching, and generates Ada source code comprising a
+lexical analyzer along with two auxiliary Ada packages.  The main file
+includes a routine that partitions the input text stream into strings 
+matching the expressions.  Associated with each rule is an 
+action block composed of program fragments.  Whenever a rule is recognized 
+in the input stream, the corresponding program fragment is executed.
+This feature, combined with the powerful string pattern matching capability,
+allows the user to implement a lexical analyzer for any type of application
+efficiently and quickly.
+For instance, <i>aflex</i> can be used alone for simple lexical analysis and 
+statistics, or with <i>ayacc</i> [] to generate a parser front-end.  
+<i>Ayacc</i> is an Ada parser generator that accepts context-free grammars.
+
+<div class="p"><!----></div>
+<br /><i>Aflex</i> is a successor to the Arcadia tool <i>Alex</i>[] which
+was inspired by the popular Unix operating system tool, <i>lex</i> 
+[],.  Consequently, most of <i>lex</i>'s features and conventions are 
+retained in <i>aflex</i>; however, a few important differences are discussed 
+in section .  There are also a few minor differences
+between <i>aflex</i> and <i>alex</i> which will be discussed in
+section .
+
+<div class="p"><!----></div>
+<br />This paper is intended to serve as both the reference manual and the
+user manual for <i>aflex</i>.  Some knowledge of <i>lex</i>, while not
+required, would be very useful in understanding the use of<i>aflex.</i>
+A good introduction to <i>lex</i>, as well as lexical and syntactic analysis, 
+can be found in [], frequently referred to as "the Dragon Book."
+Topics to be covered in this paper include the usage of
+<i>aflex</i>, the operators' description, the source file format,
+the generated output, the necessary interfaces with <i>ayacc</i>,
+and ambiguity among rules.
+The appendices provide a simple example, <i>aflex</i> dependencies,
+the differences between <i>aflex</i>,<i>alex</i>, and <i>lex</i>, known bugs and
+limitations, and references.
+
+<div class="p"><!----></div>
+ <h2><a name="tth_sEc2">
+2</a>&nbsp;&nbsp;Command Line Options</h2>
+Command line options are given in a different format than in the
+old UCI alex.  Aflex options are as follows
+
+<dl compact="compact">
+ <dt><b>-t</b></dt>
+	<dd>
+Write the scanner output to the standard output rather than to a file.
+The default name of the scanner file for base.l is base.a  Note that this
+option is not as useful with aflex because in addition to the scanner
+file there are files for the externally visible dfa functions
+(base_dfa.a) and the external IO functions (base_io.a)</dd>
+ <dt><b>-b</b></dt>
+	<dd>
+Generate backtracking information to
+<i></i> aflex.backtrack.
+This is a list of scanner states which require backtracking
+and the input characters on which they do so.  By adding rules one
+can remove backtracking states.  If all backtracking states
+are eliminated and
+<b>-f</b>
+is used, the generated scanner will run faster (see the
+<b>-p</b>
+flag).  Only users who wish to squeeze every last cycle out of their
+scanners need worry about this option.</dd>
+ <dt><b>-d</b></dt>
+	<dd>
+makes the generated scanner run in
+<i>debug</i>
+mode.  Whenever a pattern is recognized the scanner will
+write to
+<i>stderr</i>
+a line of the form:
+
+<pre>
+
+    --accepting rule #n
+
+
+</pre>
+Rules are numbered sequentially with the first one being 1.  Rule #0
+is executed when the scanner backtracks; Rule #(n+1) (where
+<i>n</i>
+is the number of rules) indicates the default action; Rule #(n+2) indicates
+that the input buffer is empty and needs to be refilled and then the scan
+restarted.  Rules beyond (n+2) are end-of-file actions.</dd>
+ <dt><b>-f</b></dt>
+	<dd>
+has the same effect as lex's -f flag (do not compress the scanner
+tables); the mnemonic changes from
+<i>fast compilation</i>
+to (take your pick)
+<i>full table</i>
+or
+<i>fast scanner.</i>
+The actual compilation takes
+<i>longer,</i>
+since aflex is I/O bound writing out the big table.
+The compilation of the Ada file containing the scanner is also likely
+to take a long time because of the large arrays generated.</dd>
+ <dt><b>-i</b></dt>
+	<dd>
+instructs aflex to generate a
+<i>case-insensitive</i>
+scanner.  The case of letters given in the aflex input patterns will
+be ignored, and the rules will be matched regardless of case.  The
+matched text given in
+<i>yytext</i>
+will have the preserved case (i.e., it will not be folded).</dd>
+ <dt><b>-p</b></dt>
+	<dd>
+generates a performance report to stderr.  The report
+consists of comments regarding features of the aflex input file
+which will cause a loss of performance in the resulting scanner.
+Note that the use of
+the
+<b><tt>^</tt></b>
+operator
+and the
+<b>-I</b>
+flag entail minor performance penalties.</dd>
+ <dt><b>-s</b></dt>
+	<dd>
+causes the
+<i>default rule</i>
+(that unmatched scanner input is echoed to
+<i>stdout)</i>
+to be suppressed.  If the scanner encounters input that does not
+match any of its rules, it aborts with an error.  This option is
+useful for finding holes in a scanner's rule set.</dd>
+ <dt><b>-v</b></dt>
+	<dd>
+has the same meaning as for lex (print to
+<i>stderr</i>
+a summary of statistics of the generated scanner).  Many more statistics
+are printed, though, and the summary spans several lines.  Most
+of the statistics are meaningless to the casual aflex user, but the
+first line identifies the version of aflex, which is useful for figuring
+out where you stand with respect to patches and new releases.</dd>
+ <dt><b>-E</b></dt>
+	<dd>
+instructs aflex to generate additional information about each token,
+including line and column numbers.  This is needed for the advanced
+automatic error option correction in ayacc.</dd>
+ <dt><b>-I</b></dt>
+	<dd>
+instructs aflex to generate an
+<i>interactive</i>
+scanner.  Normally, scanners generated by aflex always look ahead one
+character before deciding that a rule has been matched.  At the cost of
+some scanning overhead, aflex will generate a scanner which only looks ahead
+when needed.  Such scanners are called
+<i>interactive</i>
+because if you want to write a scanner for an interactive system such as a
+command shell, you will probably want the user's input to be terminated
+with a newline, and without
+<b>-I</b>
+the user will have to type a character in addition to the newline in order
+to have the newline recognized.  This leads to dreadful interactive
+performance.
+
+<div class="p"><!----></div>
+If all this seems to confusing, here's the general rule: if a human will
+be typing in input to your scanner, use
+<b>-I,</b>
+otherwise don't; if you don't care about how fast your scanners run and
+don't want to make any assumptions about the input to your scanner,
+always use
+<b>-I.</b>
+
+<div class="p"><!----></div>
+Note,
+<b>-I</b>
+cannot be used in conjunction with
+<i>full</i>
+i.e., the
+<b>-f</b>
+flag.</dd>
+ <dt><b>-L</b></dt>
+	<dd>
+instructs aflex to not generate
+<b>#line</b>
+directives (see below).</dd>
+ <dt><b>-T</b></dt>
+	<dd>
+makes aflex run in
+<i>trace</i>
+mode.  It will generate a lot of messages to stdout concerning
+the form of the input and the resultant non-deterministic and deterministic
+finite automatons.  This option is mostly for use in maintaining aflex.</dd>
+ <dt><b>-Sskeleton_file</b></dt>
+	<dd>
+overrides the default internal skeleton from which aflex constructs
+its scanners.  You'll probably never need this option unless you are doing
+aflex maintenance or development.</dd>
+</dl>
+
+ <h2><a name="tth_sEc3">
+3</a>&nbsp;&nbsp;<i>Aflex</i> Output</h2>
+<i>Aflex</i> generates a file containing a lexical analyzer function along
+with two auxiliary packages, all of which are written in Ada.  
+The context in which the lexical analyzer function is defined is flexible 
+and may be specified by the user.  For instance,  the file may only 
+contain the lexical analyzer function as a single compilation unit which 
+may be called by <i>ayacc</i>,  
+or it may be placed within a package body or embedded within a driver 
+routine.  This scanner function, when invoked, partitions the character stream 
+into tokens as specified by the regular expressions defined in the rules 
+section of the source file.  The name of the lexical analyzer 
+function is <i>yylex</i>. Note that it returns values of type <i>token</i>.  
+Type <i>token</i> must be defined as an enumeration type which contains, 
+at a minimum, (<i>End_of_Input, Error</i>). It is up to the user to make 
+sure that this type is visible (see Section ). The general 
+format of the output file which contains this function is found in
+Figure 3.
+
+<div class="p"><!----></div>
+<br />The auxiliary packages include a DFA and an IO package.  The DFA
+package contains externally visible functions and variables from the
+scanner.  Many of the variables in this package should not be modified
+by normal user programs, but they are provided here to allow the user to
+modify the internal behavior of aflex to match specific needs.  Only
+the functions YYText and YYLength will be needed by most programs.
+
+<div class="p"><!----></div>
+<br />The IO package contains
+routines which allow <i>yylex</i> to scan the input source file.
+These include the unput, input, output, and yywrap functions
+from <i>lex</i>,<br />
+plus Open_Input, Create_Output, Close_Input and Close_Output
+provided for compatibility with <i>alex.</i>
+<br />
+It is also possible to write your own IO and DFA packages.  Redefining
+input is possible by changing the YY_INPUT procedure.  As an example
+you might wish to take input from an array instead of from a file.  By
+changing the calls to the TEXT_IO routines to access elements of the
+array you can change the input strategy.  If you change the IO or DFA
+packages you should make a copy of the generated files under a
+different name and change that, because <i>aflex</i> will overwrite
+them whenever you rerun <i>aflex</i>.
+
+<div class="p"><!----></div>
+<font size="-1">1234&#175;1234&#175;1234&#175;1234&#175;1234&#175;1234 
+
+<div class="p"><!----></div>
+    &nbsp;&nbsp;&nbsp;<b>with</b>  &lt; rootname &gt; _DFA; <br />
+    &nbsp;&nbsp;&nbsp;<b>with</b>  &lt; rootname &gt; _IO; <br />
+    &nbsp;&nbsp;&nbsp;<b>with</b> TEXT_IO; <br />
+<br />
+    &nbsp;&nbsp;&nbsp;<tt>--</tt> User Specified Context<br />
+<br />
+    &nbsp;&nbsp;&nbsp;&nbsp;<b>function</b> yylex <b>return</b> Token <b>is</b> <br />
+    &nbsp;&nbsp;&nbsp;&nbsp;<b>begin</b> <br />
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<tt>--</tt> Analysis of expressions <br />
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<tt>--</tt> Execution of user-defined actions <br />
+    &nbsp;&nbsp;&nbsp;&nbsp;<b>end</b> yylex; <br />
+<br />
+    &nbsp;&nbsp;&nbsp;<tt>--</tt> User Specified Context<br />
+
+
+<table align="center" border="0"><tr><td>
+Figure 3: Example of File Containing Lexical Analyzer</td></tr></table><!--hboxt-->
+
+<div class="p"><!----></div>
+<br />Before showing the general layout of the specification file, we will
+describe the specification language of <i>aflex</i>, namely, regular expressions.
+
+<div class="p"><!----></div>
+ <h2><a name="tth_sEc4">
+4</a>&nbsp;&nbsp;Regular Expressions</h2>
+<i>Aflex</i> distinguishes two types  of  character  sets  used  to
+define regular expressions: text characters and operator characters.
+A regular expression specifies how a set of strings from the input
+string can be recognized.  It contains text characters  (which  match  the
+corresponding characters in  the  strings  being  compared)  and
+operator  characters  (which  specify  repetitions, choices, and
+other features).  The letters of the alphabet  and  the  digits  are
+always text characters.
+
+<div class="p"><!----></div>
+<br />A rule specifies a  sequence of  characters  to  be  matched. It 
+<b>must</b> begin in column one. 
+The set of <i>aflex</i> operators consists of 
+the following:
+
+<div class="p"><!----></div>
+
+<pre>
+      " \ { } [ ] ^ $ &lt; &#62; ? . * + | ( ) /   
+
+</pre>
+
+<div class="p"><!----></div>
+The meaning of each operator is summarized below:
+
+<div class="p"><!----></div>
+1234&#175;1234&#175;1234&#175;1234&#175;1234&#175;1234 
+  &nbsp;<tt>x</tt>     &nbsp;&nbsp;<tt>--</tt> the character "x" <br />
+  &nbsp;<tt>"x"</tt>   &nbsp;&nbsp;<tt>--</tt> an "x", even if x is an operator. <br />
+  &nbsp;<tt>\x</tt>    &nbsp;&nbsp;<tt>--</tt> an "x", even if x is an operator. <br />
+  &nbsp;<tt>^x</tt>    &nbsp;&nbsp;<tt>--</tt> an x at the beginning of a line. <br />
+  &nbsp;<tt>x$</tt>    &nbsp;&nbsp;<tt>--</tt> an x at the end of line. <br />
+  &nbsp;<tt>x+</tt>    &nbsp;&nbsp;<tt>--</tt> 1 or more instances of x. <br />
+  &nbsp;<tt>x*</tt>    &nbsp;&nbsp;<tt>--</tt> 0 or more instances of x. <br />
+  &nbsp;<tt>x?</tt>    &nbsp;&nbsp;<tt>--</tt> an optional x. <br />
+  &nbsp;<tt>(x)</tt>   &nbsp;&nbsp;<tt>--</tt> an x. <br />
+  &nbsp;<tt>.</tt>     &nbsp;&nbsp;<tt>--</tt> any character but newline. <br />
+  &nbsp;<tt>x|y</tt>   &nbsp;&nbsp;<tt>--</tt> an x or y. <br />
+  &nbsp;<tt>[xy]</tt>  &nbsp;&nbsp;<tt>--</tt> the character x or the character y. <br />
+  &nbsp;<tt>[x-z]</tt> &nbsp;&nbsp;<tt>--</tt> the character x, y or z. <br />
+  &nbsp;<tt>[^x]</tt>  &nbsp;&nbsp;<tt>--</tt> any character but x. <br />
+  &nbsp;<tt>&lt;y&gt;x</tt>  &nbsp;&nbsp;<tt>--</tt> an x when <i>aflex</i> is in start condition y. <br />
+  &nbsp;<tt>{xx}</tt>  &nbsp;&nbsp;<tt>--</tt> the translation of xx from the definitions section. <br />
+
+
+<div class="p"><!----></div>
+If any of these operators is used in a regular expression as a character
+literal, it must be either preceded by an escape character or surrounded by
+double quotes.  For example, to recognize a dollar sign <tt>$</tt>, the correct
+expression is either <tt>\$</tt> or <tt>"$"</tt>.
+Note a quote cannot be quoted and should therefore be escaped.
+
+<div class="p"><!----></div>
+<br />A regular expression may <b>not</b> contain any spaces
+unless they are within in a quoted string or character class 
+or they are preceded by the <tt>"\"</tt> operator. 
+
+<div class="p"><!----></div>
+<br />When in doubt, use parentheses.  When an <i>aflex</i> operator needs to be 
+embedded in a string, it is often neater to quote the entire string rather 
+than just the operator, e.g. the string <tt>"what?"</tt> is more readable 
+than both <tt>What"?"</tt>, and <tt>What\?</tt>.
+
+<div class="p"><!----></div>
+<font size="-1">
+<pre>
+Rules              Interpretations
+-----              ---------------
+a or "a"           The character a
+Begin or "Begin"   The string Begin
+\"Begin\"          The string "Begin"
+^\t or ^"\t"       The tab character \t at the beginning of line.
+\n$                The newline character \n at the end of line.
+
+</pre>
+<font size="+0">
+
+<div class="p"><!----></div>
+There are a few special characters which can be specified in a regular
+expression:
+
+1234&#175;1234&#175;1234&#175;1234&#175;1234&#175;1234 
+  &nbsp;<tt>\n</tt>     &nbsp;&nbsp;<tt>--</tt> newline <br />
+  &nbsp;<tt>\b</tt>     &nbsp;&nbsp;<tt>--</tt> backspace <br />
+  &nbsp;<tt>\t</tt>     &nbsp;&nbsp;<tt>--</tt> tab <br />
+  &nbsp;<tt>\r</tt>     &nbsp;&nbsp;<tt>--</tt> carriage return <br />
+  &nbsp;<tt>\f</tt>     &nbsp;&nbsp;<tt>--</tt> form feed <br />
+  &nbsp;<tt>\ddd</tt>   &nbsp;&nbsp;<tt>--</tt> octal ASCII code <br />
+
+Here is the precedence of the above  operators  that  have  precedence. 
+
+1234&#175;1234&#175;1234&#175;1234&#175;1234&#175;1234 
+  &nbsp;<tt>"  []  ()</tt>            &nbsp;&nbsp;&nbsp;&nbsp;Highest <br />
+  &nbsp;<tt>+  *  ?</tt>		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: <br />
+  &nbsp;<tt>concatenation</tt>	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: <br />
+  &nbsp;<tt>|</tt>                    &nbsp;&nbsp;&nbsp;&nbsp;Lowest <br />
+
+
+<div class="p"><!----></div>
+
+<dl compact="compact">
+ <dt><b>Character Classes:</b></dt>
+	<dd>  Classes of characters can be specified using
+      the  operator pair <b>[]</b>.  Within these square brackets, the operator
+      meanings are ignored except for three special characters:  <tt>\</tt>
+      and <font face="symbol">-</font
+> and <tt>^</tt>.
+
+<div class="p"><!----></div>
+<font size="-1">
+<pre>
+Rules       Interpretations
+-----       ---------------
+[^abc]      Any character except a, b, or c.
+[abc]       The single character a, b, or c.
+[-+0-9]     The - or + sign or any digit from 0 to 9.
+[\t\n\b]    The tab, newline, or backspace character.
+
+</pre>
+<font size="+0"></font></font></dd>
+ <dt><b>Arbitrary and Optional Characters:</b></dt>
+	<dd>  The dot, ".", operator 
+  matches all characters except newline.  The  operator  ?  indicates  an
+  optional character of an expression.
+
+<div class="p"><!----></div>
+<font size="-1">
+<pre>
+Rules     Interpretations
+-----     ---------------
+ab?c      Matches either abc or ac.
+ab.c      Matches all strings of length 4 having a, b and
+          c as the first, second and fourth letter where the
+          third character is not a newline.
+
+</pre>
+<font size="+0"></font></font></dd>
+ <dt><b>Repeated Expressions:</b></dt>
+	<dd>  Repetitions of classes are  indicated  by
+      the operators * and +.
+
+<div class="p"><!----></div>
+<font size="-1">
+<pre>
+Rules                  Interpretations
+-----                  ---------------
+[a-z]+                 Matches all strings of lower case letters.
+[A-Za-z][A-Za-z0-9]*   Indicates all alphanumeric strings with a
+                       leading alphabetic character.
+
+</pre>
+<font size="+0"></font></font></dd>
+ <dt><b>Alternation and Grouping:</b></dt>
+	<dd>  The operator <tt>|</tt> indicates  alternation
+      and parentheses are used for grouping complex expressions.
+
+<div class="p"><!----></div>
+<font size="-1">
+<pre>
+Rules           Interpretations
+-----           ---------------
+ab|cd           Matches either ab or cd.
+(ab|cd+)?(ef)*  Matches such strings as abefef, efefef, cdef,
+                or cddd; but not abc, abcd, or abcdef.
+
+</pre>
+<font size="+0"></font></font></dd>
+ <dt><b>Context Sensitivity:</b></dt>
+	<dd>  <i>aflex</i> will recognize a small amount of
+      surrounding context.  Two simple operators for this are <tt>^</tt> and
+      $.  If the first character of an expression is <tt>^</tt>, the expression
+      will  only  be  matched at the beginning of a line.  If the very
+      last character is $, the expression will only be matched at  the
+      end  of  a line.  
+
+<div class="p"><!----></div>
+<font size="-1">
+<pre>
+Rules          Interpretations
+-----          ---------------
+^ab            Matches ab at the beginning of line.
+ab$            Matches ab at the end of line.
+
+</pre>
+<font size="+0"></font></font></dd>
+ <dt><b>Definitions:</b></dt>
+	<dd>  The operators  { }  enclosing a name
+      specify a macro definition expansion.
+
+<div class="p"><!----></div>
+<font size="-1">
+<pre>
+Rules          Interpretations
+-----          ---------------
+{INTEGER}      If INTEGER is defined in the macro definition
+               section, then it will be expanded here.
+
+</pre>
+<font size="+0"></font></font></dd>
+</dl>
+
+<div class="p"><!----></div>
+     <h3><a name="tth_sEc4.1">
+4.1</a>&nbsp;&nbsp;Predefined Variables &amp; Routines</h3>
+<a name="routines">
+</a>
+Once a token is matched, the textual string representation of the token
+may be obtained by a call to the function <i>yytext</i> which is located
+in the <i>dfa package</i>.  This function returns type string.
+
+<div class="p"><!----></div>
+<br />The IO package contains
+routines which allow <i>yylex</i> to scan the input source file.
+These include the input, output, unput and yywrap functions
+from lex,<br />plus Open_Input, Create_Output, Close_Input and Close_Output
+provided for compatibility with <i>alex.</i>  Note that in <i>alex
+1.0</i> it was mandatory to call the <i>Open_Input</i> and <i>
+Create_Output</i> routines before calling <i>YYLex.</i>  This is not
+required in <i>Aflex.</i>  The default input and output are attached to
+the files that Ada considers to be the  standard_input and
+ standard_output. 
+
+<div class="p"><!----></div>
+The following routines must be used in lieu of the normal 
+text_io routines because of internal buffering and read-ahead done by
+<i>aflex.</i> 
+
+<div class="p"><!----></div>
+
+<dl compact="compact">
+ <dt><b>input</b></dt>
+	<dd> function input return character - inputs a character from the
+current <i>aflex</i> input stream.</dd>
+ <dt><b>unput</b></dt>
+	<dd> procedure unput(c : character) - returns a character
+already read by input to the input stream.  Note that attempting to
+push back more than one character at a time can cause <i>aflex</i> to<br />
+raise the exception  pushback_overflow.</dd>
+ <dt><b>output</b></dt>
+	<dd> procedure output(c : character) - outputs a character to the
+current <i>aflex</i> output stream.</dd>
+ <dt><b>yywrap</b></dt>
+	<dd> function yywrap return boolean - This function is
+called when <i>aflex</i> reaches the end of file.  If <i>yywrap</i>
+returns true, <i>aflex</i> continues with normal wrapup at end of
+input.  If you wish to arrange for more input to arrive from a new
+source then you provide a yywrap which returns false.  The default
+yywrap return true.</dd>
+ <dt><b>Open_Input</b></dt>
+	<dd> Open_Input(fname : in String) - Uses the file named
+fname as the source for input to <i>YYLex.</i>  If this function is not
+called then the default input is the Ada  standard_input.</dd>
+ <dt><b>Open_Input</b></dt>
+	<dd> Create_Output(fname : in String) - Uses the file named
+fname as output for <i>YYLex.</i>  If this function is not
+called then the default output is the Ada  standard_output.</dd>
+ <dt><b>Close_Input and Close_Output</b></dt>
+	<dd>  These functions have null
+bodies in <i>aflex</i> and are provided only for compatibility with
+<i>alex.</i></dd>
+</dl>
+
+<div class="p"><!----></div>
+<br />There are a few predefined subroutines that may be used once a token
+is matched.  In many lexical processing applications, the printing of
+the string returned by <i>yytext</i>, i.e. <tt>put(yytext)</tt>, is desired 
+and this action is so common that it may be written as <tt>ECHO</tt>.
+
+<div class="p"><!----></div>
+ <h2><a name="tth_sEc5">
+5</a>&nbsp;&nbsp;<i>Aflex</i> Source Specification</h2>
+<a name="specformat">
+</a>
+
+<div class="p"><!----></div>
+The general format of the source file is
+
+<div class="p"><!----></div>
+<font size="-1">
+<pre>
+    definitions section
+    %% 
+    rules section
+    %% 
+    user defined section
+    \#\#
+    user defined section
+
+</pre>
+<font size="+0">
+
+<div class="p"><!----></div>
+where <tt>%%</tt> is used as a delimiter between sections  and <tt>##</tt> 
+indicates where function <i>yylex</i> will be placed.  Both <tt>%%</tt> 
+and <tt>##</tt> <i>must</i> occur in column one.
+
+<div class="p"><!----></div>
+<br />The definitions section is used to define macros which appear in the rules 
+section and also to define start conditions.  The rules section defines the 
+regular expressions with their corresponding actions.  These regular 
+expressions, in turn, define the tokens to be identified by the scanner.
+The user defined section allows the user to define the context in which the 
+<i>yylex</i> function will be located.  The user can include routines which
+may be executed when a certain token or condition is recognized.  
+
+<div class="p"><!----></div>
+     <h3><a name="tth_sEc5.1">
+5.1</a>&nbsp;&nbsp;Definitions Section</h3>
+
+<div class="p"><!----></div>
+The definitions section may contain both macro definitions and
+start condition definitions.  Macro and start condition definitions
+must begin in column one and may be interspersed.
+
+<div class="p"><!----></div>
+      <h4><a name="tth_sEc5.1.1">
+5.1.1</a>&nbsp;&nbsp;Macros</h4>
+Macro definitions take the form:
+
+<div class="p"><!----></div>
+<font size="-1">
+<pre>
+    name   expression
+
+</pre>
+<font size="+0">
+
+<div class="p"><!----></div>
+where <tt>name</tt> must begin with a letter and contain only letters,
+digits and underscores, and <tt>expression</tt> is
+any string of characters that <tt>name</tt> will be textually substituted to 
+if found in the rule section.  At least one space must separate <tt>name</tt> 
+from <tt>expression</tt> in the definition.  No syntax checking is done in 
+the expression, instead the whole rule is parsed after expansion.
+The macro facility is very useful in writing regular expressions which
+have common substrings, and in defining often-used ranges like <i>digit</i> 
+and <i>letter</i>.
+Perhaps its best advantage is to give a mnemonic name to a rather strange
+regular expression - making it easier for the programmer to debug the
+expressions.  These macros, once defined, can be used in the
+regular expression by surrounding them with { and }, e.g., <tt>{DIGIT}</tt>.
+For example, the rule
+
+<div class="p"><!----></div>
+<font size="-1">
+<pre>
+[a-zA-Z]([0-9a-zA-Z])*   {put_line ("Found an identifier");}
+[0-9]+                   {put_line ("Found a number");}
+
+</pre>
+<font size="+0">
+
+<div class="p"><!----></div>
+defines identifiers and integer numbers.  With macros, the source file is
+
+<div class="p"><!----></div>
+<font size="-1">
+<pre>
+LETTER [a-zA-Z]
+DIGIT  [0-9]
+%%
+{LETTER}({DIGIT}|{LETTER})*   {put_line ("Found an identifier");}
+{DIGIT}+                      {put_line ("Found a number");}
+
+</pre>
+<font size="+0">
+
+<div class="p"><!----></div>
+<br />It is customary, although not necessary, to use all capital letters
+for macro names. This allows macros to be easily identified in complex rules.
+Macro names are case sensitive, e.g., <tt>{DIGIT}</tt> and <tt>{Digit}</tt> are
+two different macro names.
+
+<div class="p"><!----></div>
+      <h4><a name="tth_sEc5.1.2">
+5.1.2</a>&nbsp;&nbsp;Start Conditions</h4>
+Left context is handled in <i>aflex</i> by start conditions that are defined 
+in the macro definition section.  Start conditions are declared as follows,
+
+<div class="p"><!----></div>
+
+<pre>
+      %Start cond1 cond2 ...
+
+</pre>
+
+<div class="p"><!----></div>
+where cond1 and cond2 indicate start conditions.
+Note that %Start may be abbreviated as %S or %s.
+
+<div class="p"><!----></div>
+<br />A condition is set only when  the  <i>aflex</i>  command  <tt>ENTER</tt>  in  the
+action  part  is executed, e.g. <tt>ENTER cond1</tt>;. Thus the expression 
+which  has  the  form <tt>&lt;condition&gt;rule</tt> will only be matched 
+when <tt>condition</tt> is set.  Note that <i>aflex</i> uses <tt>ENTER</tt>
+instead of <tt>BEGIN</tt> which is used in <i>lex.</i>  This is done
+because <tt>BEGIN</tt> is a keyword in Ada.  The <tt>ENTER</tt> command must
+have parentheses surrounding its argument.
+
+<pre>
+      ENTER(cond1);
+
+</pre>
+
+<div class="p"><!----></div>
+<i>Aflex</i> also provides <i>exclusive start conditions.</i>  These are
+similar to normal start conditions except they have the property that
+when they are active no other rules are active.  Exclusive start
+conditions are declared and used like normal start conditions except
+that the declaration is done with %x instead of %s.
+
+<div class="p"><!----></div>
+     <h3><a name="tth_sEc5.2">
+5.2</a>&nbsp;&nbsp;Rules Section</h3>
+
+<div class="p"><!----></div>
+Contained in the rule section are regular expressions which define the
+format of each token to be recognized by the scanner.
+Each rule has the following format:
+
+<div class="p"><!----></div>
+
+<pre>
+pattern  {action}
+
+</pre>
+
+<div class="p"><!----></div>
+where <tt>pattern</tt> is a regular expression and <tt>action</tt> is an Ada 
+code fragment enclosed between { and }.  A <tt>pattern</tt> must 
+always begin in column one.
+
+<div class="p"><!----></div>
+<br />While a pattern defines the format of the token, the action portion
+defines
+the operation to be performed by the scanner each time the corresponding
+token is recognized.  Therefore, the user must provide a syntactically
+correct Ada code fragment.  <i>aflex</i> does not check for the validity of the
+program portion, but rather copies it to the output package and leaves it to
+the Ada compiler to detect syntax and semantics errors.  There can be more 
+than one Ada statement in the code fragment.  For example, the rule
+
+<div class="p"><!----></div>
+<font size="-1">
+<pre>
+%%
+begin|BEGIN     {copy (yytext, buffer);
+                 Install (yytext,symbol_table);
+                 return RESERVED;}
+
+</pre>
+<font size="+0">
+
+<div class="p"><!----></div>
+recognizes the reserved word "begin" or "BEGIN", copies the
+token string into the buffer, inserts it in the symbol table and returns 
+the value, RESERVED.  
+
+<div class="p"><!----></div>
+Note that the user must provide the procedures
+<tt>copy</tt> and <tt>install</tt> along with all necessary types and variables
+in the user defined section.
+
+<div class="p"><!----></div>
+     <h3><a name="tth_sEc5.3">
+5.3</a>&nbsp;&nbsp;User Defined Section</h3>
+The user defined section allows the user to specify the context surrounding
+the <i>yylex</i> function.  <tt>##</tt> is used to indicate where the 
+<i>yylex</i> function should be placed. It must be present in this 
+section and must occur in the first column.  Any text following <tt>##</tt>
+on the same line is ignored.
+
+<div class="p"><!----></div>
+ <h2><a name="tth_sEc6">
+6</a>&nbsp;&nbsp;Ambiguous Source Rules</h2>
+When a set of regular expressions is ambiguous, <i>aflex</i> uses the
+following rules to choose among the regular expressions that match
+the input.
+
+<ol type="1">
+<li> The longest string is matched.
+<div class="p"><!----></div>
+</li>
+
+<li> If the strings are of the same length, the rule given
+	  <b>first</b> is matched.
+<div class="p"><!----></div>
+</li>
+</ol>
+
+<div class="p"><!----></div>
+For example, if input <tt>"aabb"</tt> matches both <tt>"a*"</tt> and
+<tt>"aab*"</tt> the action associated with <tt>"aab*"</tt> is executed
+because it matches four as opposed to two characters.
+
+<div class="p"><!----></div>
+ <h2><a name="tth_sEc7">
+7</a>&nbsp;&nbsp;<i>Aflex</i> and <i>Ayacc</i></h2>
+<a name="alexayacc">
+</a>
+As briefly mentioned in Section <a href="#intro">1</a>, <i>aflex</i> can be integrated with
+<i>ayacc</i> to produce a parser.
+
+<div class="p"><!----></div>
+<br />Since the parser generated by <i>ayacc</i> expects a value of type <i>token</i>,
+each <i>aflex</i> rule should end with 
+
+<div class="p"><!----></div>
+
+<pre>
+     return (token_val);
+
+</pre>
+
+<div class="p"><!----></div>
+to return the appropriate token value.  <i>Ayacc</i> creates a package
+defining this token type from its specification file, which in turn 
+should be <i>with</i>'ed at the beginning of the user defined section.
+Thus, this token package must be compiled before the lexical analyzer.
+The user is encouraged to read the Ayacc User Manual [] for 
+more information on the interaction between <i>aflex</i> and <i>ayacc</i>.
+
+<div class="p"><!----></div>
+ <h2><a name="tth_sEc8">
+8</a>&nbsp;&nbsp;Appendix A: A Detailed Example</h2>
+
+<div class="p"><!----></div>
+This section shows a complete <i>aflex</i> specification file for translating all
+characters to uppercase.  The following file,
+<i>example.l</i>, defines rules for recognizing lowercase and uppercase words.
+If a word is in lowercase, the scanner converts it to uppercase.
+In addition, the frequencies of lower and uppercase words
+are retained in the two variables defined in the global section.
+All other characters (spaces, tabs, punctuation) remain the same.
+
+<div class="p"><!----></div>
+<font size="-1">
+<pre>
+LOWER    [a-z]
+UPPER    [A-Z]
+
+%%
+
+{LOWER}+       { Lower_Case := Lower_Case + 1; 
+                 TEXT_IO.PUT(To_Upper_Case(Example_DFA.YYText)); }
+
+		  -- convert all alphabetic words in lower case
+		  -- to upper case
+
+{UPPER}+       { Upper_Case := Upper_Case + 1;
+                 TEXT_IO.PUT(Example_DFA.YYText); }
+
+		  -- write uppercase word as is
+
+\n             { TEXT_IO.NEW_LINE;}
+
+.              { TEXT_IO.PUT(Example_DFA.YYText); }
+                 -- write anything else as is
+
+%%
+with U_Env;  -- VADS environment package for UNIX
+procedure Example is
+
+  type Token is (End_of_Input, Error);
+
+  Tok        : Token;
+  Lower_Case : NATURAL := 0;   -- frequency of lower case words
+  Upper_Case : NATURAL := 0;   -- frequency of upper case words
+
+  function To_Upper_Case (Word : STRING) return STRING is
+  Temp : STRING(1..Word'LENGTH);
+  begin
+    for i in 1.. Word'LENGTH loop
+      Temp(i) := CHARACTER'VAL(CHARACTER'POS(Word(i)) - 32); 
+    end loop;
+    return Temp;
+  end To_Upper_Case;
+  
+
+-- function YYlex will go here!!
+##
+
+
+begin  -- Example
+
+  Example_IO.Open_Input     (U_Env.argv(1).s);
+
+  Read_Input :
+  loop
+    Tok := YYLex;
+    exit Read_Input
+      when Tok = End_of_Input;
+  end loop Read_Input;
+
+  TEXT_IO.NEW_LINE;
+  TEXT_IO.PUT_LINE("Number of lowercase words is =&#62; " &amp; 
+		   INTEGER'IMAGE(Lower_Case));
+  TEXT_IO.PUT_LINE("Number of uppercase words is =&#62; " &amp; 
+		   INTEGER'IMAGE(Upper_Case));
+end Example;
+
+</pre>
+<font size="+0">
+
+<div class="p"><!----></div>
+This source file is run through <i>aflex</i> using the command
+
+<div class="p"><!----></div>
+<font size="-1">
+<pre>
+% aflex example.l
+
+</pre>
+<font size="+0">
+
+<div class="p"><!----></div>
+<i>aflex</i> produces an output file called <i>example.a</i>
+along with two packages, <i>example_dfa.a</i> and <i>example_io.a</i>.
+Assuming that the main procedure, <i>Example</i>, is used to construct
+an object file called <i>example.out</i>, the Unix command
+
+<div class="p"><!----></div>
+<font size="-1">
+<pre>
+% example.out example.l
+
+</pre>
+<font size="+0">
+
+<div class="p"><!----></div>
+prints to the screen the exact file <i>example.l</i> with letters in 
+uppercase, i.e. the output to the screen is
+
+<div class="p"><!----></div>
+<font size="-1">
+<pre>
+LOWER    [A-Z]
+UPPER    [A-Z]
+
+%%
+
+{LOWER}+       { LOWER_CASE := LOWER_CASE + 1; 
+                 TEXT_IO.PUT(TO_UPPER_CASE(EXAMPLE_DFA.YYTEXT)); }
+
+		  -- CONVERT ALL ALPHABETIC WORDS IN LOWER CASE
+		  -- TO UPPER CASE
+
+{UPPER}+       { UPPER_CASE := UPPER_CASE + 1;
+                 TEXT_IO.PUT(EXAMPLE_DFA.YYTEXT); }
+
+		  -- WRITE UPPERCASE WORD AS IS
+
+\N             { TEXT_IO.NEW_LINE;}
+
+.              { TEXT_IO.PUT(EXAMPLE_DFA.YYTEXT); }
+                 -- WRITE ANYTHING ELSE AS IS
+
+%%
+WITH U_ENV;  -- VADS ENVIRONMENT PACKAGE FOR UNIX
+PROCEDURE EXAMPLE IS
+
+  TYPE TOKEN IS (END_OF_INPUT, ERROR);
+
+  TOK        : TOKEN;
+  LOWER_CASE : NATURAL := 0;   -- FREQUENCY OF LOWER CASE WORDS
+  UPPER_CASE : NATURAL := 0;   -- FREQUENCY OF UPPER CASE WORDS
+
+  FUNCTION TO_UPPER_CASE (WORD : STRING) RETURN STRING IS
+  TEMP : STRING(1..WORD'LENGTH);
+  BEGIN
+    FOR I IN 1.. WORD'LENGTH LOOP
+      TEMP(I) := CHARACTER'VAL(CHARACTER'POS(WORD(I)) - 32); 
+    END LOOP;
+    RETURN TEMP;
+  END TO_UPPER_CASE;
+  
+
+-- FUNCTION YYLEX WILL GO HERE!!
+##
+
+
+BEGIN  -- EXAMPLE
+
+  EXAMPLE_IO.OPEN_INPUT     (U_ENV.ARGV(1).S);
+
+  READ_INPUT :
+  LOOP
+    TOK := YYLEX;
+    EXIT READ_INPUT
+      WHEN TOK = END_OF_INPUT;
+  END LOOP READ_INPUT;
+
+  TEXT_IO.NEW_LINE;
+  TEXT_IO.PUT_LINE("NUMBER OF LOWERCASE WORDS IS =&#62; " &amp; 
+		   INTEGER'IMAGE(LOWER_CASE));
+  TEXT_IO.PUT_LINE("NUMBER OF UPPERCASE WORDS IS =&#62; " &amp; 
+		   INTEGER'IMAGE(UPPER_CASE));
+END EXAMPLE;
+Number of lowercase words is =&#62;  144
+Number of uppercase words is =&#62;  120
+
+</pre>
+<font size="+0">
+
+<div class="p"><!----></div>
+ <h2><a name="tth_sEc9">
+9</a>&nbsp;&nbsp;Appendix B: <i>Aflex</i> Dependencies</h2>
+
+<div class="p"><!----></div>
+This release of <i>aflex</i> was successfully compiled by VADS 5.5 and
+Telesoft 1.3a.01 running under Sun Unix 4.0.3.  Other 
+machines/systems may support <i>aflex</i> but have not been tested.
+
+<div class="p"><!----></div>
+     <h3><a name="tth_sEc9.1">
+9.1</a>&nbsp;&nbsp;Command Line Interface</h3>
+The following files are host dependent : 
+
+1234&#175;1234&#175;1234&#175;1234&#175;1234&#175;1234 
+    &nbsp;&nbsp;<i>command_lineS.a</i><br />
+    &nbsp;&nbsp;<i>command_lineB.a</i><br />
+    &nbsp;&nbsp;<i>file_managerS.a</i><br />
+    &nbsp;&nbsp;<i>file_managerB.a</i><br />
+
+The command_line package function  initialize_command_line
+breaks up the command line into a vector containing
+the arguments passed to the program.  Note that modifications may need
+to be made to this file if the host system doesn't allow differentiation
+of upper and lower case on the command line.
+<br />
+The external_file_manager package is host dependent in that it chooses
+the names and suffixes for the generated files.  It also sets up the
+file_type  standard_error to allow error output to appear on the
+screen.
+
+<div class="p"><!----></div>
+<br />If <i>aflex</i> is to be rehosted, only these files should need modification.
+For more detailed information see the file PORTING in the <i>aflex</i>
+distribution.
+
+
+ <h2><a name="tth_sEc10">
+10</a>&nbsp;&nbsp;Appendix C: Differences between <i>Aflex</i> and <i>Lex</i></h2>
+<a name="lexdiff">
+</a>
+
+<div class="p"><!----></div>
+Although <i>aflex</i> supports most of the
+conventions and features of <i>lex</i>, there are some differences
+that the user should be aware of in order to port a <i>lex</i> specification
+to an <i>aflex</i> specification.
+
+<div class="p"><!----></div>
+
+<ul>
+<li> Source file's format:
+   <font size="-1">
+   
+<pre>
+       definitions section
+       %% 
+       rules section
+       %% 
+       user defined section
+       ## -- places yylex function
+       user defined section
+   
+</pre>
+   <font size="+0"></font></font>
+<div class="p"><!----></div>
+</li>
+
+<li> Although <i>aflex</i> supports most <i>lex</i>'s constructs, it does not
+	implement the following features of <i>lex</i>.
+
+1234&#175;1234&#175;1234&#175;1234&#175;1234&#175;1234 
+   &nbsp;- REJECT <br />
+   &nbsp;- %x &nbsp;&nbsp;&nbsp;-  changes to the internal array sizes, but see below.
+ 
+<div class="p"><!----></div>
+</li>
+
+<li>  Ada style comments are supported instead of C style comments.
+<div class="p"><!----></div>
+</li>
+
+<li>  All template files are internalized.
+<div class="p"><!----></div>
+</li>
+
+<li>  The input source file name must end with a ".l" extension.
+<div class="p"><!----></div>
+</li>
+
+<li>	In start conditions ENTER is used instead of BEGIN.  This is
+	done because BEGIN is a keyword in Ada.
+<div class="p"><!----></div>
+</li>
+</ul>
+
+<div class="p"><!----></div>
+ <h2><a name="tth_sEc11">
+11</a>&nbsp;&nbsp;Appendix D: Differences between <i>Aflex</i> and <i>Alex</i></h2>
+<a name="alexdiff">
+</a>
+While <i>aflex</i> is intended to be upwardly compatible with <i>
+Alex</i>, there are a few minor differences.  Any major inconsistencies
+with <i>alex</i> should be considered bugs and reported.
+
+<ul>
+<li>  The <tt>ENTER</tt> calls must have parentheses around their
+arguments.  Parentheses were optional in <i>alex.</i>
+<div class="p"><!----></div>
+</li>
+
+<li>  It is no longer mandatory to call Open_Input and Create_Output
+before calling YYLex.  Previously if output was to be directed to
+Standard_Output it was recommended that a call of
+
+<pre>
+Create_Output("/dev/tty");
+
+</pre>
+be made.  This will still work but because of differences in
+implementation this may cause difficulties in redirecting output using
+the  unix shell pipes and redirection.  Instead just don't call
+Open_Input and output will go to the default  standard_output.
+<div class="p"><!----></div>
+</li>
+
+<li>	Compilation order.  In previous versions of <i>alex</i> the DFA
+and IO packages could be compiled in any order.  With <i>aflex</i> it
+is necessary to compile the DFA package first, because it contains
+declarations used by the IO package.
+<div class="p"><!----></div>
+</li>
+</ul>
+
+<div class="p"><!----></div>
+ <h2><a name="tth_sEc12">
+12</a>&nbsp;&nbsp;Appendix E: Known Bugs and Limitations</h2>
+
+<ul>
+<li> Some trailing context
+patterns cannot be properly matched and generate
+warning messages ("Dangerous trailing context").  These are
+patterns where the ending of the
+first part of the rule matches the beginning of the second
+part, such as "zx*/xy*", where the 'x*' matches the 'x' at
+the beginning of the trailing context.  (Lex doesn't get these
+patterns right either.)
+<div class="p"><!----></div>
+</li>
+
+<li> <i>variable</i>
+trailing context (where both the leading and trailing parts do not have
+a fixed length) entails a substantial performance loss.
+<div class="p"><!----></div>
+</li>
+
+<li> For some trailing context rules, parts which are actually
+fixed-length are not recognized as such, leading to the abovementioned
+performance loss.  In particular, parts using ' - ' or n are always
+considered variable-length.
+<div class="p"><!----></div>
+</li>
+
+<li> Nulls are not allowed in aflex inputs or in the inputs to
+scanners generated by aflex.  Their presence generates fatal
+errors.
+<div class="p"><!----></div>
+</li>
+
+<li> Pushing back definitions enclosed in ()'s can <br />result in nasty,
+difficult-to-understand problems like:
+
+<pre>
+
+	{DIG}  [0-9] -- a digit
+
+
+</pre>
+In which the pushed-back text is "([0-9] - a digit)".
+<div class="p"><!----></div>
+</li>
+
+<li> Due to both buffering of input and read-ahead, you cannot intermix
+calls to text_io routines, such as, for example,
+<b>text_io.get()</b>
+with aflex rules and expect it to work.  Call
+<b>input()</b>
+instead.
+<div class="p"><!----></div>
+</li>
+
+<li> There are still more features that could be 
+implemented (especially REJECT.)  Also the speed of the compressed
+scanners could be improved.
+<div class="p"><!----></div>
+</li>
+
+<li> The utility needs more complete documentation, especially more
+information on modifying the internals.
+<div class="p"><!----></div>
+</li>
+</ul>
+
+<div class="p"><!----></div>
+</font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font><hr /><h3>Footnotes:</h3>
+
+<div class="p"><!----></div>
+<a name="tthFtNtAAB"></a><a href="#tthFrefAAB"><sup>1</sup></a>This work was supported in
+part by the National Science Foundation under grants CCR-8704311
+and CCR-8451421 with cooperation from the Defense Advanced Research
+Projects Agency, and by the National Science Foundation under Award
+No. CCR-8521398.
+<br /><br /><hr /><small>File translated from
+T<sub><font size="-1">E</font></sub>X
+by <a href="http://hutchinson.belmont.ma.us/tth/">
+T<sub><font size="-1">T</font></sub>H</a>,
+version 3.56.<br />On 24 Jan 2004, 00:36.</small>
+</html>

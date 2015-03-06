@@ -1,0 +1,2 @@
+a amk 'a.make -v -C "ada -e" aflex'
+a ckup 'a.make -V aflex'

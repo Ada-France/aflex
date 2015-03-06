@@ -1,0 +1,66 @@
+# USAGE: you must type 'source compile' and run with csh
+# compile shell script for aflex
+# set the following to match the requirements of your system
+# NOTE: This version is for the Verdix 6.0.3 compiler, which seems to
+# have an optmizer bug.
+
+COMPILER="/usr/lib/cmplrs/vads_6.1.0/bin/ada -E -O0 -v "
+LINKER="a.ld"
+
+#note: if you have a different suffix for Ada programs the script
+#change_suffix will do it automatically on a Unix system.
+
+ADA_SUFFIX=".a"
+
+set verbose
+# compile the vstrings package
+$COMPILER vstringS$ADA_SUFFIX    
+$COMPILER vstringB$ADA_SUFFIX
+
+# compile instantiations
+$COMPILER tstrings$ADA_SUFFIX
+$COMPILER file_strings$ADA_SUFFIX
+$COMPILER int_io$ADA_SUFFIX    
+
+$COMPILER misc_defsS$ADA_SUFFIX
+$COMPILER parse_goto$ADA_SUFFIX  
+$COMPILER nfaS$ADA_SUFFIX  
+$COMPILER mainS$ADA_SUFFIX  
+$COMPILER -O0 ascan_dfa$ADA_SUFFIX  
+$COMPILER template_managerS$ADA_SUFFIX  
+$COMPILER file_managerS$ADA_SUFFIX    
+$COMPILER parse_shift_reduce$ADA_SUFFIX  
+$COMPILER -O0 ascan_io$ADA_SUFFIX
+$COMPILER skeleton_managerS$ADA_SUFFIX
+$COMPILER command_lineS$ADA_SUFFIX
+$COMPILER command_lineB$ADA_SUFFIX
+$COMPILER dfaS$ADA_SUFFIX
+$COMPILER cclS$ADA_SUFFIX
+$COMPILER parse_tokens$ADA_SUFFIX
+$COMPILER genS$ADA_SUFFIX
+$COMPILER miscS$ADA_SUFFIX
+$COMPILER template_managerB$ADA_SUFFIX
+$COMPILER file_managerB$ADA_SUFFIX
+$COMPILER miscB$ADA_SUFFIX
+$COMPILER aflex$ADA_SUFFIX
+$COMPILER cclB$ADA_SUFFIX
+$COMPILER misc_defsB$ADA_SUFFIX
+$COMPILER tblcmpS$ADA_SUFFIX
+$COMPILER skeleton_managerB$ADA_SUFFIX
+$COMPILER ecsS$ADA_SUFFIX
+$COMPILER tblcmpB$ADA_SUFFIX
+$COMPILER -O0 dfaB$ADA_SUFFIX
+$COMPILER nfaB$ADA_SUFFIX
+$COMPILER ecsB$ADA_SUFFIX
+$COMPILER symS$ADA_SUFFIX
+$COMPILER -O0 ascan$ADA_SUFFIX
+$COMPILER aflex_scanner$ADA_SUFFIX
+$COMPILER parse$ADA_SUFFIX
+$COMPILER mainB$ADA_SUFFIX
+$COMPILER genB$ADA_SUFFIX
+$COMPILER symB$ADA_SUFFIX
+
+$LINKER aflex
+
+unset verbose
+

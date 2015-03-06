@@ -1,0 +1,10 @@
+This directory contains changes to let aflex compile under Alsys V5 on
+a  SPARCstation.  These changes were contributed by Rolf EBERT
+<re@spinoza.enpc.fr> of Groupe Informatique Systemes Energetiques at the
+Ecole Nationale des Ponts et Chaussees.
+
+Problems have been reported with the makefile in the alsys_sparc port,
+however the Alsys make program is supposed to work.  The generated
+scanners reference STANDARD_ERROR, so you need to set this up in
+your own code.
+

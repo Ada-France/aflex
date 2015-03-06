@@ -1,0 +1,40 @@
+#!/bin/sh 
+# Receipt for porting aflex to GNAT  on UNIX-boxes. Changed files
+# have been put in directory gant_unix.
+# In aflex/src the script tognat is
+# to be called, which calls gnatchop for *.a. gnatchop konverts
+# program files to a  form need by GNAT. 
+# Be sure gnatchop and gnatmake are in your path.
+
+# When using alfex it will generate *.a files. Therefore use tognat
+# to prepare aflex's output for GNATMAKE.
+#
+# During porting I fixed a bug, it now seems to work, but I
+# give no warranty. It works with GNAT 3.10p (or higher I  guess). 
+# Some other Versions wouldn't do some initializations. Of course 
+# the test with ascan.l won't be ok...
+# 
+#
+# For porting Aflex to GNAT on UNIX do then  following (assumed
+# you are in aflex/src/gnat_unix):
+#
+
+
+# creating backupdir in src
+cd ..; 
+# 
+mkdir bu
+# 
+cp ./* bu  
+
+# copy changed files into src
+cp gnat_unix/*.a . 
+
+#
+./gnat_unix/tognat
+#
+gnatmake aflex
+
+
+# hope that helps, cheers, 
+#          lohmi@acm.org   ,  Team Ada

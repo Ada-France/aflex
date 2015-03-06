@@ -1,0 +1,4 @@
+This directory contains changes to let aflex compile under Alsys on
+a PC running DOS.  These changes were contributed by 
+Sriram Sankar at Stanford <sankar@cs.stanford.edu>
+

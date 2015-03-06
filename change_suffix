@@ -1,0 +1,11 @@
+#!/bin/sh
+# shell script to change the suffix on files
+# usage : change_suffix X Y
+# e.g. change_suffix .a .ada
+# this will rename all files ending in .a to the equivalent names
+# but with the .a replaced by .ada
+
+for i in *$1 ; do
+	echo mv $i `basename $i $1`$2
+	mv $i `basename $i $1`$2
+done

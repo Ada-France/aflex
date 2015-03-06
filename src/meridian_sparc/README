@@ -1,0 +1,4 @@
+This directory contains changes to let aflex compile under Meridian on
+a Sparc.  These changes were contributed by 
+Andrew Dunstan of the University of Adelaide <andrewd@cs.adelaide.edu.au>
+
