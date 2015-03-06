@@ -42,8 +42,7 @@ package DFA is
   procedure EPSCLOSURE(T                  : in out INT_PTR;
                        NS_ADDR            : in out INTEGER;
                        ACCSET             : in     INT_PTR;
-                       NACC_ADDR, HV_ADDR : out INTEGER;
-                       RESULT             : out INT_PTR);
+                       NACC_ADDR, HV_ADDR : out INTEGER);
 
   procedure INCREASE_MAX_DFAS;
 

@@ -229,8 +229,7 @@ package body DFA is
   procedure EPSCLOSURE(T                  : in out INT_PTR;
                        NS_ADDR            : in out INTEGER;
                        ACCSET             : in     INT_PTR;
-                       NACC_ADDR, HV_ADDR : out INTEGER;
-                       RESULT             : out INT_PTR) is
+                       NACC_ADDR, HV_ADDR : out INTEGER) is
     NS, TSP                                      : INTEGER;
     NUMSTATES, NACC, HASHVAL, TRANSSYM, NFACCNUM : INTEGER;
     STKEND                                       : INTEGER;
@@ -370,7 +369,6 @@ package body DFA is
     HV_ADDR := HASHVAL;
     NACC_ADDR := NACC;
 
-    RESULT := T;
   end EPSCLOSURE;
 
 
@@ -490,7 +488,7 @@ package body DFA is
         NSET(NUMSTATES) := NFA.MKBRANCH(SCBOL(CNT/2), SCSET(CNT/2));
       end if;
 
-      DFA.EPSCLOSURE(NSET, NUMSTATES, ACCSET, NACC, HASHVAL, NSET);
+      DFA.EPSCLOSURE(NSET, NUMSTATES, ACCSET, NACC, HASHVAL);
 
       SNSTODS(NSET, NUMSTATES, ACCSET, NACC, HASHVAL, DS, SNSRESULT);
       if SNSRESULT then
@@ -542,7 +540,7 @@ package body DFA is
           if (DUPLIST(SYM) = NIL) then
           -- symbol has unique out-transitions
             NUMSTATES := SYMFOLLOWSET(DSET, DSIZE, SYM, NSET);
-            DFA.EPSCLOSURE(NSET, NUMSTATES, ACCSET, NACC, HASHVAL, NSET);
+            DFA.EPSCLOSURE(NSET, NUMSTATES, ACCSET, NACC, HASHVAL);
 
             SNSTODS(NSET, NUMSTATES, ACCSET, NACC, HASHVAL, NEWDS, SNSRESULT);
             if SNSRESULT then
