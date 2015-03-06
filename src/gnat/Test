@@ -1,5 +1,0 @@
-
-aflex ../../doc/test95.l
-gnatchop -pqrw test95*.a
-gnatmake test_aflex
-

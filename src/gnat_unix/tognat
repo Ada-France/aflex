@@ -1,8 +1,0 @@
-#!/bin/sh
-for I
-  in `ls *.a`; do
-#  ls -l $I;
-  echo "gnatchopping $I...";
-  gnatchop -w $I 
-done
-
