@@ -22,13 +22,13 @@
 -- NOTES This package opens external files, and thus may be system dependent
 --       because of limitations on file names.
 --       This version is for the VADS 5.5 Ada development system.
--- $Header: /co/ua/self/arcadia/aflex/ada/src/RCS/file_managerS.a,v 1.4 90/01/12 15:20:00 self Exp Locker: self $ 
+-- $Header: /co/ua/self/arcadia/aflex/ada/src/RCS/file_managerS.a,v 1.4 90/01/12 15:20:00 self Exp Locker: self $
 
-with TEXT_IO; use TEXT_IO; 
-package EXTERNAL_FILE_MANAGER is 
-  procedure GET_IO_FILE(F : in out FILE_TYPE); 
-  procedure GET_DFA_FILE(F : in out FILE_TYPE); 
-  procedure GET_SCANNER_FILE(F : in out FILE_TYPE); 
-  procedure GET_BACKTRACK_FILE(F : in out FILE_TYPE); 
-  procedure INITIALIZE_FILES; 
-end EXTERNAL_FILE_MANAGER; 
+with TEXT_IO; use TEXT_IO;
+package EXTERNAL_FILE_MANAGER is
+  procedure GET_IO_FILE(F : in out FILE_TYPE; Spec : in Boolean);
+  procedure GET_DFA_FILE(F : in out FILE_TYPE; Spec : in Boolean);
+  procedure GET_SCANNER_FILE(F : in out FILE_TYPE; Spec : in Boolean);
+  procedure GET_BACKTRACK_FILE(F : in out FILE_TYPE);
+  procedure INITIALIZE_FILES;
+end EXTERNAL_FILE_MANAGER;
