@@ -699,7 +699,7 @@ VSTR("")
   procedure GENERATE_DFA_FILE is
     DFA_OUT_FILE : FILE_TYPE;
   begin
-    EXTERNAL_FILE_MANAGER.GET_DFA_FILE(DFA_OUT_FILE);
+    EXTERNAL_FILE_MANAGER.GET_DFA_FILE(DFA_OUT_FILE, True);
     Text_IO.PUT_LINE(DFA_OUT_FILE, "pragma Style_Checks (Off);");
     Text_IO.PUT_LINE(DFA_OUT_FILE, "package " & MISC.PACKAGE_NAME &
       "_dfa is");
@@ -713,7 +713,10 @@ VSTR("")
     end if;
     TEMPLATE_OUT(DFA_OUT_FILE, DFA_TEMPLATE, DFA_CURRENT_LINE);
     Text_IO.PUT_LINE(DFA_OUT_FILE, "end " & MISC.PACKAGE_NAME & "_dfa;"
-      );
+                    );
+    Text_IO.Close(DFA_OUT_FILE);
+
+    EXTERNAL_FILE_MANAGER.GET_DFA_FILE(DFA_OUT_FILE, False);
     Text_IO.NEW_LINE(DFA_OUT_FILE);
     Text_IO.PUT_LINE(DFA_OUT_FILE, "pragma Style_Checks (Off);");
     Text_IO.PUT(DFA_OUT_FILE, "with " & MISC.PACKAGE_NAME & "_dfa" &
@@ -729,7 +732,7 @@ VSTR("")
   procedure GENERATE_IO_FILE is
     IO_OUT_FILE : FILE_TYPE;
   begin
-    EXTERNAL_FILE_MANAGER.GET_IO_FILE(IO_OUT_FILE);
+    EXTERNAL_FILE_MANAGER.GET_IO_FILE(IO_OUT_FILE, True);
     Text_IO.PUT_LINE(IO_OUT_FILE, "pragma Style_Checks (Off);");
     Text_IO.PUT(IO_OUT_FILE, "with " & MISC.PACKAGE_NAME & "_dfa; ");
     Text_IO.PUT_LINE(IO_OUT_FILE, "use " & MISC.PACKAGE_NAME & "_dfa; ");
@@ -739,6 +742,9 @@ VSTR("")
     TEMPLATE_OUT(IO_OUT_FILE, IO_TEMPLATE, IO_CURRENT_LINE);
     Text_IO.PUT_LINE(IO_OUT_FILE, "end " & MISC.PACKAGE_NAME & "_io;")
       ;
+    Text_IO.Close(IO_OUT_FILE);
+
+    EXTERNAL_FILE_MANAGER.GET_IO_FILE(IO_OUT_FILE, False);
     Text_IO.NEW_LINE(IO_OUT_FILE);
     Text_IO.PUT_LINE(IO_OUT_FILE, "pragma Style_Checks (Off);");
     Text_IO.PUT_LINE(IO_OUT_FILE, "package body " & MISC.PACKAGE_NAME
