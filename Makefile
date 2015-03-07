@@ -25,6 +25,7 @@ autobuild:
 # Clean the root project of all build products.
 clean:
 	-$(GNATCLEAN) -q -P "$(GPRPATH)"
+	-rm -rf tests
 
 # Check *all* sources for errors, even those not changed.
 # Does not build executables.
@@ -38,3 +39,22 @@ install:
 	$(INSTALL_PROGRAM) bin/aflex ${bindir}
 	$(INSTALL) doc/aflex.man $(mandir)/man1/aflex.1
 
+
+# Targets to rebuild some files from ascan.l and parse.y
+lexer:	  bin/aflex
+	cd src && ../bin/aflex ascan.l
+
+test:
+	mkdir -p tests
+	cp src/ascan.l tests/ascan.l
+	cd tests && ../bin/aflex ascan.l
+	@echo -n "Checking generated body..."
+	@(cd tests && cmp ascan.adb ../src/ascan.adb && echo "OK") || (echo "FAILED")
+	@echo -n "Checking generated DFA spec..."
+	@(cd tests && cmp ascan_dfa.ads ../src/ascan_dfa.ads && echo "OK") || (echo "FAILED")
+	@echo -n "Checking generated DFA body..."
+	@(cd tests && cmp ascan_dfa.adb ../src/ascan_dfa.adb && echo "OK") || (echo "FAILED")
+	@echo -n "Checking generated IO spec..."
+	@(cd tests && cmp ascan_io.ads ../src/ascan_io.ads && echo "OK") || (echo "FAILED")
+	@echo -n "Checking generated IO body..."
+	@(cd tests && cmp ascan_io.adb ../src/ascan_io.adb && echo "OK") || (echo "FAILED")
