@@ -20,7 +20,7 @@ UPPER    [A-Z]
                  -- write anything else as is
 
 %%
-with U_Env;  -- VADS environment package for UNIX
+with Ada.Command_Line;
 procedure Example is
 
   type Token is (End_of_Input, Error);
@@ -45,7 +45,7 @@ procedure Example is
 
 begin  -- Example
 
-  Example_IO.Open_Input     (U_Env.argv(1).s);
+  Example_IO.Open_Input     (Ada.Command_Line.Argument (1));
 
   Read_Input :
   loop
