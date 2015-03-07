@@ -27,7 +27,7 @@ with MISC_DEFS, MISC, COMMAND_LINE_INTERFACE, ECS, TEXT_IO, PARSER;
 with MAIN_BODY, TSTRING, PARSE_TOKENS, SKELETON_MANAGER, EXTERNAL_FILE_MANAGER;
 with INT_IO; use MISC_DEFS, COMMAND_LINE_INTERFACE,
   TSTRING, EXTERNAL_FILE_MANAGER, text_io;
-
+with Ada.Text_IO;
 package body MAIN_BODY is
 
 package nat_io is new integer_io(natural); use nat_io; -- CvdL: gnat/gnarl
@@ -242,6 +242,26 @@ package nat_io is new integer_io(natural); use nat_io; -- CvdL: gnat/gnarl
     end if;
   end AFLEXEND;
 
+   --  Print aflex usage.
+   procedure Usage is
+      use Ada.Text_IO;
+   begin
+      Put_Line (Standard_Error, "Usage: aflex [-bdfipstvEILT] [-Sskeleton] [filename]");
+      Put_Line (Standard_Error, "-b         Generate backtracking information");
+      Put_Line (Standard_Error, "-d         Generate the scanner with debug mode");
+      Put_Line (Standard_Error, "-f         Don't compress the scanner tables");
+      Put_Line (Standard_Error, "-i         Generate case-insensitive scanner");
+      Put_Line (Standard_Error, "-p         Generate performance report on standard error");
+      Put_Line (Standard_Error, "-s         Suppress the default rule to ECHO unmached text");
+      Put_Line (Standard_Error, "-t         Write the scanner output on standard output");
+      Put_Line (Standard_Error, "-v         Write summary of scanner statistics");
+      Put_Line (Standard_Error, "-E         Generate additional information about tokens for ayacc");
+      Put_Line (Standard_Error, "-I         Generate an interactive scanner");
+      Put_Line (Standard_Error, "-L         Do not generate #line directives");
+      Put_Line (Standard_Error, "-T         Run in trace mode");
+      Put_Line (Standard_Error, "-Sskeleton Specify the skeleton file");
+   end Usage;
+
   -- aflexinit - initialize aflex
 
   procedure AFLEXINIT is
@@ -331,6 +351,7 @@ package nat_io is new integer_io(natural); use nat_io; -- CvdL: gnat/gnarl
         Ayacc_Extension_Flag := TRUE;
 -- END OF UMASS CODES.
       when others =>
+        Usage;
         MISC.AFLEXERROR("unknown flag " & CHAR(ARG, FLAG_POS));
     end case;
     FLAG_POS := FLAG_POS + 1;
