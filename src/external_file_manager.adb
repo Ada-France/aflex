@@ -22,76 +22,80 @@
 -- NOTES This package opens external files, and thus may be system dependent
 --       because of limitations on file names.
 --       This version is for the VADS 5.5 Ada development system.
--- $Header: /co/ua/self/arcadia/aflex/ada/src/RCS/file_managerB.a,v 1.5 90/01/12 15:19:58 self Exp Locker: self $ 
+-- $Header: /co/ua/self/arcadia/aflex/ada/src/RCS/file_managerB.a,v 1.5 90/01/12 15:19:58 self Exp Locker: self $
 
-with MISC_DEFS, TSTRING, MISC; use MISC_DEFS, TSTRING, MISC; 
+with MISC_DEFS, TSTRING, MISC; use MISC_DEFS, TSTRING, MISC;
 
-package body EXTERNAL_FILE_MANAGER is 
+package body EXTERNAL_FILE_MANAGER is
 
 -- FIX comment about compiler dependent
 
-  subtype SUFFIX_TYPE is STRING(1 .. 1); 
+  subtype SUFFIX_TYPE is STRING(1 .. 3);
 
-  function ADA_SUFFIX return SUFFIX_TYPE is 
-  begin
-    return "a"; 
-  end ADA_SUFFIX; 
+   function ADA_SUFFIX(Spec : in Boolean) return SUFFIX_TYPE is
+   begin
+      if Spec then
+         return "ads";
+      else
+         return "adb";
+      end if;
+   end ADA_SUFFIX;
 
-  procedure GET_IO_FILE(F : in out FILE_TYPE) is 
+  procedure GET_IO_FILE(F : in out FILE_TYPE; Spec : in Boolean) is
   begin
-    if (LEN(INFILENAME) /= 0) then 
-      CREATE(F, OUT_FILE, STR(MISC.BASENAME) & "_io." & ADA_SUFFIX); 
-    else 
-      CREATE(F, OUT_FILE, "aflex_yy_io." & ADA_SUFFIX); 
-    end if; 
+    if (LEN(INFILENAME) /= 0) then
+      CREATE(F, OUT_FILE, STR(MISC.BASENAME) & "_io." & ADA_SUFFIX (Spec));
+    else
+      CREATE(F, OUT_FILE, "aflex_yy_io." & ADA_SUFFIX (Spec));
+    end if;
   exception
-    when USE_ERROR | NAME_ERROR => 
-      MISC.AFLEXFATAL("could not create IO package file"); 
-  end GET_IO_FILE; 
+    when USE_ERROR | NAME_ERROR =>
+      MISC.AFLEXFATAL("could not create IO package file");
+  end GET_IO_FILE;
 
-  procedure GET_DFA_FILE(F : in out FILE_TYPE) is 
+  procedure GET_DFA_FILE(F : in out FILE_TYPE; Spec : in Boolean) is
   begin
-    if (LEN(INFILENAME) /= 0) then 
-      CREATE(F, OUT_FILE, STR(MISC.BASENAME) & "_dfa." & ADA_SUFFIX); 
-    else 
-      CREATE(F, OUT_FILE, "aflex_yy_dfa." & ADA_SUFFIX); 
-    end if; 
+    if (LEN(INFILENAME) /= 0) then
+      CREATE(F, OUT_FILE, STR(MISC.BASENAME) & "_dfa." & ADA_SUFFIX (Spec));
+    else
+      CREATE(F, OUT_FILE, "aflex_yy_dfa." & ADA_SUFFIX (Spec));
+    end if;
   exception
-    when USE_ERROR | NAME_ERROR => 
-      MISC.AFLEXFATAL("could not create DFA package file"); 
-  end GET_DFA_FILE; 
+    when USE_ERROR | NAME_ERROR =>
+      MISC.AFLEXFATAL("could not create DFA package file");
+  end GET_DFA_FILE;
 
-  procedure GET_SCANNER_FILE(F : in out FILE_TYPE) is 
-    OUTFILE_NAME : VSTRING; 
+  procedure GET_SCANNER_FILE(F : in out FILE_TYPE; Spec : in Boolean) is
+    OUTFILE_NAME : VSTRING;
   begin
-    if (LEN(INFILENAME) /= 0) then 
+    if (LEN(INFILENAME) /= 0) then
 
       -- give out infile + ada_suffix
-      OUTFILE_NAME := MISC.BASENAME & "." & ADA_SUFFIX; 
-    else 
-      OUTFILE_NAME := VSTR("aflex_yy." & ADA_SUFFIX); 
-    end if; 
+      OUTFILE_NAME := MISC.BASENAME & "." & ADA_SUFFIX(Spec);
+    else
+      OUTFILE_NAME := VSTR("aflex_yy." & ADA_SUFFIX(Spec));
+    end if;
 
-    CREATE(F, OUT_FILE, STR(OUTFILE_NAME)); 
-    SET_OUTPUT(F); 
+    CREATE(F, OUT_FILE, STR(OUTFILE_NAME));
+    SET_OUTPUT(F);
   exception
-    when NAME_ERROR | USE_ERROR => 
-      MISC.AFLEXFATAL("can't create scanner file " & OUTFILE_NAME); 
-  end GET_SCANNER_FILE; 
+    when NAME_ERROR | USE_ERROR =>
+      MISC.AFLEXFATAL("can't create scanner file " & OUTFILE_NAME);
+  end GET_SCANNER_FILE;
 
-  procedure GET_BACKTRACK_FILE(F : in out FILE_TYPE) is 
+  procedure GET_BACKTRACK_FILE(F : in out FILE_TYPE) is
   begin
-    CREATE(F, OUT_FILE, "aflex.backtrack"); 
+    CREATE(F, OUT_FILE, "aflex.backtrack");
   exception
-    when USE_ERROR | NAME_ERROR => 
-      MISC.AFLEXFATAL("could not create backtrack file"); 
-  end GET_BACKTRACK_FILE; 
+    when USE_ERROR | NAME_ERROR =>
+      MISC.AFLEXFATAL("could not create backtrack file");
+  end GET_BACKTRACK_FILE;
 
-  procedure INITIALIZE_FILES is 
+  procedure INITIALIZE_FILES is
   begin
-    null; 
+    null;
 
   -- doesn't need to do anything on Verdix
-  end INITIALIZE_FILES; 
+  end INITIALIZE_FILES;
 
-end EXTERNAL_FILE_MANAGER; 
+end EXTERNAL_FILE_MANAGER;
