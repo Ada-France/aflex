@@ -21,6 +21,9 @@
 -- DESCRIPTION
 -- NOTES contains functions used in various places throughout aflex.
 -- $Header: /co/ua/self/arcadia/aflex/ada/src/RCS/miscS.a,v 1.9 90/01/12 15:20:19 self Exp Locker: self $
+--
+-- 2004/10/16 Thierry Bernier
+-- + Add support for Ada95 parent/child units
 
 with MISC_DEFS, TSTRING, TEXT_IO;
 package MISC is
@@ -64,5 +67,8 @@ package MISC is
   function ISDIGIT(C : in CHARACTER) return BOOLEAN;
   function TOLOWER(C : in INTEGER) return INTEGER;
   function BASENAME return VSTRING;
+  procedure SET_UNITNAME (STR : in VSTRING);
+  function UNITNAME return VSTRING;
   function PACKAGE_NAME return STRING;
+  procedure SET_FILENAME (STR : in VSTRING);
 end MISC;
