@@ -20,9 +20,10 @@
 -- AUTHOR: John Self (UCI)
 -- DESCRIPTION outputs skeleton sections when called by gen.
 -- NOTES allows use of internal or external skeleton
--- $Header: /co/ua/self/arcadia/aflex/ada/src/RCS/skeleton_managerS.a,v 1.3 90/01/12 15:20:38 self Exp Locker: self $ 
+-- $Header: /co/ua/self/arcadia/aflex/ada/src/RCS/skeleton_managerS.a,v 1.3 90/01/12 15:20:38 self Exp Locker: self $
 
-package SKELETON_MANAGER is 
-  procedure SKELOUT; 
-  procedure SET_EXTERNAL_SKELETON; 
-end SKELETON_MANAGER; 
+package SKELETON_MANAGER is
+   procedure Initialize (Use_Text_IO : in Boolean);
+  procedure SKELOUT;
+  procedure SET_EXTERNAL_SKELETON;
+end SKELETON_MANAGER;
