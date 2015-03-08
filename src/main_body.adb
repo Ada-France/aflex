@@ -244,6 +244,8 @@ package nat_io is new integer_io(natural); use nat_io; -- CvdL: gnat/gnarl
    --  Print aflex usage.
    procedure Usage is
    begin
+      Put_Line (Standard_Error, "aflex version 1.4a.2015");
+      Put_Line (Standard_Error, "");
       Put_Line (Standard_Error, "Usage: aflex [-bdfipstvEILT] [-Sskeleton] [filename]");
       Put_Line (Standard_Error, "-b         Generate backtracking information");
       Put_Line (Standard_Error, "-d         Generate the scanner with debug mode");
