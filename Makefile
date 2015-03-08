@@ -43,7 +43,7 @@ install:
 # Targets to rebuild some files from ascan.l and parse.y
 lexer:	  bin/aflex
 	cd src && ../bin/aflex -i ascan.l
-	cd src && mv ascan.adb ascan.a && gnatchop -w ascan.a
+	cd src && gnatchop -w ascan.ada
 
 parser:
 	cd src && ayacc -s -n 300 -e .ada parse.y
@@ -52,8 +52,7 @@ parser:
 test:
 	mkdir -p tests
 	cp src/ascan.l tests/ascan.l
-	cd tests && ../bin/aflex -i ascan.l && mv ascan.adb ascan.a \
-	   && gnatchop -w ascan.a
+	cd tests && ../bin/aflex -i ascan.l && gnatchop -w ascan.ada
 	@echo -n "Checking generated spec..."
 	@(cd tests && cmp scanner.ads ../src/scanner.ads && echo "OK") || (echo "FAILED")
 	@echo -n "Checking generated body..."
