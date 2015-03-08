@@ -28,7 +28,7 @@ with SCANNER, SKELETON_MANAGER; use MISC_DEFS, TEXT_IO,
 
 package body GEN is 
   INDENT_LEVEL : INTEGER := 0;  -- each level is 4 spaces
-
+  INDENT_BASE  : NATURAL := 3;
   MAX_SHORT    : constant INTEGER := 32767;
  
   procedure INDENT_UP is
@@ -50,13 +50,8 @@ package body GEN is
   -- indent to the current level
 
   procedure DO_INDENT is 
-    I : INTEGER := INDENT_LEVEL*4; 
+    I : INTEGER := INDENT_LEVEL * INDENT_BASE; 
   begin
-    while I >= 8 loop
-      TEXT_IO.PUT(ASCII.HT); 
-      I := I - 8; 
-    end loop; 
-
     while I > 0 loop
       TEXT_IO.PUT(' '); 
       I := I - 1; 
@@ -582,7 +577,7 @@ package body GEN is
     -- output YYLex code up to part about tables.
     end if; 
 
-    TEXT_IO.PUT("YY_END_OF_BUFFER : constant := "); 
+    INDENT_PUTS("YY_END_OF_BUFFER : constant := "); 
     INT_IO.PUT(NUM_RULES + 1, 1); 
     TEXT_IO.PUT_LINE(";"); 
 
@@ -606,20 +601,25 @@ package body GEN is
     RESET(TEMP_ACTION_FILE, IN_FILE); 
 
     -- generate code for yy_get_previous_state
-    SET_INDENT(1); 
+    -- SET_INDENT(3); 
     SKELETON_MANAGER.SKELOUT; 
 
+    INDENT_UP;
+    INDENT_UP;
     if (BOL_NEEDED) then 
-      INDENT_PUTS("yy_bp : Integer := yytext_ptr;"); 
+      INDENT_UP;
+      INDENT_PUTS("yy_bp : constant Integer := yytext_ptr;");
+      INDENT_DOWN;
     end if; 
     SKELETON_MANAGER.SKELOUT; 
 
-    GEN_START_STATE; 
+    INDENT_UP;
+    GEN_START_STATE;
     SKELETON_MANAGER.SKELOUT; 
     GEN_NEXT_STATE; 
     SKELETON_MANAGER.SKELOUT; 
 
-    SET_INDENT(2); 
+    --  SET_INDENT(4); 
 
     INDENT_PUTS("yy_bp := yy_cp;"); 
 
@@ -628,10 +628,11 @@ package body GEN is
 
     SKELETON_MANAGER.SKELOUT; 
 
-    SET_INDENT(3); 
+    -- SET_INDENT(3); 
     GEN_FIND_ACTION; 
 
-    SET_INDENT(1); 
+    -- SET_INDENT(1);
+    INDENT_DOWN;
     SKELETON_MANAGER.SKELOUT; 
 
     INDENT_UP; 
@@ -645,9 +646,9 @@ package body GEN is
       if not SCEOF(I) then 
         DO_INDENT; 
         if not DID_EOF_RULE then 
-          TEXT_IO.PUT("when "); 
+          INDENT_PUTS("when "); 
         else 
-          TEXT_IO.PUT_LINE("|"); 
+          TEXT_IO.PUT_LINE("| "); 
         end if; 
         TEXT_IO.PUT("YY_END_OF_BUFFER + "); 
         TSTRING.PUT(SCNAME(I)); 
