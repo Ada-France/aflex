@@ -52,9 +52,12 @@ parser:
 test:
 	mkdir -p tests
 	cp src/ascan.l tests/ascan.l
-	cd tests && ../bin/aflex ascan.l
+	cd tests && ../bin/aflex -i ascan.l && mv ascan.adb ascan.a \
+	   && gnatchop -w ascan.a
+	@echo -n "Checking generated spec..."
+	@(cd tests && cmp scanner.ads ../src/scanner.ads && echo "OK") || (echo "FAILED")
 	@echo -n "Checking generated body..."
-	@(cd tests && cmp ascan.adb ../src/ascan.adb && echo "OK") || (echo "FAILED")
+	@(cd tests && cmp scanner.adb ../src/scanner.adb && echo "OK") || (echo "FAILED")
 	@echo -n "Checking generated DFA spec..."
 	@(cd tests && cmp ascan_dfa.ads ../src/ascan_dfa.ads && echo "OK") || (echo "FAILED")
 	@echo -n "Checking generated DFA body..."
