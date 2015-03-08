@@ -510,29 +510,10 @@ yy_chk : constant array(0..948) of Short :=
          yy_c_buf_p := yytext_ptr;
          yy_hold_char := yy_ch_buf(yy_c_buf_p);
          yy_init := false;
-         -- UMASS CODES :
-         --   Initialization
-         tok_begin_line := 1;
-         tok_end_line := 1;
-         tok_begin_col := 0;
-         tok_end_col := 0;
-         token_at_end_of_line := false;
-         line_number_of_saved_tok_line1 := 0;
-         line_number_of_saved_tok_line2 := 0;
-         -- END OF UMASS CODES.
       end if; -- yy_init
 
       loop                -- loops until end-of-file is reached
 
-         -- UMASS CODES :
-         --    if last matched token is end_of_line, we must
-         --    update the token_end_line and reset tok_end_col.
-         if Token_At_End_Of_Line then
-            Tok_End_Line := Tok_End_Line + 1;
-            Tok_End_Col := 0;
-            Token_At_End_Of_Line := False;
-         end if;
-         -- END OF UMASS CODES.
 
          yy_cp := yy_c_buf_p;
 
@@ -578,19 +559,6 @@ end if;
             Text_IO.Put_Line (Standard_Error, "(""" & yytext & """)");
          end if;
 
-         -- UMASS CODES :
-         --   Update tok_begin_line, tok_end_line, tok_begin_col and tok_end_col
-         --   after matching the token.
-         if yy_act /= YY_END_OF_BUFFER and then yy_act /= 0 then
-            -- Token are matched only when yy_act is not yy_end_of_buffer or 0.
-            Tok_Begin_Line := Tok_End_Line;
-            Tok_Begin_Col := Tok_End_Col + 1;
-            Tok_End_Col := Tok_Begin_Col + yy_cp - yy_bp - 1;
-            if yy_ch_buf ( yy_bp ) = ASCII.LF then
-               Token_At_End_Of_Line := True;
-            end if;
-         end if;
-         -- END OF UMASS CODES.
 
    <<do_action>>   -- this label is used only to access EOF actions
             case yy_act is
