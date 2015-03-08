@@ -29,15 +29,15 @@
 %token USCDECL UNAME
 %token NEWLINE
 
-%with TEXT_IO
-%with ccl
-%with NFA
-%with Parse_Shift_Reduce
-%with Parse_Goto
-%with misc_defs
-%use misc_defs
-%with external_file_manager
-%use external_file_manager
+-- %with TEXT_IO
+-- %with ccl
+-- %with NFA
+-- %with Parse_Shift_Reduce
+-- %with Parse_Goto
+-- %with misc_defs
+-- %use misc_defs
+-- %with external_file_manager
+-- %use external_file_manager
 
 {
   subtype YYSType is Integer;
@@ -616,11 +616,6 @@ string		:  string CHAR
 
 %%
 
-with Parse_Tokens, Parse_Goto, Parse_Shift_Reduce, Text_IO, scanner;
-with NFA, ccl, misc, misc_defs, sym, ecs, aflex_scanner;
-with tstring, int_io, main_body, text_io, external_file_manager;
-use aflex_scanner, external_file_manager;
-
 package parser is
   procedure build_eof_action;
   procedure yyerror(msg: string);
@@ -628,9 +623,16 @@ package parser is
   def_rule:integer;
 end parser;
 
+with ascan_io;
+with Parse_Tokens, Parse_Goto, Parse_Shift_Reduce, Text_IO, scanner;
+with NFA, ccl, misc, misc_defs, sym, ecs, aflex_scanner;
+with tstring, int_io, main_body, text_io, external_file_manager;
+use aflex_scanner, external_file_manager;
 package body parser is
 -- build_eof_action - build the "<<EOF>>" action for the active start
 --                    conditions
+
+   package Parse_IO renames Ascan_IO;
 
 use text_io, misc_defs;
 procedure build_eof_action is
