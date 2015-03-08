@@ -71,7 +71,7 @@ package body EXTERNAL_FILE_MANAGER is
     if (LEN(INFILENAME) /= 0) then
 
       -- give out infile + ada_suffix
-      OUTFILE_NAME := MISC.BASENAME & "." & ADA_SUFFIX(Spec);
+      OUTFILE_NAME := MISC.BASENAME & ".ada";
     else
       OUTFILE_NAME := VSTR("aflex_yy." & ADA_SUFFIX(Spec));
     end if;
