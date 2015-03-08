@@ -34,6 +34,7 @@ package nat_io is new integer_io(natural); use nat_io; -- CvdL: gnat/gnarl
 
   AFLEX_VERSION      : CONSTANT STRING := "1.4a";
   STARTTIME, ENDTIME : VSTRING;
+  MINIMALIST_WITH : BOOLEAN := FALSE;
 
   -- aflexend - terminate aflex
   --
@@ -246,11 +247,12 @@ package nat_io is new integer_io(natural); use nat_io; -- CvdL: gnat/gnarl
    begin
       Put_Line (Standard_Error, "aflex version 1.4a.2015");
       Put_Line (Standard_Error, "");
-      Put_Line (Standard_Error, "Usage: aflex [-bdfipstvEILT] [-Sskeleton] [filename]");
+      Put_Line (Standard_Error, "Usage: aflex [-bdfimpstvEILT] [-Sskeleton] [filename]");
       Put_Line (Standard_Error, "-b         Generate backtracking information");
       Put_Line (Standard_Error, "-d         Generate the scanner with debug mode");
       Put_Line (Standard_Error, "-f         Don't compress the scanner tables");
       Put_Line (Standard_Error, "-i         Generate case-insensitive scanner");
+      Put_Line (Standard_Error, "-m         Minimalist with clauses (do not emit a with Text_IO)");
       Put_Line (Standard_Error, "-p         Generate performance report on standard error");
       Put_Line (Standard_Error, "-s         Suppress the default rule to ECHO unmached text");
       Put_Line (Standard_Error, "-t         Write the scanner output on standard output");
@@ -272,7 +274,7 @@ package nat_io is new integer_io(natural); use nat_io; -- CvdL: gnat/gnarl
     FLAG_POS               : INTEGER;
     ARG                    : VSTRING;
     SKELNAME               : VSTRING;
-    SKELNAME_USED          : BOOLEAN := FALSE;
+      SKELNAME_USED          : BOOLEAN := FALSE;
   begin
     PRINTSTATS := FALSE;
     SYNTAXERROR := FALSE;
@@ -322,7 +324,9 @@ package nat_io is new integer_io(natural); use nat_io; -- CvdL: gnat/gnarl
       when 'I' =>
         INTERACTIVE := TRUE;
       when 'i' =>
-        CASEINS := TRUE;
+               CASEINS := TRUE;
+               when 'm' =>
+                  MINIMALIST_WITH := TRUE;
       when 'L' =>
         GEN_LINE_DIRS := FALSE;
       when 'p' =>
@@ -368,7 +372,9 @@ package nat_io is new integer_io(natural); use nat_io; -- CvdL: gnat/gnarl
       MISC.AFLEXERROR("full table and -I are (currently) incompatible");
     end if;
 
-    --initialize the statistics
+      SKELETON_MANAGER.Initialize (not MINIMALIST_WITH);
+
+      --initialize the statistics
     STARTTIME := MISC.AFLEX_GETTIME;
 
     if ARG_CNT < ARGC then
@@ -485,11 +491,13 @@ package nat_io is new integer_io(natural); use nat_io; -- CvdL: gnat/gnarl
   -- readin - read in the rules section of the input file(s)
   procedure READIN is
   begin
-    SKELETON_MANAGER.SKELOUT;
---      TEXT_IO.PUT("with " & MISC.PACKAGE_NAME & "_dfa" & "; ");
---      TEXT_IO.PUT_LINE("use " & MISC.PACKAGE_NAME & "_dfa" & "; ");
---      TEXT_IO.PUT("with " & MISC.PACKAGE_NAME & "_io" & "; ");
---      TEXT_IO.PUT_LINE("use " & MISC.PACKAGE_NAME & "_io" & "; ");
+      SKELETON_MANAGER.SKELOUT;
+      if not MINIMALIST_WITH then
+         TEXT_IO.PUT("with " & MISC.PACKAGE_NAME & "_dfa" & "; ");
+         TEXT_IO.PUT_LINE("use " & MISC.PACKAGE_NAME & "_dfa" & "; ");
+         TEXT_IO.PUT("with " & MISC.PACKAGE_NAME & "_io" & "; ");
+         TEXT_IO.PUT_LINE("use " & MISC.PACKAGE_NAME & "_io" & "; ");
+      end if;
     MISC.LINE_DIRECTIVE_OUT;
 
     PARSER.YYPARSE;
