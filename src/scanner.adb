@@ -50,7 +50,8 @@ package body scanner is
 
       -- returned upon end-of-file
       YY_END_TOK : constant Integer := 0;
-YY_END_OF_BUFFER : constant := 84;
+YY_END_OF_BUFFER : constant := 
+84;
 subtype yy_state_type is Integer;
 yy_current_state : yy_state_type;
 INITIAL : constant := 0;
@@ -450,26 +451,26 @@ yy_chk : constant array(0..948) of Short :=
       function yy_get_previous_state return yy_state_type is
          yy_current_state : yy_state_type;
          yy_c : short;
-    yy_bp : Integer := yytext_ptr;
+         yy_bp : constant Integer := yytext_ptr;
       begin
-    yy_current_state := yy_start;
-    if yy_ch_buf(yy_bp-1) = ASCII.LF then
-	yy_current_state := yy_current_state + 1;
-    end if;
+         yy_current_state := yy_start;
+         if yy_ch_buf(yy_bp-1) = ASCII.LF then
+            yy_current_state := yy_current_state + 1;
+         end if;
 
-         for yy_cp in yytext_ptr..yy_c_buf_p - 1 loop
-	yy_c := yy_ec(yy_ch_buf(yy_cp));
-	if yy_accept(yy_current_state) /= 0 then
-	    yy_last_accepting_state := yy_current_state;
-	    yy_last_accepting_cpos := yy_cp;
-	end if;
-	while yy_chk(yy_base(yy_current_state) + yy_c) /= yy_current_state loop
-	    yy_current_state := yy_def(yy_current_state);
-	    if ( yy_current_state >= 214 ) then
-		yy_c := yy_meta(yy_c);
-	    end if;
-	end loop;
-	yy_current_state := yy_nxt(yy_base(yy_current_state) + yy_c);
+         for yy_cp in yytext_ptr .. yy_c_buf_p - 1 loop
+            yy_c := yy_ec(yy_ch_buf(yy_cp));
+            if yy_accept(yy_current_state) /= 0 then
+               yy_last_accepting_state := yy_current_state;
+               yy_last_accepting_cpos := yy_cp;
+            end if;
+            while yy_chk(yy_base(yy_current_state) + yy_c) /= yy_current_state loop
+               yy_current_state := yy_def(yy_current_state);
+               if ( yy_current_state >= 214 ) then
+                  yy_c := yy_meta(yy_c);
+               end if;
+            end loop;
+            yy_current_state := yy_nxt(yy_base(yy_current_state) + yy_c);
          end loop;
 
          return yy_current_state;
@@ -509,10 +510,29 @@ yy_chk : constant array(0..948) of Short :=
          yy_c_buf_p := yytext_ptr;
          yy_hold_char := yy_ch_buf(yy_c_buf_p);
          yy_init := false;
+         -- UMASS CODES :
+         --   Initialization
+         tok_begin_line := 1;
+         tok_end_line := 1;
+         tok_begin_col := 0;
+         tok_end_col := 0;
+         token_at_end_of_line := false;
+         line_number_of_saved_tok_line1 := 0;
+         line_number_of_saved_tok_line2 := 0;
+         -- END OF UMASS CODES.
       end if; -- yy_init
 
       loop                -- loops until end-of-file is reached
 
+         -- UMASS CODES :
+         --    if last matched token is end_of_line, we must
+         --    update the token_end_line and reset tok_end_col.
+         if Token_At_End_Of_Line then
+            Tok_End_Line := Tok_End_Line + 1;
+            Tok_End_Col := 0;
+            Token_At_End_Of_Line := False;
+         end if;
+         -- END OF UMASS CODES.
 
          yy_cp := yy_c_buf_p;
 
@@ -521,34 +541,34 @@ yy_chk : constant array(0..948) of Short :=
 
          -- yy_bp points to the position in yy_ch_buf of the start of the
          -- current run.
-	yy_bp := yy_cp;
-	yy_current_state := yy_start;
-	if yy_ch_buf(yy_bp-1) = ASCII.LF then
-	    yy_current_state := yy_current_state + 1;
-	end if;
-	loop
-		yy_c := yy_ec(yy_ch_buf(yy_cp));
-		if yy_accept(yy_current_state) /= 0 then
-		    yy_last_accepting_state := yy_current_state;
-		    yy_last_accepting_cpos := yy_cp;
-		end if;
-		while yy_chk(yy_base(yy_current_state) + yy_c) /= yy_current_state loop
-		    yy_current_state := yy_def(yy_current_state);
-		    if ( yy_current_state >= 214 ) then
-			yy_c := yy_meta(yy_c);
-		    end if;
-		end loop;
-		yy_current_state := yy_nxt(yy_base(yy_current_state) + yy_c);
-	    yy_cp := yy_cp + 1;
+         yy_bp := yy_cp;
+         yy_current_state := yy_start;
+         if yy_ch_buf(yy_bp-1) = ASCII.LF then
+            yy_current_state := yy_current_state + 1;
+         end if;
+         loop
+               yy_c := yy_ec(yy_ch_buf(yy_cp));
+               if yy_accept(yy_current_state) /= 0 then
+                  yy_last_accepting_state := yy_current_state;
+                  yy_last_accepting_cpos := yy_cp;
+               end if;
+               while yy_chk(yy_base(yy_current_state) + yy_c) /= yy_current_state loop
+                  yy_current_state := yy_def(yy_current_state);
+                  if ( yy_current_state >= 214 ) then
+                     yy_c := yy_meta(yy_c);
+                  end if;
+               end loop;
+               yy_current_state := yy_nxt(yy_base(yy_current_state) + yy_c);
+            yy_cp := yy_cp + 1;
 if ( yy_current_state = 213 ) then
     exit;
 end if;
-	end loop;
-	yy_cp := yy_last_accepting_cpos;
-	yy_current_state := yy_last_accepting_state;
+         end loop;
+         yy_cp := yy_last_accepting_cpos;
+         yy_current_state := yy_last_accepting_state;
 
    <<next_action>>
-	    yy_act := yy_accept(yy_current_state);
+         yy_act := yy_accept(yy_current_state);
          YY_DO_BEFORE_ACTION;
          YY_USER_ACTION;
 
@@ -558,15 +578,28 @@ end if;
             Text_IO.Put_Line (Standard_Error, "(""" & yytext & """)");
          end if;
 
+         -- UMASS CODES :
+         --   Update tok_begin_line, tok_end_line, tok_begin_col and tok_end_col
+         --   after matching the token.
+         if yy_act /= YY_END_OF_BUFFER and then yy_act /= 0 then
+            -- Token are matched only when yy_act is not yy_end_of_buffer or 0.
+            Tok_Begin_Line := Tok_End_Line;
+            Tok_Begin_Col := Tok_End_Col + 1;
+            Tok_End_Col := Tok_Begin_Col + yy_cp - yy_bp - 1;
+            if yy_ch_buf ( yy_bp ) = ASCII.LF then
+               Token_At_End_Of_Line := True;
+            end if;
+         end if;
+         -- END OF UMASS CODES.
 
    <<do_action>>   -- this label is used only to access EOF actions
             case yy_act is
-		when 0 => -- must backtrack
-		-- undo the effects of YY_DO_BEFORE_ACTION
-		yy_ch_buf(yy_cp) := yy_hold_char;
-		yy_cp := yy_last_accepting_cpos;
-		yy_current_state := yy_last_accepting_state;
-		goto next_action;
+            when 0 => -- must backtrack
+            -- undo the effects of YY_DO_BEFORE_ACTION
+            yy_ch_buf(yy_cp) := yy_hold_char;
+            yy_cp := yy_last_accepting_cpos;
+            yy_current_state := yy_last_accepting_state;
+            goto next_action;
 
 
 
@@ -1128,21 +1161,22 @@ when 82 =>
 when 83 => 
 --# line 382 "ascan.l"
 ECHO;
-when YY_END_OF_BUFFER + INITIAL + 1 |
-YY_END_OF_BUFFER + SECT2 + 1 |
-YY_END_OF_BUFFER + SECT3 + 1 |
-YY_END_OF_BUFFER + PICKUPDEF + 1 |
-YY_END_OF_BUFFER + SC + 1 |
-YY_END_OF_BUFFER + CARETISBOL + 1 |
-YY_END_OF_BUFFER + NUM + 1 |
-YY_END_OF_BUFFER + QUOTE + 1 |
-YY_END_OF_BUFFER + FIRSTCCL + 1 |
-YY_END_OF_BUFFER + CCL + 1 |
-YY_END_OF_BUFFER + ACTION + 1 |
-YY_END_OF_BUFFER + RECOVER + 1 |
-YY_END_OF_BUFFER + BRACEERROR + 1 |
+when 
+YY_END_OF_BUFFER + INITIAL + 1 | 
+YY_END_OF_BUFFER + SECT2 + 1 | 
+YY_END_OF_BUFFER + SECT3 + 1 | 
+YY_END_OF_BUFFER + PICKUPDEF + 1 | 
+YY_END_OF_BUFFER + SC + 1 | 
+YY_END_OF_BUFFER + CARETISBOL + 1 | 
+YY_END_OF_BUFFER + NUM + 1 | 
+YY_END_OF_BUFFER + QUOTE + 1 | 
+YY_END_OF_BUFFER + FIRSTCCL + 1 | 
+YY_END_OF_BUFFER + CCL + 1 | 
+YY_END_OF_BUFFER + ACTION + 1 | 
+YY_END_OF_BUFFER + RECOVER + 1 | 
+YY_END_OF_BUFFER + BRACEERROR + 1 | 
 YY_END_OF_BUFFER + ACTION_STRING + 1 => 
-    return End_Of_Input;
+   return End_Of_Input;
                 when YY_END_OF_BUFFER =>
                     -- undo the effects of YY_DO_BEFORE_ACTION
                     yy_ch_buf(yy_cp) := yy_hold_char;
@@ -1151,7 +1185,6 @@ YY_END_OF_BUFFER + ACTION_STRING + 1 =>
 
                     case yy_get_next_buffer is
                         when EOB_ACT_END_OF_FILE =>
-                            begin
                             if yywrap then
                                 -- note: because we've taken care in
                                 -- yy_get_next_buffer() to have set up yytext,
@@ -1171,7 +1204,7 @@ YY_END_OF_BUFFER + ACTION_STRING + 1 =>
                                 yy_init := true;
                                 goto new_file;
                             end if;
-                            end;
+
                         when EOB_ACT_RESTART_SCAN =>
                             yy_c_buf_p := yytext_ptr;
                             yy_hold_char := yy_ch_buf(yy_c_buf_p);
@@ -1182,8 +1215,10 @@ YY_END_OF_BUFFER + ACTION_STRING + 1 =>
                             yy_cp := yy_c_buf_p;
                             yy_bp := yytext_ptr;
                             goto next_action;
-                        when others => null;
-                        end case; -- case yy_get_next_buffer()
+                        when others =>
+                           null;
+                    end case; -- case yy_get_next_buffer()
+
                 when others =>
                     Text_IO.put( "action # " );
                     Text_IO.put( INTEGER'IMAGE(yy_act) );
@@ -1191,7 +1226,7 @@ YY_END_OF_BUFFER + ACTION_STRING + 1 =>
                     raise AFLEX_INTERNAL_ERROR;
             end case; -- case (yy_act)
         end loop; -- end of loop waiting for end of file
-end YYLex;
+   end YYLex;
 --# line 382 "ascan.l"
    begin
 
