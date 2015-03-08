@@ -484,10 +484,10 @@ package nat_io is new integer_io(natural); use nat_io; -- CvdL: gnat/gnarl
   procedure READIN is
   begin
     SKELETON_MANAGER.SKELOUT;
-    TEXT_IO.PUT("with " & MISC.PACKAGE_NAME & "_dfa" & "; ");
-    TEXT_IO.PUT_LINE("use " & MISC.PACKAGE_NAME & "_dfa" & "; ");
-    TEXT_IO.PUT("with " & MISC.PACKAGE_NAME & "_io" & "; ");
-    TEXT_IO.PUT_LINE("use " & MISC.PACKAGE_NAME & "_io" & "; ");
+--      TEXT_IO.PUT("with " & MISC.PACKAGE_NAME & "_dfa" & "; ");
+--      TEXT_IO.PUT_LINE("use " & MISC.PACKAGE_NAME & "_dfa" & "; ");
+--      TEXT_IO.PUT("with " & MISC.PACKAGE_NAME & "_io" & "; ");
+--      TEXT_IO.PUT_LINE("use " & MISC.PACKAGE_NAME & "_io" & "; ");
     MISC.LINE_DIRECTIVE_OUT;
 
     PARSER.YYPARSE;
