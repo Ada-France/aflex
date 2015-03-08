@@ -43,11 +43,11 @@ install:
 # Targets to rebuild some files from ascan.l and parse.y
 lexer:	  bin/aflex
 	cd src && ../bin/aflex -mi ascan.l
-	cd src && gnatchop -w ascan.ada
+	cd src && gnatchop -w ascan.ada && rm ascan.ada
 
 parser:
 	cd src && ayacc -s -n 300 -e .ada parse.y
-	cd src && gnatchop -w parse.ada
+	cd src && gnatchop -w parse.ada && rm parse.ada
 
 test:
 	mkdir -p tests
