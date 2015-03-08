@@ -1,4 +1,4 @@
-.TH AFLEX 1 "10 March 1994" "Version 1.4"
+.TH AFLEX 1 "March 2015" "Version 1.4a.2015"
 .SH NAME
 aflex - fast lexical analyzer generator for Ada
 .SH SYNOPSIS
@@ -316,11 +316,18 @@ All template files are internalized.
 The input source file must end with a ".l" extension.
 .SH FILES
 .TP
+.IR filename _io.ads
+.TP
+.IR filename _io.adb
+.TP
+.IR filename _dfa.ads
+.TP
+.IR filename _dfa.adb
 The names of the files containing the generated scanner, IO,
 and DFA packages are based on the basename of the input file.
 For example if the input file is called scan.l then the
-scanner file is called scan.a, the DFA package is in scan_dfa.a, and
-scan_io.a is the IO package file.  All of these file names may be changed
+scanner file is called \fIscan.ada\fR, the DFA package is in \fIscan_dfa.ads\fR, and
+\fIscan_io.ads\fR is the IO package file.  All of these file names may be changed
 by modifying the external_file_manager package (see the porting notes
 for more information.)
 .TP
@@ -328,8 +335,7 @@ for more information.)
 backtracking information for
 .B -b
 .SH "SEE ALSO"
-.LP
-lex(1)
+.BR lex (1)
 .LP
 M. E. Lesk and E. Schmidt,
 .I LEX - Lexical Analyzer Generator.
