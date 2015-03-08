@@ -1,4 +1,5 @@
 
+pragma Warnings (Off);
 with Ada.Text_Io;
 with misc_defs, misc, sym, parse_tokens, int_io;
 with tstring, ascan_dfa, ascan_io;
