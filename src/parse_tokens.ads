@@ -1,19 +1,22 @@
+pragma Style_Checks (Off);
 package Parse_Tokens is
 
-    subtype YYSType is Integer;
+
+  subtype YYSType is Integer;
 
     YYLVal, YYVal : YYSType; 
     type Token is
         (End_Of_Input, Error, Char, Number,
          Sectend, Scdecl, Xscdecl,
          Whitespace, Name, Prevccl,
-         Eof_Op, Newline, '^',
-         '<', '>', ',',
-         '$', '|', '/',
-         '*', '+', '?',
-         '{', '}', '.',
-         '"', '(', ')',
-         '[', ']', '-' );
+         Eof_Op, Uscdecl, Uname,
+         Newline, '^', '<',
+         '>', ',', '$',
+         '|', '/', '*',
+         '+', '?', '{',
+         '}', '.', '"',
+         '(', ')', '[',
+         ']', '-' );
 
     Syntax_Error : exception;
 

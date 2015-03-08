@@ -1,3 +1,4 @@
+
 package parser is
   procedure build_eof_action;
   procedure yyerror(msg: string);
