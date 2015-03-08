@@ -4,7 +4,7 @@ aflex - fast lexical analyzer generator for Ada
 .SH SYNOPSIS
 .B aflex
 [
-.B -bdfipstvEILT -Sskeleton_file
+.B -bdfimpstvEILT -Sskeleton_file
 ] [ 
 .I filename
 ]
@@ -80,6 +80,14 @@ be ignored, and the rules will be matched regardless of case.  The
 matched text given in
 .I yytext
 will have the preserved case (i.e., it will not be folded).
+.TP
+.B -m
+minimalist with clause.  When the
+.B -m
+option is passed, the
+.B Ada.Text_IO
+package, the DFA and IO packages are not with'ed from the main
+generated lexer.
 .TP
 .B -p
 generates a performance report to stderr.  The report
