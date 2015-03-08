@@ -637,7 +637,7 @@ package body parser is
 use text_io, misc_defs;
 procedure build_eof_action is
 begin
-    text_io.put( temp_action_file, "when " );
+    text_io.put( temp_action_file, "   when " );
     for i in 1..actvp loop
 	if ( sceof(actvsc(i)) ) then
 	    text_io.put( Standard_Error,
