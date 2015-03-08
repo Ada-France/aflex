@@ -1,39 +1,47 @@
 
+with Ada.Text_Io;
+with misc_defs, misc, sym, parse_tokens, int_io;
+with tstring, ascan_dfa, ascan_io;
+use misc_defs, parse_tokens, tstring;
+use ascan_dfa, ascan_io;
 package body scanner is
 
-beglin : boolean := false;
-i, bracelevel: integer;
+   use Ada;
+   use Ada.Text_IO;
 
-function get_token return Token is
-    toktype : Token;
-    didadef, indented_code : boolean;
-    cclval : integer;
-    nmdefptr : vstring;
-    nmdef, tmpbuf : vstring;
+   beglin : boolean := false;
+   i, bracelevel: integer;
 
-procedure ACTION_ECHO is
-begin
-    text_io.put( temp_action_file, yytext(1..YYLength) );
-end ACTION_ECHO;
+   function get_token return Token is
+      toktype : Token;
+      didadef, indented_code : boolean;
+      cclval : integer;
+      nmdefptr : vstring;
+      nmdef, tmpbuf : vstring;
 
-procedure MARK_END_OF_PROLOG is
-begin
-     text_io.put( temp_action_file, "%%%% end of prolog" );
-     text_io.new_line( temp_action_file );
-end MARK_END_OF_PROLOG;
+      procedure ACTION_ECHO is
+      begin
+         Ada.Text_IO.Put( temp_action_file, yytext(1..YYLength) );
+      end ACTION_ECHO;
 
-procedure PUT_BACK_STRING(str : vstring; start : integer) is
-begin
-	for i in reverse start+1..tstring.len(str) loop
-	    unput( CHAR(str,i) );
-	end loop;
-end PUT_BACK_STRING;
+      procedure MARK_END_OF_PROLOG is
+      begin
+         Ada.Text_IO.Put (temp_action_file, "%%%% end of prolog");
+         Ada.Text_IO.New_Line (temp_action_file);
+      end MARK_END_OF_PROLOG;
 
-function check_yylex_here return boolean is
-begin
-	return ( (yytext'length >= 2) and then
-			((yytext(1) = '#') and (yytext(2) = '#')));
-end check_yylex_here;
+      procedure PUT_BACK_STRING(str : vstring; start : integer) is
+      begin
+	     for i in reverse start+1..tstring.len(str) loop
+	        unput( CHAR(str,i) );
+         end loop;
+      end PUT_BACK_STRING;
+
+      function check_yylex_here return boolean is
+      begin
+	     return ( (yytext'length >= 2) and then
+		        ((yytext(1) = '#') and (yytext(2) = '#')));
+      end check_yylex_here;
 
    function YYLex return Token is
       subtype Short is Integer range -32768..32767;
@@ -545,9 +553,9 @@ end if;
          YY_USER_ACTION;
 
          if aflex_debug then  -- output acceptance info. for (-d) debug mode
-            Text_IO.put( Standard_Error, "--accepting rule #" );
-            Text_IO.put( Standard_Error, INTEGER'IMAGE(yy_act) );
-            Text_IO.put_line( Standard_Error, "(""" & yytext & """)");
+            Text_IO.Put (Standard_Error, "--accepting rule #");
+            Text_IO.Put (Standard_Error, INTEGER'IMAGE(yy_act));
+            Text_IO.Put_Line (Standard_Error, "(""" & yytext & """)");
          end if;
 
 
@@ -604,12 +612,12 @@ when 8 =>
 when 9 => 
 --# line 73 "ascan.l"
 
-			text_io.put( Standard_Error, "old-style lex command at line " );
+			Ada.Text_IO.Put( Standard_Error, "old-style lex command at line " );
 			int_io.put( Standard_Error, linenum );
-			text_io.put( Standard_Error, " ignored:" );
+			Ada.Text_IO.Put( Standard_Error, " ignored:" );
 			text_io.new_line( Standard_Error );
-			text_io.put( Standard_Error, ASCII.HT );
-			text_io.put( Standard_Error, yytext(1..YYLength) );
+			Ada.Text_IO.Put( Standard_Error, ASCII.HT );
+			Ada.Text_IO.Put( Standard_Error, yytext(1..YYLength) );
 			linenum := linenum + 1;
 			
 
@@ -1185,113 +1193,112 @@ YY_END_OF_BUFFER + ACTION_STRING + 1 =>
         end loop; -- end of loop waiting for end of file
 end YYLex;
 --# line 382 "ascan.l"
-begin
-    if (call_yylex) then
-    	toktype := YYLex;
-    	call_yylex := false;
-    	return toktype;
-    end if;
+   begin
 
-    if ( eofseen ) then
-	toktype := End_Of_Input;
-    else
-	toktype := YYLex;
-    end if;
--- this tracing code allows easy tracing of aflex runs
-if (trace) then
-text_io.new_line(Standard_Error);
-text_io.put(Standard_Error, "toktype = :" );
-text_io.put(Standard_Error, Token'image(toktype));
-text_io.put_line(Standard_Error, ":" );
-end if;
+      if (call_yylex) then
+         toktype := YYLex;
+         call_yylex := false;
+         return toktype;
+      end if;
 
-    if ( toktype = End_Of_Input ) then
-	eofseen := true;
+      if ( eofseen ) then
+         toktype := End_Of_Input;
+      else
+         toktype := YYLex;
+      end if;
 
-	if sectnum = 1 then
-	    misc.synerr(  "unexpected EOF" );
-	    sectnum := 2;
-	    toktype := SECTEND;
-	else
-	    if ( sectnum = 2 ) then
-	    	sectnum := 3;
-	    	toktype := SECTEND;
-	    end if;
-    	end if;
-    end if;
+      -- this tracing code allows easy tracing of aflex runs
+      if (trace) then
+         Ada.Text_IO.New_Line(Standard_Error);
+         Ada.Text_IO.Put(Standard_Error, "toktype = :" );
+         Ada.Text_IO.Put(Standard_Error, Token'image(toktype));
+         Ada.Text_IO.Put_line(Standard_Error, ":" );
+      end if;
+
+      if ( toktype = End_Of_Input ) then
+         eofseen := true;
+
+         if sectnum = 1 then
+            misc.synerr(  "unexpected EOF" );
+            sectnum := 2;
+            toktype := SECTEND;
+         elsif sectnum = 2 then
+            sectnum := 3;
+            toktype := SECTEND;
+         end if;
+      end if;
     
-    if trace then
-	if beglin then
-	    int_io.put( Standard_Error, num_rules + 1 );
-	    text_io.put( Standard_Error, ASCII.HT );
-	    beglin := false;
-    	end if;
+      if trace then
+         if beglin then
+            int_io.put( Standard_Error, num_rules + 1 );
+            Ada.Text_IO.Put( Standard_Error, ASCII.HT );
+            beglin := false;
+         end if;
 
-	case toktype is
-	    when '<' | '>'|'^'|'$'|'"'|'['|']'|'{'|'}'|'|'|'('|
-    	    	 ')'|'-'|'/'|'?'|'.'|'*'|'+'|',' =>
-		text_io.put( Standard_Error, Token'image(toktype) );
+         case toktype is
+            when '<' | '>'|'^'|'$'|'"'|'['|']'|'{'|'}'|'|'|'('|
+                 ')'|'-'|'/'|'?'|'.'|'*'|'+'|',' =>
+               Ada.Text_IO.Put( Standard_Error, Token'image(toktype) );
 
-	    when NEWLINE =>
-		text_io.new_line(Standard_Error);
-		if ( sectnum = 2 ) then
-		    beglin := true;
-    	    	end if;
+            when NEWLINE =>
+               Ada.Text_IO.New_Line(Standard_Error);
+               if sectnum = 2 then
+                  beglin := true;
+               end if;
 
-	    when SCDECL =>
-		text_io.put( Standard_Error, "%s" );
+            when SCDECL =>
+               Ada.Text_IO.Put( Standard_Error, "%s" );
 
-	    when XSCDECL =>
-   		text_io.put( Standard_Error, "%x" );
+            when XSCDECL =>
+               Ada.Text_IO.Put( Standard_Error, "%x" );
 
-	    when WHITESPACE =>
-       		text_io.put( Standard_Error, " " );
+            when WHITESPACE =>
+               Ada.Text_IO.Put( Standard_Error, " " );
 
-	    when SECTEND =>
-       		text_io.put_line( Standard_Error, "%%" );	   
+            when SECTEND =>
+               Ada.Text_IO.Put_line( Standard_Error, "%%" );      
 
-		-- we set beglin to be true so we'll start
-		-- writing out numbers as we echo rules.  aflexscan() has
-		-- already assigned sectnum
+               -- we set beglin to be true so we'll start
+               -- writing out numbers as we echo rules.  aflexscan() has
+               -- already assigned sectnum
 
-		if ( sectnum = 2 ) then
-		    beglin := true;
-    	    	end if;
+               if sectnum = 2 then
+                  beglin := true;
+               end if;
 
-	    when NAME =>
-		text_io.put( Standard_Error, ''' );
-		text_io.put( Standard_Error, YYText);
-		text_io.put( Standard_Error, ''' );
+            when NAME =>
+               Ada.Text_IO.Put( Standard_Error, ''' );
+               Ada.Text_IO.Put( Standard_Error, YYText);
+               Ada.Text_IO.Put( Standard_Error, ''' );
 
-	    when CHAR =>
-	    	if ( (yylval < CHARACTER'POS(' ')) or
-		     (yylval = CHARACTER'POS(ASCII.DEL)) ) then
-		    text_io.put( Standard_Error, '\' );
-		    int_io.put( Standard_Error, yylval );
-    		    text_io.put( Standard_Error, '\' );
-		else
-		    text_io.put( Standard_Error, Token'image(toktype) );
-    	    	end if;
+            when CHAR =>
+               if ( (yylval < CHARACTER'POS(' ')) or
+                  (yylval = CHARACTER'POS(ASCII.DEL)) ) then
+                  Ada.Text_IO.Put( Standard_Error, '\' );
+                  int_io.put( Standard_Error, yylval );
+                  Ada.Text_IO.Put( Standard_Error, '\' );
+               else
+                  Ada.Text_IO.Put( Standard_Error, Token'image(toktype) );
+               end if;
 
-	    when NUMBER =>
-    	    	int_io.put( Standard_Error, yylval );
+            when NUMBER =>
+               int_io.put( Standard_Error, yylval );
 
-	    when PREVCCL =>
-		text_io.put( Standard_Error, '[' );
-   	    	int_io.put( Standard_Error, yylval );
-		text_io.put( Standard_Error, ']' );		
+            when PREVCCL =>
+               Ada.Text_IO.Put( Standard_Error, '[' );
+               int_io.put( Standard_Error, yylval );
+               Ada.Text_IO.Put( Standard_Error, ']' );     
 
-    	    when End_Of_Input =>
-    	    	text_io.put( Standard_Error, "End Marker" );
+            when End_Of_Input =>
+               Ada.Text_IO.Put( Standard_Error, "End Marker" );
 
-	    when others =>
-	    	text_io.put( Standard_Error, "Something weird:" );
-		text_io.put_line( Standard_Error, Token'image(toktype));
-    	end case;
-    end if;
-	    
-    return toktype;
+            when others =>
+               Ada.Text_IO.Put( Standard_Error, "Something weird:" );
+               Ada.Text_IO.Put_line( Standard_Error, Token'image(toktype));
+         end case;
+      end if;
+      return toktype;
+   end get_token;
 
-end get_token;
 end scanner;
 
