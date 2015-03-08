@@ -623,22 +623,20 @@ package parser is
   def_rule:integer;
 end parser;
 
-with ascan_io;
 with Parse_Tokens, Parse_Goto, Parse_Shift_Reduce, Text_IO, scanner;
 with NFA, ccl, misc, misc_defs, sym, ecs, aflex_scanner;
-with tstring, int_io, main_body, text_io, external_file_manager;
-use aflex_scanner, external_file_manager;
+with tstring, int_io, main_body;
+use aflex_scanner;
 package body parser is
--- build_eof_action - build the "<<EOF>>" action for the active start
---                    conditions
+   -- build_eof_action - build the "<<EOF>>" action for the active start
+   --                    conditions
 
-   package Parse_IO renames Ascan_IO;
+   use text_io, misc_defs;
 
-use text_io, misc_defs;
-procedure build_eof_action is
-begin
-    text_io.put( temp_action_file, "   when " );
-    for i in 1..actvp loop
+   procedure build_eof_action is
+   begin
+      text_io.put( temp_action_file, "   when " );
+      for i in 1 .. actvp loop
 	if ( sceof(actvsc(i)) ) then
 	    text_io.put( Standard_Error,
 		"multiple <<EOF>> rules for start condition ");
@@ -655,9 +653,9 @@ begin
 	        text_io.put_line( temp_action_file, " =>" );
 	    end if;
         end if;
-    end loop;
-    misc.line_directive_out( temp_action_file );
-end build_eof_action;
+     end loop;
+     misc.line_directive_out( temp_action_file );
+   end build_eof_action;
 
 --  yyerror - eat up an error message from the parser
 -- 
@@ -665,11 +663,11 @@ end build_eof_action;
 --     char msg[];
 --     yyerror( msg );
 
-procedure yyerror( msg : string ) is
-begin
-null;
-end yyerror;
+   procedure yyerror( msg : string ) is
+   begin
+      null;
+   end yyerror;
 
-use  Parse_Goto, Parse_Shift_Reduce, Text_IO, misc_defs, tstring;
+   use  Parse_Goto, Parse_Shift_Reduce, tstring;
 ##
 end parser;
