@@ -21,12 +21,19 @@
 -- DESCRIPTION
 -- NOTES contains functions used in various places throughout aflex.
 -- $Header: /dc/uc/self/tmp/gnat_aflex/orig/RCS/misc.adb,v 1.1 1995/02/19 01:38:51 self Exp self $
+--
+-- 2004/10/16 Thierry Bernier
+-- + Add support for Ada95 parent/child units
+-- + Less GNAT warnings
 
 with MISC, MAIN_BODY, INT_IO, CALENDAR;
 
 package body MISC is
 
   -- action_out - write the actions from the temporary file to lex.yy.c
+  UNITNAME_DEFINED : Boolean := False;
+   UNITNAME_VALUE   : VSTRING;
+   LEX_FILENAME     : VSTRING;
 
   procedure ACTION_OUT is
     BUF : VSTRING;
@@ -298,6 +305,23 @@ package body MISC is
       return INFILENAME;
     end if;
   end BASENAME;
+
+  procedure SET_UNITNAME (STR : in VSTRING) is
+  begin
+    UNITNAME_VALUE   := STR & '.';
+    UNITNAME_DEFINED := True;
+  end SET_UNITNAME;
+
+  -- unitname - finds the parent unit name of the parser
+  function UNITNAME return VSTRING is
+  begin
+    -- if no unitname is defined, use the file name
+    if not UNITNAME_DEFINED then
+      return BASENAME & "_";
+    else
+      return UNITNAME_VALUE;
+    end if;
+  end UNITNAME;
 
   -- basename - find the basename of a file
   function PACKAGE_NAME return STRING is
@@ -612,13 +636,20 @@ package body MISC is
     return C - CHARACTER'POS('A') + CHARACTER'POS('a');
   end TOLOWER;
 
-  procedure SYNERR(STR : in STRING) is
-  begin
-    SYNTAXERROR := TRUE;
-    TEXT_IO.PUT(STANDARD_ERROR, "Syntax error at line ");
-    INT_IO.PUT(STANDARD_ERROR, LINENUM);
-    TEXT_IO.PUT(STANDARD_ERROR, STR);
-    TEXT_IO.NEW_LINE(STANDARD_ERROR);
-  end SYNERR;
+   procedure SYNERR(STR : in STRING) is
+   begin
+      SYNTAXERROR := TRUE;
+      PUT(STANDARD_ERROR, LEX_FILENAME);
+      Text_IO.PUT(STANDARD_ERROR, ":");
+      PUT(STANDARD_ERROR, Integer'Image (LINENUM));
+      TEXT_IO.PUT(STANDARD_ERROR, ": syntax error: ");
+      TEXT_IO.PUT(STANDARD_ERROR, STR);
+      TEXT_IO.NEW_LINE(STANDARD_ERROR);
+   end SYNERR;
+
+   procedure SET_FILENAME (STR : in VSTRING) is
+   begin
+      LEX_FILENAME := STR;
+   end SET_FILENAME;
 
 end MISC;
