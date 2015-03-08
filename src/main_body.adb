@@ -377,6 +377,8 @@ package nat_io is new integer_io(natural); use nat_io; -- CvdL: gnat/gnarl
 
     -- Tell aflex where to read input from.
     INFILENAME := ARGV(ARG_CNT);
+
+    MISC.SET_FILENAME(INFILENAME);
     OPEN(INPUT_FILE, IN_FILE, STR(ARGV(ARG_CNT)));
     SET_INPUT(INPUT_FILE);
 
