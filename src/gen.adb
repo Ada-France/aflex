@@ -28,7 +28,7 @@ with SCANNER, SKELETON_MANAGER; use MISC_DEFS, TEXT_IO,
 
 package body GEN is 
   INDENT_LEVEL : INTEGER := 0;  -- each level is 4 spaces
-  INDENT_BASE  : NATURAL := 3;
+  INDENT_BASE  : constant NATURAL := 3;
   MAX_SHORT    : constant INTEGER := 32767;
  
   procedure INDENT_UP is
@@ -549,7 +549,8 @@ package body GEN is
   -- do_sect3_out - dumps section 3.
 
   procedure DO_SECT3_OUT is 
-    GARBAGE : TOKEN; 
+    GARBAGE : TOKEN;
+    pragma Unreferenced (GARBAGE);
   begin
     SCANNER.CALL_YYLEX := TRUE; 
     GARBAGE := SCANNER.GET_TOKEN; 
