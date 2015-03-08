@@ -717,7 +717,7 @@ when 21 =>
 --# line 144 "ascan.l"
  linenum := linenum + 1; ACTION_ECHO; 
 
-when YY_END_OF_BUFFER +SECT2PROLOG + 1 
+   when YY_END_OF_BUFFER +SECT2PROLOG + 1 
  =>
 --# line 146 "ascan.l"
  MARK_END_OF_PROLOG;
