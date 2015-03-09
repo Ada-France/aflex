@@ -204,7 +204,7 @@ package body NFA is
 
         -- do trailing context magic to not match the trailing characters
         TEXT_IO.PUT_LINE(TEMP_ACTION_FILE,
-          "            yy_ch_buf(yy_cp) := yy_hold_char; -- undo effects of setting up yytext"
+          "            yy_ch_buf (yy_cp) := yy_hold_char; -- undo effects of setting up yytext"
           );
 
         if (HEADCNT > 0) then
