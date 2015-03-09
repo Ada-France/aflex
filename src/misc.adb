@@ -308,7 +308,7 @@ package body MISC is
 
   procedure SET_UNITNAME (STR : in VSTRING) is
   begin
-    UNITNAME_VALUE   := STR & '.';
+    UNITNAME_VALUE   := STR;
     UNITNAME_DEFINED := True;
   end SET_UNITNAME;
 
@@ -324,16 +324,19 @@ package body MISC is
   end UNITNAME;
 
   -- basename - find the basename of a file
-  function PACKAGE_NAME return STRING is
-     Name : String := STR(BASENAME);
-  begin
-     for I in Name'Range loop
-        if Name (I) = '-' then
-           Name (I) := '.';
-        end if;
-     end loop;
-     return Name;
-  end PACKAGE_NAME;
+   function PACKAGE_NAME return STRING is
+      Name : String := STR(BASENAME);
+   begin
+      if UNITNAME_DEFINED then
+         return TSTRING.STR (UNITNAME_VALUE);
+      end if;
+      for I in Name'Range loop
+         if Name (I) = '-' then
+            Name (I) := '.';
+         end if;
+      end loop;
+      return Name;
+   end PACKAGE_NAME;
 
   -- line_directive_out - spit out a "# line" statement
 
