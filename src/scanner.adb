@@ -701,7 +701,7 @@ end if;
             
 
          when 20 => 
-            yy_ch_buf(yy_cp) := yy_hold_char; -- undo effects of setting up yytext
+            yy_ch_buf (yy_cp) := yy_hold_char; -- undo effects of setting up yytext
             yy_cp := yy_cp - 1;
             yy_c_buf_p := yy_cp;
             YY_DO_BEFORE_ACTION; -- set up yytext again
@@ -751,7 +751,7 @@ end if;
              ENTER(QUOTE); return ( '"' ); 
 
          when 28 => 
-            yy_ch_buf(yy_cp) := yy_hold_char; -- undo effects of setting up yytext
+            yy_ch_buf (yy_cp) := yy_hold_char; -- undo effects of setting up yytext
             yy_cp := yy_bp + 1;
             yy_c_buf_p := yy_cp;
             YY_DO_BEFORE_ACTION; -- set up yytext again
@@ -763,7 +763,7 @@ end if;
              ENTER(BRACEERROR); 
 
          when 30 => 
-            yy_ch_buf(yy_cp) := yy_hold_char; -- undo effects of setting up yytext
+            yy_ch_buf (yy_cp) := yy_hold_char; -- undo effects of setting up yytext
             yy_cp := yy_bp + 1;
             yy_c_buf_p := yy_cp;
             YY_DO_BEFORE_ACTION; -- set up yytext again
@@ -795,7 +795,7 @@ end if;
             
 
          when 34 => 
-            yy_ch_buf(yy_cp) := yy_hold_char; -- undo effects of setting up yytext
+            yy_ch_buf (yy_cp) := yy_hold_char; -- undo effects of setting up yytext
             yy_cp := yy_cp - 1;
             yy_c_buf_p := yy_cp;
             YY_DO_BEFORE_ACTION; -- set up yytext again
@@ -907,7 +907,7 @@ end if;
              ENTER(SECT2); return ( '>' ); 
 
          when 45 => 
-            yy_ch_buf(yy_cp) := yy_hold_char; -- undo effects of setting up yytext
+            yy_ch_buf (yy_cp) := yy_hold_char; -- undo effects of setting up yytext
             yy_cp := yy_bp + 1;
             yy_c_buf_p := yy_cp;
             YY_DO_BEFORE_ACTION; -- set up yytext again
@@ -949,7 +949,7 @@ end if;
             
 
          when 52 => 
-            yy_ch_buf(yy_cp) := yy_hold_char; -- undo effects of setting up yytext
+            yy_ch_buf (yy_cp) := yy_hold_char; -- undo effects of setting up yytext
             yy_cp := yy_bp + 1;
             yy_c_buf_p := yy_cp;
             YY_DO_BEFORE_ACTION; -- set up yytext again
@@ -957,7 +957,7 @@ end if;
              ENTER(CCL); return '^'; 
 
          when 53 => 
-            yy_ch_buf(yy_cp) := yy_hold_char; -- undo effects of setting up yytext
+            yy_ch_buf (yy_cp) := yy_hold_char; -- undo effects of setting up yytext
             yy_cp := yy_bp + 1;
             yy_c_buf_p := yy_cp;
             YY_DO_BEFORE_ACTION; -- set up yytext again
@@ -977,7 +977,7 @@ end if;
             
 
          when 56 => 
-            yy_ch_buf(yy_cp) := yy_hold_char; -- undo effects of setting up yytext
+            yy_ch_buf (yy_cp) := yy_hold_char; -- undo effects of setting up yytext
             yy_cp := yy_bp + 1;
             yy_c_buf_p := yy_cp;
             YY_DO_BEFORE_ACTION; -- set up yytext again
@@ -1130,22 +1130,21 @@ end if;
          when 83 => 
 --# line 382 "ascan.l"
             ECHO;
-when 
-YY_END_OF_BUFFER + INITIAL + 1 | 
-YY_END_OF_BUFFER + SECT2 + 1 | 
-YY_END_OF_BUFFER + SECT3 + 1 | 
-YY_END_OF_BUFFER + PICKUPDEF + 1 | 
-YY_END_OF_BUFFER + SC + 1 | 
-YY_END_OF_BUFFER + CARETISBOL + 1 | 
-YY_END_OF_BUFFER + NUM + 1 | 
-YY_END_OF_BUFFER + QUOTE + 1 | 
-YY_END_OF_BUFFER + FIRSTCCL + 1 | 
-YY_END_OF_BUFFER + CCL + 1 | 
-YY_END_OF_BUFFER + ACTION + 1 | 
-YY_END_OF_BUFFER + RECOVER + 1 | 
-YY_END_OF_BUFFER + BRACEERROR + 1 | 
-YY_END_OF_BUFFER + ACTION_STRING + 1 => 
-   return End_Of_Input;
+         when YY_END_OF_BUFFER + INITIAL + 1 |
+             YY_END_OF_BUFFER + SECT2 + 1 |
+             YY_END_OF_BUFFER + SECT3 + 1 |
+             YY_END_OF_BUFFER + PICKUPDEF + 1 |
+             YY_END_OF_BUFFER + SC + 1 |
+             YY_END_OF_BUFFER + CARETISBOL + 1 |
+             YY_END_OF_BUFFER + NUM + 1 |
+             YY_END_OF_BUFFER + QUOTE + 1 |
+             YY_END_OF_BUFFER + FIRSTCCL + 1 |
+             YY_END_OF_BUFFER + CCL + 1 |
+             YY_END_OF_BUFFER + ACTION + 1 |
+             YY_END_OF_BUFFER + RECOVER + 1 |
+             YY_END_OF_BUFFER + BRACEERROR + 1 |
+             YY_END_OF_BUFFER + ACTION_STRING + 1 => 
+               return End_Of_Input;
             when YY_END_OF_BUFFER =>
                     -- undo the effects of YY_DO_BEFORE_ACTION
                     yy_ch_buf(yy_cp) := yy_hold_char;
