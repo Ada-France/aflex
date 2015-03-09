@@ -62,6 +62,7 @@ VSTR("%% tables get generated here."),
 VSTR(""),
 VSTR("      -- copy whatever the last rule matched to the standard output"),
 VSTR(""),
+VSTR("-- ECHO CODES :"),
 VSTR("      procedure ECHO is"),
 VSTR("      begin"),
 VSTR("         if Text_IO.is_open(user_output_file) then"),
@@ -70,6 +71,7 @@ VSTR("         else"),
 VSTR("            Text_IO.put( yytext );"),
 VSTR("         end if;"),
 VSTR("      end ECHO;"),
+VSTR("-- END OF ECHO CODES."),
 VSTR(""),
 VSTR("      -- enter a start condition."),
 VSTR("      -- Using procedure requires a () after the ENTER, but makes everything"),
@@ -329,46 +331,59 @@ VSTR("ERROR tried to output beyond end of skeleton file")
   --    Copies from skelfile to stdout until a line beginning with "%%" or
   --    EOF is found.
 
-  procedure SKELOUT is
-    BUF      : FILE_STRING.VSTRING;
--- UMASS CODES :
-    Umass_Codes : Boolean := False;
-    -- Indicates whether or not current line of the template
-    -- is the Umass codes.
--- END OF UMASS CODES.
-  begin
-    while not END_OF_SKELETON loop
-      GET_FILE_LINE(BUF);
-      if ((FILE_STRING.LEN(BUF) >= 2)
-          and then ((FILE_STRING.CHAR(BUF, 1) = '%')
-                     and (FILE_STRING.CHAR(BUF, 2) = '%'))) then
-        exit;
-      else
--- UMASS CODES :
---   In the template, the codes between "-- UMASS CODES : " and
---   "-- END OF UMASS CODES." are specific to be used by Ayacc
---   extension. Ayacc extension has more power in error recovery.
---   So we generate those codes only when Ayacc_Extension_Flag is True.
-        if FILE_STRING.STR(BUF) = "-- UMASS CODES :" then
-          Umass_Codes := True;
-        end if;
+   procedure SKELOUT is
+      BUF      : FILE_STRING.VSTRING;
+      -- UMASS CODES :
+      Umass_Codes : Boolean := False;
+      -- Indicates whether or not current line of the template
+      -- is the Umass codes.
+      -- END OF UMASS CODES.
+      Echo_Codes  : Boolean := False;
+      Ignore_Line : Boolean := False;
+   begin
+      while not END_OF_SKELETON loop
+         GET_FILE_LINE(BUF);
+         if ((FILE_STRING.LEN(BUF) >= 2)
+             and then ((FILE_STRING.CHAR(BUF, 1) = '%')
+                       and (FILE_STRING.CHAR(BUF, 2) = '%'))) then
+            exit;
+         else
+            -- UMASS CODES :
+            --   In the template, the codes between "-- UMASS CODES : " and
+            --   "-- END OF UMASS CODES." are specific to be used by Ayacc
+            --   extension. Ayacc extension has more power in error recovery.
+            --   So we generate those codes only when Ayacc_Extension_Flag is True.
+            if FILE_STRING.STR(BUF) = "-- UMASS CODES :" then
+               Umass_Codes := True;
+               Ignore_Line := True;
+            elsif FILE_STRING.STR(BUF) = "-- ECHO CODES :" then
+               Echo_Codes := True;
+               Ignore_Line := True;
+            end if;
 
-        if not Umass_Codes or else
-           MISC_DEFS.Ayacc_Extension_Flag then
-          FILE_STRING.PUT_LINE(BUF);
-        end if;
+            if Umass_Codes and not MISC_DEFS.Ayacc_Extension_Flag then
+               Ignore_Line := True;
+            end if;
+            if Echo_Codes and MISC_DEFS.SPPRDFLT then
+               Ignore_Line := True;
+            end if;
 
-        if FILE_STRING.STR(BUF) = "-- END OF UMASS CODES." then
-          Umass_Codes := False;
-        end if;
--- END OF UMASS CODES.
+            if FILE_STRING.STR(BUF) = "-- END OF UMASS CODES." then
+               Umass_Codes := False;
+               Ignore_Line := True;
+            end if;
 
--- UCI CODES commented out :
---   The following line is commented out because it is done in Umass codes.
---      FILE_STRING.PUT_LINE(BUF);
+            if FILE_STRING.STR(BUF) = "-- END OF ECHO CODES." then
+               Echo_Codes  := False;
+               Ignore_Line := True;
+            end if;
 
-      end if;
-    end loop;
-  end SKELOUT;
+            if not Ignore_Line then
+               FILE_STRING.PUT_LINE(BUF);
+            end if;
+            Ignore_Line := False;
+         end if;
+      end loop;
+   end SKELOUT;
 
 end SKELETON_MANAGER;
