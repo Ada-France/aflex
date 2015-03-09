@@ -623,7 +623,7 @@ package parser is
   def_rule:integer;
 end parser;
 
-with Parse_Tokens, Parse_Goto, Parse_Shift_Reduce, Text_IO, scanner;
+with Parse_Tokens, Parse_Goto, Parse_Shift_Reduce, Text_IO;
 with NFA, ccl, misc, misc_defs, sym, ecs, aflex_scanner;
 with tstring, int_io, main_body;
 use aflex_scanner;
@@ -637,24 +637,24 @@ package body parser is
    begin
       text_io.put( temp_action_file, "   when " );
       for i in 1 .. actvp loop
-	if ( sceof(actvsc(i)) ) then
-	    text_io.put( Standard_Error,
-		"multiple <<EOF>> rules for start condition ");
-	    tstring.put( Standard_Error, scname(actvsc(i)));
-	    main_body.aflexend(1);
-	else
-	    sceof(actvsc(i)) := true;
-	    text_io.put( temp_action_file, "YY_END_OF_BUFFER +" );
-	    tstring.put( temp_action_file,  scname(actvsc(i)) );
-	    text_io.put_line( temp_action_file, " + 1 " );
-	    if (i /= actvp) then
-	        text_io.put_line( temp_action_file, " |" );
-	    else
-	        text_io.put_line( temp_action_file, " =>" );
-	    end if;
-        end if;
-     end loop;
-     misc.line_directive_out( temp_action_file );
+         if ( sceof(actvsc(i)) ) then
+            text_io.put(Standard_Error,
+                        "multiple <<EOF>> rules for start condition ");
+            tstring.put( Standard_Error, scname(actvsc(i)));
+            main_body.aflexend(1);
+         else
+            sceof(actvsc(i)) := true;
+            text_io.put( temp_action_file, "YY_END_OF_BUFFER +" );
+            tstring.put( temp_action_file,  scname(actvsc(i)) );
+            text_io.put_line( temp_action_file, " + 1 " );
+            if (i /= actvp) then
+               text_io.put_line( temp_action_file, " |" );
+            else
+               text_io.put_line( temp_action_file, " =>" );
+            end if;
+         end if;
+      end loop;
+      misc.line_directive_out( temp_action_file );
    end build_eof_action;
 
 --  yyerror - eat up an error message from the parser
@@ -668,6 +668,5 @@ package body parser is
       null;
    end yyerror;
 
-   use  Parse_Goto, Parse_Shift_Reduce, tstring;
 ##
 end parser;
