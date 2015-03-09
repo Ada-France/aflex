@@ -183,7 +183,7 @@ package body NFA is
     -- number because we do it before we start parsing the current rule
     RULE_LINENUM(NUM_RULES) := LINENUM;
 
-    TEXT_IO.PUT(TEMP_ACTION_FILE, "when ");
+    TEXT_IO.PUT(TEMP_ACTION_FILE, "         when ");
     INT_IO.PUT(TEMP_ACTION_FILE, NUM_RULES, 1);
     TEXT_IO.PUT_LINE(TEMP_ACTION_FILE, " => ");
 
@@ -204,26 +204,27 @@ package body NFA is
 
         -- do trailing context magic to not match the trailing characters
         TEXT_IO.PUT_LINE(TEMP_ACTION_FILE,
-          "yy_ch_buf(yy_cp) := yy_hold_char; -- undo effects of setting up yytext"
+          "            yy_ch_buf(yy_cp) := yy_hold_char; -- undo effects of setting up yytext"
           );
 
         if (HEADCNT > 0) then
-          TEXT_IO.PUT(TEMP_ACTION_FILE, " yy_cp := yy_bp + ");
+          TEXT_IO.PUT(TEMP_ACTION_FILE, "            yy_cp := yy_bp + ");
           INT_IO.PUT(TEMP_ACTION_FILE, HEADCNT, 1);
           TEXT_IO.PUT_LINE(TEMP_ACTION_FILE, ";");
         else
-          TEXT_IO.PUT(TEMP_ACTION_FILE, "yy_cp := yy_cp - ");
+          TEXT_IO.PUT(TEMP_ACTION_FILE, "            yy_cp := yy_cp - ");
           INT_IO.PUT(TEMP_ACTION_FILE, TRAILCNT, 1);
           TEXT_IO.PUT_LINE(TEMP_ACTION_FILE, ";");
         end if;
 
-        TEXT_IO.PUT_LINE(TEMP_ACTION_FILE, "yy_c_buf_p := yy_cp;");
+        TEXT_IO.PUT_LINE(TEMP_ACTION_FILE, "            yy_c_buf_p := yy_cp;");
         TEXT_IO.PUT_LINE(TEMP_ACTION_FILE,
-          "YY_DO_BEFORE_ACTION; -- set up yytext again");
+          "            YY_DO_BEFORE_ACTION; -- set up yytext again");
       end if;
     end if;
 
     MISC.LINE_DIRECTIVE_OUT(TEMP_ACTION_FILE);
+    TEXT_IO.PUT(TEMP_ACTION_FILE, "            ");
   end FINISH_RULE;
 
   -- link_machines - connect two machines together
