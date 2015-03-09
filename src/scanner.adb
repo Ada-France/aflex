@@ -10,19 +10,19 @@ package body scanner is
    use Ada;
    use Ada.Text_IO;
 
-   beglin : boolean := false;
-   i, bracelevel: integer;
+   beglin : Boolean := False;
+   i, bracelevel: Integer;
 
    function get_token return Token is
       toktype : Token;
-      didadef, indented_code : boolean;
-      cclval : integer;
+      didadef, indented_code : Boolean;
+      cclval : Integer;
       nmdefptr : vstring;
       nmdef, tmpbuf : vstring;
 
       procedure ACTION_ECHO is
       begin
-         Ada.Text_IO.Put( temp_action_file, yytext(1..YYLength) );
+         Ada.Text_IO.Put (temp_action_file, yytext(1 .. YYLength));
       end ACTION_ECHO;
 
       procedure MARK_END_OF_PROLOG is
@@ -31,17 +31,17 @@ package body scanner is
          Ada.Text_IO.New_Line (temp_action_file);
       end MARK_END_OF_PROLOG;
 
-      procedure PUT_BACK_STRING(str : vstring; start : integer) is
+      procedure PUT_BACK_STRING(str : vstring; start : Integer) is
       begin
-	     for i in reverse start+1..tstring.len(str) loop
-	        unput( CHAR(str,i) );
+         for i in reverse start + 1 .. tstring.len (str) loop
+            unput (CHAR (str, i));
          end loop;
       end PUT_BACK_STRING;
 
-      function check_yylex_here return boolean is
+      function check_yylex_here return Boolean is
       begin
-	     return ( (yytext'length >= 2) and then
-		        ((yytext(1) = '#') and (yytext(2) = '#')));
+         return ( (yytext'length >= 2) and then
+                ((yytext(1) = '#') and (yytext(2) = '#')));
       end check_yylex_here;
 
    function YYLex return Token is
@@ -574,13 +574,13 @@ end if;
 
 when 1 => 
 --# line 55 "ascan.l"
- indented_code := true; 
+ indented_code := True; 
 
 when 2 => 
 --# line 56 "ascan.l"
  linenum := linenum + 1; ECHO;
-				-- treat as a comment;
-			
+                -- treat as a comment;
+            
 
 when 3 => 
 --# line 59 "ascan.l"
@@ -605,49 +605,49 @@ when 7 =>
 when 8 => 
 --# line 66 "ascan.l"
 
-			sectnum := 2;
-			misc.line_directive_out;
-			ENTER(SECT2PROLOG);
-			return SECTEND;
-			
+            sectnum := 2;
+            misc.line_directive_out;
+            ENTER(SECT2PROLOG);
+            return SECTEND;
+            
 
 when 9 => 
 --# line 73 "ascan.l"
 
-			Ada.Text_IO.Put( Standard_Error, "old-style lex command at line " );
-			int_io.put( Standard_Error, linenum );
-			Ada.Text_IO.Put( Standard_Error, " ignored:" );
-			text_io.new_line( Standard_Error );
-			Ada.Text_IO.Put( Standard_Error, ASCII.HT );
-			Ada.Text_IO.Put( Standard_Error, yytext(1..YYLength) );
-			linenum := linenum + 1;
-			
+            Ada.Text_IO.Put( Standard_Error, "old-style lex command at line " );
+            int_io.put( Standard_Error, linenum );
+            Ada.Text_IO.Put( Standard_Error, " ignored:" );
+            text_io.new_line( Standard_Error );
+            Ada.Text_IO.Put( Standard_Error, ASCII.HT );
+            Ada.Text_IO.Put( Standard_Error, yytext(1..YYLength) );
+            linenum := linenum + 1;
+            
 
 when 10 => 
 --# line 83 "ascan.l"
 
-			nmstr := vstr(yytext(1..YYLength));
-			didadef := false;
-			ENTER(PICKUPDEF);
-			
+            nmstr := vstr(yytext(1..YYLength));
+            didadef := False;
+            ENTER(PICKUPDEF);
+            
 
 when 11 => 
 --# line 89 "ascan.l"
  nmstr := vstr(yytext(1..YYLength));
-			  return UNAME;
-			
+              return UNAME;
+            
 
 when 12 => 
 --# line 93 "ascan.l"
  nmstr := vstr(yytext(1..YYLength));
-			  return NAME;
-			
+              return NAME;
+            
 
 when 13 => 
 --# line 96 "ascan.l"
  linenum := linenum + 1;
-			  -- allows blank lines in section 1;
-			
+              -- allows blank lines in section 1;
+            
 
 when 14 => 
 --# line 99 "ascan.l"
@@ -660,45 +660,45 @@ when 15 =>
 when 16 => 
 --# line 102 "ascan.l"
  null;
-			  -- separates name and definition;
-			
+              -- separates name and definition;
+            
 
 when 17 => 
 --# line 106 "ascan.l"
 
-			nmdef := vstr(yytext(1..YYLength));
+            nmdef := vstr(yytext(1..YYLength));
 
-			i := tstring.len( nmdef );
-			while ( i >= tstring.first ) loop
-			    if ( (CHAR(nmdef,i) /= ' ') and
-				 (CHAR(nmdef,i) /= ASCII.HT) ) then
-				exit;
-			    end if;
-			    i := i - 1;
-			end loop;
+            i := tstring.len( nmdef );
+            while ( i >= tstring.first ) loop
+                if ( (CHAR(nmdef,i) /= ' ') and
+                 (CHAR(nmdef,i) /= ASCII.HT) ) then
+                exit;
+                end if;
+                i := i - 1;
+            end loop;
 
                         sym.ndinstal( nmstr,
-				tstring.slice(nmdef, tstring.first, i) );
-			didadef := true;
-			
+                tstring.slice(nmdef, tstring.first, i) );
+            didadef := True;
+            
 
 when 18 => 
 --# line 123 "ascan.l"
 
-			if not didadef then
-			    misc.synerr( "incomplete name definition" );
-			end if;
-			ENTER(0);
-			linenum := linenum + 1;
-			
+            if not didadef then
+                misc.synerr( "incomplete name definition" );
+            end if;
+            ENTER(0);
+            linenum := linenum + 1;
+            
 
 when 19 => 
 --# line 131 "ascan.l"
  linenum := linenum + 1;
-			  ENTER(0);
-			  nmstr := vstr(yytext(1..YYLength));
-			  return NAME;
-			
+              ENTER(0);
+              nmstr := vstr(yytext(1..YYLength));
+              return NAME;
+            
 
 when 20 => 
 yy_ch_buf(yy_cp) := yy_hold_char; -- undo effects of setting up yytext
@@ -707,11 +707,11 @@ yy_c_buf_p := yy_cp;
 YY_DO_BEFORE_ACTION; -- set up yytext again
 --# line 137 "ascan.l"
 
-			linenum := linenum + 1;
-			ACTION_ECHO;
-			MARK_END_OF_PROLOG;
-			ENTER(SECT2);
-			
+            linenum := linenum + 1;
+            ACTION_ECHO;
+            MARK_END_OF_PROLOG;
+            ENTER(SECT2);
+            
 
 when 21 => 
 --# line 144 "ascan.l"
@@ -721,22 +721,22 @@ when 21 =>
  =>
 --# line 146 "ascan.l"
  MARK_END_OF_PROLOG;
-			  return End_Of_Input;
-			
+              return End_Of_Input;
+            
 
 when 23 => 
 --# line 150 "ascan.l"
  linenum := linenum + 1;
-			  -- allow blank lines in sect2;
+              -- allow blank lines in sect2;
 
-			-- this rule matches indented lines which
-			-- are not comments.
+            -- this rule matches indented lines which
+            -- are not comments.
 when 24 => 
 --# line 155 "ascan.l"
 
-			misc.synerr("indented code found outside of action");
-			linenum := linenum + 1;
-			
+            misc.synerr("indented code found outside of action");
+            linenum := linenum + 1;
+            
 
 when 25 => 
 --# line 160 "ascan.l"
@@ -772,10 +772,10 @@ YY_DO_BEFORE_ACTION; -- set up yytext again
 
 when 31 => 
 --# line 167 "ascan.l"
- continued_action := true;
-			  linenum := linenum + 1;
-			  return Newline;
-			
+ continued_action := True;
+              linenum := linenum + 1;
+              return Newline;
+            
 
 when 32 => 
 --# line 172 "ascan.l"
@@ -784,15 +784,15 @@ when 32 =>
 when 33 => 
 --# line 174 "ascan.l"
 
-			-- this rule is separate from the one below because
-			-- otherwise we get variable trailing context, so
-			-- we can't build the scanner using -f,F
+            -- this rule is separate from the one below because
+            -- otherwise we get variable trailing context, so
+            -- we can't build the scanner using -f,F
 
-			bracelevel := 0;
-			continued_action := false;
-			ENTER(ACTION);
-			return Newline;
-			
+            bracelevel := 0;
+            continued_action := False;
+            ENTER(ACTION);
+            return Newline;
+            
 
 when 34 => 
 yy_ch_buf(yy_cp) := yy_hold_char; -- undo effects of setting up yytext
@@ -801,11 +801,11 @@ yy_c_buf_p := yy_cp;
 YY_DO_BEFORE_ACTION; -- set up yytext again
 --# line 185 "ascan.l"
 
-			bracelevel := 0;
-			continued_action := false;
-			ENTER(ACTION);
-			return Newline;
-			
+            bracelevel := 0;
+            continued_action := False;
+            ENTER(ACTION);
+            return Newline;
+            
 
 when 35 => 
 --# line 192 "ascan.l"
@@ -818,81 +818,81 @@ when 36 =>
 when 37 => 
 --# line 196 "ascan.l"
 
-			sectnum := 3;
-			ENTER(SECT3);
-			return End_Of_Input;
-			-- to stop the parser
-			
+            sectnum := 3;
+            ENTER(SECT3);
+            return End_Of_Input;
+            -- to stop the parser
+            
 
 when 38 => 
 --# line 203 "ascan.l"
 
 
-			nmstr := vstr(yytext(1..YYLength));
+            nmstr := vstr(yytext(1..YYLength));
 
-			-- check to see if we've already encountered this ccl
+            -- check to see if we've already encountered this ccl
                         cclval := sym.ccllookup( nmstr );
-			if ( cclval /= 0 ) then
-			    yylval := cclval;
-			    cclreuse := cclreuse + 1;
-			    return PREVCCL;
-			else
-			    -- we fudge a bit.  We know that this ccl will
-			    -- soon be numbered as lastccl + 1 by cclinit
-			    sym.cclinstal( nmstr, lastccl + 1 );
+            if ( cclval /= 0 ) then
+                YYLVal := cclval;
+                cclreuse := cclreuse + 1;
+                return PREVCCL;
+            else
+                -- we fudge a bit.  We know that this ccl will
+                -- soon be numbered as lastccl + 1 by cclinit
+                sym.cclinstal( nmstr, lastccl + 1 );
 
-			    -- push back everything but the leading bracket
-			    -- so the ccl can be rescanned
+                -- push back everything but the leading bracket
+                -- so the ccl can be rescanned
 
-			    PUT_BACK_STRING(nmstr, 1);
+                PUT_BACK_STRING(nmstr, 1);
 
-			    ENTER(FIRSTCCL);
-			    return '[';
-			end if;
-			
+                ENTER(FIRSTCCL);
+                return '[';
+            end if;
+            
 
 when 39 => 
 --# line 228 "ascan.l"
 
-			nmstr := vstr(yytext(1..YYLength));
-			-- chop leading and trailing brace
-			tmpbuf := slice(vstr(yytext(1..YYLength)),
-								2, YYLength-1);
+            nmstr := vstr(yytext(1..YYLength));
+            -- chop leading and trailing brace
+            tmpbuf := slice(vstr(yytext(1..YYLength)),
+                                2, YYLength-1);
 
-			nmdefptr := sym.ndlookup( tmpbuf );
-			if ( nmdefptr = NUL ) then
-			    misc.synerr( "undefined {name}" );
-			else
-			    -- push back name surrounded by ()'s
-			    unput(')');
-			    PUT_BACK_STRING(nmdefptr, 0);
-			    unput('(');
-			end if;
-			
+            nmdefptr := sym.ndlookup( tmpbuf );
+            if ( nmdefptr = NUL ) then
+                misc.synerr( "undefined {name}" );
+            else
+                -- push back name surrounded by ()'s
+                unput(')');
+                PUT_BACK_STRING(nmdefptr, 0);
+                unput('(');
+            end if;
+            
 
 when 40 => 
 --# line 245 "ascan.l"
  tmpbuf := vstr(yytext(1..YYLength));
-			  case tstring.CHAR(tmpbuf,1) is
-				when '/' => return '/';
-				when '|' => return '|';
-				when '*' => return '*';
-				when '+' => return '+';
-				when '?' => return '?';
-				when '.' => return '.';
-				when '(' => return '(';
-				when ')' => return ')';
-				when others =>
-					misc.aflexerror("error in aflex case");
-			  end case;
-			
+              case tstring.CHAR(tmpbuf,1) is
+                when '/' => return '/';
+                when '|' => return '|';
+                when '*' => return '*';
+                when '+' => return '+';
+                when '?' => return '?';
+                when '.' => return '.';
+                when '(' => return '(';
+                when ')' => return ')';
+                when others =>
+                    misc.aflexerror("error in aflex case");
+              end case;
+            
 
 when 41 => 
 --# line 259 "ascan.l"
  tmpbuf := vstr(yytext(1..YYLength));
-			  yylval := CHARACTER'POS(CHAR(tmpbuf,1));
-			  return CHAR;
-			
+              YYLVal := CHARACTER'POS(CHAR(tmpbuf,1));
+              return CHAR;
+            
 
 when 42 => 
 --# line 263 "ascan.l"
@@ -917,8 +917,8 @@ YY_DO_BEFORE_ACTION; -- set up yytext again
 when 46 => 
 --# line 269 "ascan.l"
  nmstr := vstr(yytext(1..YYLength));
-			  return NAME;
-			
+              return NAME;
+            
 
 when 47 => 
 --# line 272 "ascan.l"
@@ -931,9 +931,9 @@ when 48 =>
 when 49 => 
 --# line 277 "ascan.l"
  tmpbuf := vstr(yytext(1..YYLength));
-			  yylval := CHARACTER'POS(CHAR(tmpbuf,1));
-			  return CHAR;
-			
+              YYLVal := CHARACTER'POS(CHAR(tmpbuf,1));
+              return CHAR;
+            
 
 when 50 => 
 --# line 281 "ascan.l"
@@ -942,11 +942,11 @@ when 50 =>
 when 51 => 
 --# line 283 "ascan.l"
 
-			misc.synerr( "missing quote" );
-			ENTER(SECT2);
-			linenum := linenum + 1;
-			return '"';
-			
+            misc.synerr( "missing quote" );
+            ENTER(SECT2);
+            linenum := linenum + 1;
+            return '"';
+            
 
 when 52 => 
 yy_ch_buf(yy_cp) := yy_hold_char; -- undo effects of setting up yytext
@@ -966,15 +966,15 @@ YY_DO_BEFORE_ACTION; -- set up yytext again
 
 when 54 => 
 --# line 293 "ascan.l"
- ENTER(CCL); yylval := CHARACTER'POS('-'); return ( CHAR ); 
+ ENTER(CCL); YYLVal := CHARACTER'POS('-'); return ( CHAR ); 
 
 when 55 => 
 --# line 294 "ascan.l"
  ENTER(CCL);
-			  tmpbuf := vstr(yytext(1..YYLength));
-			  yylval := CHARACTER'POS(CHAR(tmpbuf,1));
-			  return CHAR;
-			
+              tmpbuf := vstr(yytext(1..YYLength));
+              YYLVal := CHARACTER'POS(CHAR(tmpbuf,1));
+              return CHAR;
+            
 
 when 56 => 
 yy_ch_buf(yy_cp) := yy_hold_char; -- undo effects of setting up yytext
@@ -987,9 +987,9 @@ YY_DO_BEFORE_ACTION; -- set up yytext again
 when 57 => 
 --# line 301 "ascan.l"
  tmpbuf := vstr(yytext(1..YYLength));
-			  yylval := CHARACTER'POS(CHAR(tmpbuf,1));
-			  return CHAR;
-			
+              YYLVal := CHARACTER'POS(CHAR(tmpbuf,1));
+              return CHAR;
+            
 
 when 58 => 
 --# line 305 "ascan.l"
@@ -998,9 +998,9 @@ when 58 =>
 when 59 => 
 --# line 308 "ascan.l"
 
-			yylval := misc.myctoi( vstr(yytext(1..YYLength)) );
-			return NUMBER;
-			
+            YYLVal := misc.myctoi( vstr(yytext(1..YYLength)) );
+            return NUMBER;
+            
 
 when 60 => 
 --# line 313 "ascan.l"
@@ -1013,19 +1013,19 @@ when 61 =>
 when 62 => 
 --# line 316 "ascan.l"
 
-			misc.synerr( "bad character inside {}'s" );
-			ENTER(SECT2);
-			return '}';
-			
+            misc.synerr( "bad character inside {}'s" );
+            ENTER(SECT2);
+            return '}';
+            
 
 when 63 => 
 --# line 322 "ascan.l"
 
-			misc.synerr( "missing }" );
-			ENTER(SECT2);
-			linenum := linenum + 1;
-			return '}';
-			
+            misc.synerr( "missing }" );
+            ENTER(SECT2);
+            linenum := linenum + 1;
+            return '}';
+            
 
 when 64 => 
 --# line 330 "ascan.l"
@@ -1034,9 +1034,9 @@ when 64 =>
 when 65 => 
 --# line 331 "ascan.l"
  misc.synerr( "missing }" );
-			  linenum := linenum + 1;
-			  ENTER(SECT2);
-			
+              linenum := linenum + 1;
+              ENTER(SECT2);
+            
 
 when 66 => 
 --# line 336 "ascan.l"
@@ -1061,8 +1061,8 @@ when 70 =>
 when 71 => 
 --# line 341 "ascan.l"
  ACTION_ECHO;
-				  -- character constant;
-			
+                  -- character constant;
+            
 
 when 72 => 
 --# line 345 "ascan.l"
@@ -1071,13 +1071,13 @@ when 72 =>
 when 73 => 
 --# line 347 "ascan.l"
 
-			linenum := linenum + 1;
-			ACTION_ECHO;
-			if bracelevel = 0 then
-			    text_io.new_line ( temp_action_file );
-			    ENTER(SECT2);
-	                end if;
-			
+            linenum := linenum + 1;
+            ACTION_ECHO;
+            if bracelevel = 0 then
+                text_io.new_line ( temp_action_file );
+                ENTER(SECT2);
+                    end if;
+            
 
 when 74 => 
 --# line 355 "ascan.l"
@@ -1106,26 +1106,26 @@ when 79 =>
 when 80 => 
 --# line 364 "ascan.l"
 
-			yylval := CHARACTER'POS(misc.myesc( vstr(yytext(1..YYLength)) ));
-			return ( CHAR );
-			
+            YYLVal := CHARACTER'POS(misc.myesc( vstr(yytext(1..YYLength)) ));
+            return ( CHAR );
+            
 
 when 81 => 
 --# line 369 "ascan.l"
 
-			yylval := CHARACTER'POS(misc.myesc( vstr(yytext(1..YYLength)) ));
-			ENTER(CCL);
-			return CHAR;
-			
+            YYLVal := CHARACTER'POS(misc.myesc( vstr(yytext(1..YYLength)) ));
+            ENTER(CCL);
+            return CHAR;
+            
 
 when 82 => 
 --# line 376 "ascan.l"
  if check_yylex_here then
-				return End_Of_Input;
-			  else
-				ECHO;
-			  end if;
-			
+                return End_Of_Input;
+              else
+                ECHO;
+              end if;
+            
 
 when 83 => 
 --# line 382 "ascan.l"
@@ -1201,7 +1201,7 @@ YY_END_OF_BUFFER + ACTION_STRING + 1 =>
 
       if (call_yylex) then
          toktype := YYLex;
-         call_yylex := false;
+         call_yylex := False;
          return toktype;
       end if;
 
@@ -1213,17 +1213,17 @@ YY_END_OF_BUFFER + ACTION_STRING + 1 =>
 
       -- this tracing code allows easy tracing of aflex runs
       if (trace) then
-         Ada.Text_IO.New_Line(Standard_Error);
-         Ada.Text_IO.Put(Standard_Error, "toktype = :" );
-         Ada.Text_IO.Put(Standard_Error, Token'image(toktype));
-         Ada.Text_IO.Put_line(Standard_Error, ":" );
+         Ada.Text_IO.New_Line (Standard_Error);
+         Ada.Text_IO.Put (Standard_Error, "toktype = :" );
+         Ada.Text_IO.Put (Standard_Error, Token'Image (toktype));
+         Ada.Text_IO.Put_line (Standard_Error, ":" );
       end if;
 
       if ( toktype = End_Of_Input ) then
-         eofseen := true;
+         eofseen := True;
 
          if sectnum = 1 then
-            misc.synerr(  "unexpected EOF" );
+            misc.synerr ("unexpected EOF");
             sectnum := 2;
             toktype := SECTEND;
          elsif sectnum = 2 then
@@ -1234,71 +1234,71 @@ YY_END_OF_BUFFER + ACTION_STRING + 1 =>
     
       if trace then
          if beglin then
-            int_io.put( Standard_Error, num_rules + 1 );
-            Ada.Text_IO.Put( Standard_Error, ASCII.HT );
-            beglin := false;
+            Int_IO.Put (Standard_Error, num_rules + 1);
+            Ada.Text_IO.Put (Standard_Error, ASCII.HT);
+            beglin := False;
          end if;
 
          case toktype is
             when '<' | '>'|'^'|'$'|'"'|'['|']'|'{'|'}'|'|'|'('|
                  ')'|'-'|'/'|'?'|'.'|'*'|'+'|',' =>
-               Ada.Text_IO.Put( Standard_Error, Token'image(toktype) );
+               Ada.Text_IO.Put (Standard_Error, Token'Image (toktype));
 
             when NEWLINE =>
-               Ada.Text_IO.New_Line(Standard_Error);
+               Ada.Text_IO.New_Line (Standard_Error);
                if sectnum = 2 then
-                  beglin := true;
+                  beglin := True;
                end if;
 
             when SCDECL =>
-               Ada.Text_IO.Put( Standard_Error, "%s" );
+               Ada.Text_IO.Put (Standard_Error, "%s");
 
             when XSCDECL =>
-               Ada.Text_IO.Put( Standard_Error, "%x" );
+               Ada.Text_IO.Put (Standard_Error, "%x");
 
             when WHITESPACE =>
-               Ada.Text_IO.Put( Standard_Error, " " );
+               Ada.Text_IO.Put (Standard_Error, " ");
 
             when SECTEND =>
-               Ada.Text_IO.Put_line( Standard_Error, "%%" );      
+               Ada.Text_IO.Put_line (Standard_Error, "%%");
 
-               -- we set beglin to be true so we'll start
-               -- writing out numbers as we echo rules.  aflexscan() has
-               -- already assigned sectnum
+               --  we set beglin to be true so we'll start
+               --  writing out numbers as we echo rules.  aflexscan() has
+               --  already assigned sectnum
 
                if sectnum = 2 then
-                  beglin := true;
+                  beglin := True;
                end if;
 
             when NAME =>
-               Ada.Text_IO.Put( Standard_Error, ''' );
-               Ada.Text_IO.Put( Standard_Error, YYText);
-               Ada.Text_IO.Put( Standard_Error, ''' );
+               Ada.Text_IO.Put (Standard_Error, ''');
+               Ada.Text_IO.Put (Standard_Error, YYText);
+               Ada.Text_IO.Put (Standard_Error, ''');
 
             when CHAR =>
-               if ( (yylval < CHARACTER'POS(' ')) or
-                  (yylval = CHARACTER'POS(ASCII.DEL)) ) then
-                  Ada.Text_IO.Put( Standard_Error, '\' );
-                  int_io.put( Standard_Error, yylval );
-                  Ada.Text_IO.Put( Standard_Error, '\' );
+               if ( (YYLVal < CHARACTER'POS(' ')) or
+                  (YYLVal = CHARACTER'POS(ASCII.DEL)) ) then
+                  Ada.Text_IO.Put (Standard_Error, '\');
+                  Int_IO.Put (Standard_Error, YYLVal);
+                  Ada.Text_IO.Put (Standard_Error, '\');
                else
-                  Ada.Text_IO.Put( Standard_Error, Token'image(toktype) );
+                  Ada.Text_IO.Put (Standard_Error, Token'Image (toktype));
                end if;
 
             when NUMBER =>
-               int_io.put( Standard_Error, yylval );
+               Int_IO.Put (Standard_Error, YYLVal);
 
             when PREVCCL =>
-               Ada.Text_IO.Put( Standard_Error, '[' );
-               int_io.put( Standard_Error, yylval );
-               Ada.Text_IO.Put( Standard_Error, ']' );     
+               Ada.Text_IO.Put (Standard_Error, '[');
+               Int_IO.Put (Standard_Error, YYLVal);
+               Ada.Text_IO.Put (Standard_Error, ']');
 
             when End_Of_Input =>
-               Ada.Text_IO.Put( Standard_Error, "End Marker" );
+               Ada.Text_IO.Put (Standard_Error, "End Marker");
 
             when others =>
-               Ada.Text_IO.Put( Standard_Error, "Something weird:" );
-               Ada.Text_IO.Put_line( Standard_Error, Token'image(toktype));
+               Ada.Text_IO.Put (Standard_Error, "Something weird:");
+               Ada.Text_IO.Put_line (Standard_Error, Token'Image (toktype));
          end case;
       end if;
       return toktype;
