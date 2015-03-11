@@ -85,7 +85,7 @@ will have the preserved case (i.e., it will not be folded).
 minimalist with clause.  When the
 .B -m
 option is passed, the
-.B Ada.Text_IO
+.I Ada.Text_IO
 package, the DFA and IO packages are not with'ed from the main
 generated lexer.
 .TP
@@ -211,7 +211,7 @@ With lex, the following
 
     NAME    [A-Z][A-Z0-9]*
     %%
-    foo{NAME}?      text_io.put_line( "Found it" );
+    foo{NAME}?      Ada.Text_IO.Put_Line ("Found it");
     %%
 
 .fi
@@ -240,10 +240,15 @@ You also can add in things like counting keeping track of the
 input line number this way; but don't expect your scanner to
 go very fast.
 .IP -
-Yytext is a function returning a vstring.
+Yytext is a function returning a
+.B String.
 .IP -
 aflex reads only one input file, while lex's input is made
 up of the concatenation of its input files.
+.IP -
+The
+.B %unit
+directive is an optional statement to define the name of the generated Ada package.
 .IP -
 The following lex constructs are not supported
 .in 5
@@ -273,7 +278,8 @@ The special rule "<<EOF>>" indicates
 actions which are to be taken when an end-of-file is
 encountered and yywrap() returns non-zero (i.e., indicates
 no further files to process).  The action can either
-text_io.set_input() to a new file to process, in which case the
+.IR Ada.Text_IO.Set_Input ()
+to a new file to process, in which case the
 action should finish with
 .I YY_NEW_FILE
 (this is a branch, so subsequent code in the action won't
@@ -322,6 +328,16 @@ Ada style comments are supported instead of C style comments.
 All template files are internalized.
 .IP -
 The input source file must end with a ".l" extension.
+.IP -
+The Ada package name used for the generated DFA and IO files can be customized by
+using the
+.B %unit
+statement at begining of the lex file.  By default, aflex will use the
+scanner file name to build the package name.  The package name will be the
+scanner file name with the possible '-' changed into '.'.  The
+.B %unit
+allows to override this and specify the Ada package name to use.
+.\"
 .SH FILES
 .TP
 .IR filename _io.ads
@@ -417,10 +433,12 @@ difficult-to-understand problems like:
 In which the pushed-back text is "([0-9] -- a digit)".
 .LP
 Due to both buffering of input and read-ahead, you cannot intermix
-calls to text_io routines, such as, for example,
-.B text_io.get()
+calls to
+.I Ada.Text_IO
+routines, such as, for example,
+.IR Ada.Text_IO.Get ()
 with aflex rules and expect it to work.  Call
-.B input()
+.IR input ()
 instead.
 .LP
 There are still more features that could be implemented (especially REJECT) 
