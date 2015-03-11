@@ -66,7 +66,7 @@ package body GEN is
       return;
     end if;
 
-    INDENT_PUTS("if yy_accept(yy_current_state) /= 0 then");
+    INDENT_PUTS("if yy_accept (yy_current_state) /= 0 then");
 
     INDENT_UP;
     INDENT_PUTS("yy_last_accepting_state := yy_current_state;");
@@ -87,7 +87,7 @@ package body GEN is
 
     INDENT_PUTS("when 0 => -- must backtrack");
     INDENT_PUTS("-- undo the effects of YY_DO_BEFORE_ACTION");
-    INDENT_PUTS("yy_ch_buf(yy_cp) := yy_hold_char;");
+    INDENT_PUTS("yy_ch_buf (yy_cp) := yy_hold_char;");
 
     if FULLTBL then
       INDENT_PUTS("yy_cp := yy_last_accepting_cpos + 1;");
@@ -110,9 +110,9 @@ package body GEN is
   procedure GENECS is
     I, NUMROWS : INTEGER;
   begin
-    TEXT_IO.PUT("yy_ec : constant array(ASCII.NUL..");
-    TEXT_IO.PUT_LINE("Character'Last) of short :="); -- GdM for >7 bit ch.
-    TEXT_IO.PUT_LINE("    (   0,");
+    TEXT_IO.PUT("      yy_ec : constant array (ASCII.NUL .. ");
+    TEXT_IO.PUT_LINE("Character'Last) of Short :="); -- GdM for >7 bit ch.
+    TEXT_IO.PUT_LINE("      (0, ");
 
     for CHAR_COUNT in 1 .. CSIZE loop
       if (CASEINS and ((CHAR_COUNT >= CHARACTER'POS('A')) and (CHAR_COUNT <=
@@ -165,10 +165,10 @@ package body GEN is
     -- *everything* is done in terms of arrays starting at 1, so provide
     -- a null entry for the zero element of all C arrays
   begin
-    TEXT_IO.PUT("yy_accept : constant array(0..");
+    TEXT_IO.PUT("      yy_accept : constant array (0 .. ");
     INT_IO.PUT(LASTDFA, 1);
     TEXT_IO.PUT_LINE(") of Short :=");
-    TEXT_IO.PUT_LINE("    (   0,");
+    TEXT_IO.PUT_LINE("         (0,");
 
     DFAACC(END_OF_BUFFER_STATE).DFAACC_STATE := END_OF_BUFFER_ACTION;
 
@@ -204,9 +204,9 @@ package body GEN is
   procedure GEN_NEXT_COMPRESSED_STATE is
   begin
     if (USEECS) then
-      INDENT_PUTS("yy_c := yy_ec(yy_ch_buf(yy_cp));");
+      INDENT_PUTS("yy_c := yy_ec (yy_ch_buf(yy_cp));");
     else
-      INDENT_PUTS("yy_c := yy_ch_buf(yy_cp);");
+      INDENT_PUTS("yy_c := yy_ch_buf (yy_cp);");
     end if;
 
     -- save the backtracking info \before/ computing the next state
@@ -215,10 +215,10 @@ package body GEN is
     GEN_BACKTRACKING;
 
     INDENT_PUTS(
-      "while yy_chk(yy_base(yy_current_state) + yy_c) /= yy_current_state loop"
+      "while yy_chk (yy_base (yy_current_state) + yy_c) /= yy_current_state loop"
       );
     INDENT_UP;
-    INDENT_PUTS("yy_current_state := yy_def(yy_current_state);");
+    INDENT_PUTS("yy_current_state := yy_def (yy_current_state);");
 
     if (USEMECS) then
 
@@ -231,12 +231,12 @@ package body GEN is
       DO_INDENT;
 
       -- lastdfa + 2 is the beginning of the templates
-      TEXT_IO.PUT("if ( yy_current_state >= ");
+      TEXT_IO.PUT("if yy_current_state >= ");
       INT_IO.PUT(LASTDFA + 2, 1);
-      TEXT_IO.PUT_LINE(" ) then");
+      TEXT_IO.PUT_LINE(" then");
 
       INDENT_UP;
-      INDENT_PUTS("yy_c := yy_meta(yy_c);");
+      INDENT_PUTS("yy_c := yy_meta (yy_c);");
       INDENT_DOWN;
       INDENT_PUTS("end if;");
     end if;
@@ -244,7 +244,7 @@ package body GEN is
     INDENT_DOWN;
     INDENT_PUTS("end loop;");
 
-    INDENT_PUTS("yy_current_state := yy_nxt(yy_base(yy_current_state) + yy_c);")
+    INDENT_PUTS("yy_current_state := yy_nxt (yy_base (yy_current_state) + yy_c);")
       ;
     INDENT_DOWN;
   end GEN_NEXT_COMPRESSED_STATE;
@@ -256,12 +256,12 @@ package body GEN is
   begin
     if FULLTBL then
       INDENT_PUTS(
-        "yy_current_state := yy_nxt(yy_current_state, yy_ch_buf(yy_cp));");
+        "yy_current_state := yy_nxt (yy_current_state, yy_ch_buf (yy_cp));");
       INDENT_PUTS("while yy_current_state > 0 loop");
       INDENT_UP;
       INDENT_PUTS("yy_cp := yy_cp + 1;");
       INDENT_PUTS(
-        "yy_current_state := yy_nxt(yy_current_state, yy_ch_buf(yy_cp));");
+        "yy_current_state := yy_nxt (yy_current_state, yy_ch_buf (yy_cp));");
       INDENT_DOWN;
       INDENT_PUTS("end loop;");
 
@@ -284,14 +284,14 @@ package body GEN is
       INDENT_PUTS("yy_cp := yy_cp + 1;");
 
       if INTERACTIVE then
-        TEXT_IO.PUT("if ( yy_base(yy_current_state) = ");
+        TEXT_IO.PUT("if yy_base (yy_current_state) = ");
         INT_IO.PUT(JAMBASE, 1);
       else
-        TEXT_IO.PUT("if ( yy_current_state = ");
+        TEXT_IO.PUT("if yy_current_state = ");
         INT_IO.PUT(JAMSTATE, 1);
       end if;
 
-      TEXT_IO.PUT_LINE(" ) then");
+      TEXT_IO.PUT_LINE(" then");
       TEXT_IO.PUT_LINE("    exit;");
       TEXT_IO.PUT_LINE("end if;");
 
@@ -315,8 +315,8 @@ package body GEN is
   begin
     INDENT_UP;
     if FULLTBL then
-      INDENT_PUTS("yy_current_state := yy_nxt(yy_current_state,");
-      INDENT_PUTS("                    yy_ch_buf(yy_cp));");
+      INDENT_PUTS("yy_current_state := yy_nxt (yy_current_state,");
+      INDENT_PUTS("                    yy_ch_buf (yy_cp));");
       GEN_BACKTRACKING;
     else
       GEN_NEXT_COMPRESSED_STATE;
@@ -330,7 +330,7 @@ package body GEN is
     INDENT_PUTS("yy_current_state := yy_start;");
 
     if BOL_NEEDED then
-      INDENT_PUTS("if yy_ch_buf(yy_bp-1) = ASCII.LF then");
+      INDENT_PUTS("if yy_ch_buf (yy_bp - 1) = ASCII.LF then");
       INDENT_UP;
       INDENT_PUTS("yy_current_state := yy_current_state + 1;");
       INDENT_DOWN;
@@ -381,10 +381,10 @@ package body GEN is
     -- beginning at 0 and for "jam" state
     K := LASTDFA + 2;
 
-    TEXT_IO.PUT("yy_accept : constant array(0..");
+    TEXT_IO.PUT("      yy_accept : constant array (0 .. ");
     INT_IO.PUT(K - 1, 1);
     TEXT_IO.PUT_LINE(") of Short :=");
-    TEXT_IO.PUT_LINE("    (   0,");
+    TEXT_IO.PUT_LINE("          (0,");
     for CNT in 1 .. LASTDFA loop
       MISC.MKDATA(ACC_ARRAY(CNT));
 
@@ -416,10 +416,10 @@ package body GEN is
         TEXT_IO.PUT_LINE(STANDARD_ERROR, "Meta-Equivalence Classes:");
       end if;
 
-      TEXT_IO.PUT("yy_meta : constant array(0..");
+      TEXT_IO.PUT("      yy_meta : constant array (0 .. ");
       INT_IO.PUT(NUMECS, 1);
-      TEXT_IO.PUT_LINE(") of short :=");
-      TEXT_IO.PUT_LINE("    (   0,");
+      TEXT_IO.PUT_LINE(") of Short :=");
+      TEXT_IO.PUT_LINE("          (0,");
       for CNT in 1 .. NUMECS loop
         if (TRACE) then
           INT_IO.PUT(STANDARD_ERROR, CNT, 1);
@@ -435,14 +435,14 @@ package body GEN is
 
     TOTAL_STATES := LASTDFA + NUMTEMPS;
 
-    TEXT_IO.PUT("yy_base : constant array(0..");
+    TEXT_IO.PUT("      yy_base : constant array (0 .. ");
     INT_IO.PUT(TOTAL_STATES, 1);
     if TBLEND > MAX_SHORT then
       TEXT_IO.PUT_LINE(") of Integer :=");
     else
       TEXT_IO.PUT_LINE(") of Short :=");
     end if;
-    TEXT_IO.PUT_LINE("    (   0,");
+    TEXT_IO.PUT_LINE("          (0,");
 
     for CNT in 1 .. LASTDFA loop
       declare
@@ -480,28 +480,28 @@ package body GEN is
 
     MISC.DATAEND;
 
-    TEXT_IO.PUT("yy_def : constant array(0..");
+    TEXT_IO.PUT("      yy_def : constant array (0 .. ");
     INT_IO.PUT(TOTAL_STATES, 1);
     if TBLEND > MAX_SHORT then
       TEXT_IO.PUT_LINE(") of Integer :=");
     else
       TEXT_IO.PUT_LINE(") of Short :=");
     end if;
-    TEXT_IO.PUT_LINE("    (   0,");
+    TEXT_IO.PUT_LINE("          (0,");
 
     for CNT in 1 .. TOTAL_STATES loop
       MISC.MKDATA(DEF(CNT));
     end loop;
 
     MISC.DATAEND;
-    TEXT_IO.PUT("yy_nxt : constant array(0..");
+    TEXT_IO.PUT("      yy_nxt : constant array (0 .. ");
     INT_IO.PUT(TBLEND, 1);
     if LASTDFA > MAX_SHORT then
       TEXT_IO.PUT_LINE(") of Integer :=");
     else
       TEXT_IO.PUT_LINE(") of Short :=");
     end if;
-    TEXT_IO.PUT_LINE("    (   0,");
+    TEXT_IO.PUT_LINE("          (0,");
 
     for CNT in 1 .. TBLEND loop
       if ((NXT(CNT) = 0) or (CHK(CNT) = 0)) then
@@ -514,14 +514,14 @@ package body GEN is
 
     MISC.DATAEND;
 
-    TEXT_IO.PUT("yy_chk : constant array(0..");
+    TEXT_IO.PUT("      yy_chk : constant array (0 .. ");
     INT_IO.PUT(TBLEND, 1);
     if LASTDFA > MAX_SHORT then
       TEXT_IO.PUT_LINE(") of Integer :=");
     else
       TEXT_IO.PUT_LINE(") of Short :=");
     end if;
-    TEXT_IO.PUT_LINE("    (   0,");
+    TEXT_IO.PUT_LINE("          (0,");
 
     for CNT in 1 .. TBLEND loop
       if CHK(CNT) = 0 then
@@ -659,7 +659,7 @@ package body GEN is
       end if;
     end loop;
     if DID_EOF_RULE then
-      TEXT_IO.PUT_LINE("=> ");
+      TEXT_IO.PUT_LINE("=>");
     end if;
 
     if DID_EOF_RULE then
