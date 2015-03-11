@@ -45,16 +45,15 @@ package body scanner is
       end check_yylex_here;
 
    function YYLex return Token is
-      subtype Short is Integer range -32768..32767;
+      subtype Short is Integer range -32768 .. 32767;
       yy_act : Integer;
       yy_c   : Short;
 
-      -- returned upon end-of-file
+      --  returned upon end-of-file
       YY_END_TOK : constant Integer := 0;
-YY_END_OF_BUFFER : constant := 
-84;
-subtype yy_state_type is Integer;
-yy_current_state : yy_state_type;
+      YY_END_OF_BUFFER : constant := 84;
+      subtype yy_state_type is Integer;
+      yy_current_state : yy_state_type;
 INITIAL : constant := 0;
 SECT2 : constant := 1;
 SECT2PROLOG : constant := 2;
@@ -70,8 +69,8 @@ ACTION : constant := 11;
 RECOVER : constant := 12;
 BRACEERROR : constant := 13;
 ACTION_STRING : constant := 14;
-yy_accept : constant array(0..213) of Short :=
-    (   0,
+      yy_accept : constant array (0 .. 213) of Short :=
+          (0,
         0,    0,    0,    0,    0,    0,   82,   82,    0,    0,
         0,    0,    0,    0,    0,    0,    0,    0,    0,    0,
         0,    0,    0,    0,    0,    0,    0,    0,    0,    0,
@@ -96,10 +95,9 @@ yy_accept : constant array(0..213) of Short :=
 
         6,    0,    0,    0,   24,    0,   24,    0,   24,    4,
         0,   36,    0
-    ) ;
+       );
 
-yy_ec : constant array(ASCII.NUL..Character'Last) of short :=
-    (   0,
+      yy_ec : constant array (ASCII.NUL .. Character'Last) of Short := (0,
         1,    1,    1,    1,    1,    1,    1,    1,    2,    3,
         1,    4,    1,    1,    1,    1,    1,    1,    1,    1,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
@@ -113,20 +111,20 @@ yy_ec : constant array(ASCII.NUL..Character'Last) of short :=
 
        25,   26,   23,   23,   27,   23,   23,   23,   23,   28,
        29,   23,   23,   30,   31,   32,   33,   23,   23,   34,
-       23,   23,   35,   36,   37,    1,    1, others=> 1
+       23,   23,   35,   36,   37,    1,    1, others => 1
 
-    ) ;
+       );
 
-yy_meta : constant array(0..37) of short :=
-    (   0,
+      yy_meta : constant array (0 .. 37) of Short :=
+          (0,
         1,    2,    3,    2,    2,    4,    1,    1,    1,    5,
         1,    1,    6,    7,    5,    6,    1,    1,    1,    8,
         9,    1,   10,   10,   10,   10,   10,   10,   10,   10,
        10,   10,   10,   10,    5,    1,   11
-    ) ;
+       );
 
-yy_base : constant array(0..259) of Short :=
-    (   0,
+      yy_base : constant array (0 .. 259) of Short :=
+          (0,
         0,   37,   73,  108,  400,  399,  398,  397,   92,   96,
       144,    0,  377,  376,  179,  180,   83,  112,  181,  184,
       121,  187,  217,    0,  394,  393,   99,  101,  182,  252,
@@ -155,10 +153,10 @@ yy_base : constant array(0..259) of Short :=
       623,  634,  645,  656,  667,  678,  684,  694,  705,  716,
       727,  736,  742,  752,  763,  774,   70,  785,  796,  807,
       818,  828,  839,  845,  855,  866,  877,  888,  899
-    ) ;
+       );
 
-yy_def : constant array(0..259) of Short :=
-    (   0,
+      yy_def : constant array (0 .. 259) of Short :=
+          (0,
       213,  213,  214,  214,  215,  215,  216,  216,  217,  217,
       213,   11,  218,  218,  219,  219,  220,  220,  221,  221,
       222,  222,  213,   23,  223,  223,  218,  218,  224,  224,
@@ -187,10 +185,10 @@ yy_def : constant array(0..259) of Short :=
       213,  213,  213,  213,  213,  213,  213,  213,  213,  213,
       213,  213,  213,  213,  213,  213,  213,  213,  213,  213,
       213,  213,  213,  213,  213,  213,  213,  213,  213
-    ) ;
+       );
 
-yy_nxt : constant array(0..948) of Short :=
-    (   0,
+      yy_nxt : constant array (0 .. 948) of Short :=
+          (0,
        32,   33,   34,   33,   33,   32,   32,   32,   32,   32,
        32,   32,   32,   32,   32,   32,   32,   32,   32,   32,
        32,   32,   35,   35,   35,   35,   35,   35,   35,   35,
@@ -295,10 +293,10 @@ yy_nxt : constant array(0..948) of Short :=
       213,  213,  213,  213,  213,  213,  213,  213,  213,  213,
       213,  213,  213,  213,  213,  213,  213,  213,  213,  213,
       213,  213,  213,  213,  213,  213,  213,  213
-    ) ;
+       );
 
-yy_chk : constant array(0..948) of Short :=
-    (   0,
+      yy_chk : constant array (0 .. 948) of Short :=
+          (0,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
@@ -403,114 +401,114 @@ yy_chk : constant array(0..948) of Short :=
       213,  213,  213,  213,  213,  213,  213,  213,  213,  213,
       213,  213,  213,  213,  213,  213,  213,  213,  213,  213,
       213,  213,  213,  213,  213,  213,  213,  213
-    ) ;
+       );
 
 
-      -- copy whatever the last rule matched to the standard output
+      --  copy whatever the last rule matched to the standard output
 
       procedure ECHO is
       begin
-         if Text_IO.is_open(user_output_file) then
-            Text_IO.put( user_output_file, yytext );
+         if Text_IO.Is_Open (user_output_file) then
+            Text_IO.Put (user_output_file, YYText);
          else
-            Text_IO.put( yytext );
+            Text_IO.Put (YYText);
          end if;
       end ECHO;
 
-      -- enter a start condition.
-      -- Using procedure requires a () after the ENTER, but makes everything
-      -- much neater.
+      --  enter a start condition.
+      --  Using procedure requires a () after the ENTER, but makes everything
+      --  much neater.
 
-      procedure ENTER( state : integer ) is
+      procedure ENTER (state : Integer) is
       begin
          yy_start := 1 + 2 * state;
       end ENTER;
 
-      -- action number for EOF rule of a given start state
-      function YY_STATE_EOF(state : integer) return integer is
+      --  action number for EOF rule of a given start state
+      function YY_STATE_EOF (state : Integer) return Integer is
       begin
          return YY_END_OF_BUFFER + state + 1;
       end YY_STATE_EOF;
 
-      -- return all but the first 'n' matched characters back to the input stream
-      procedure yyless(n : integer) is
+      --  return all but the first 'n' matched characters back to the input stream
+      procedure yyless (n : Integer) is
       begin
-         yy_ch_buf(yy_cp) := yy_hold_char; -- undo effects of setting up yytext
+         yy_ch_buf (yy_cp) := yy_hold_char; --  undo effects of setting up yytext
          yy_cp := yy_bp + n;
          yy_c_buf_p := yy_cp;
          YY_DO_BEFORE_ACTION; -- set up yytext again
       end yyless;
 
-      -- redefine this if you have something you want each time.
+      --  redefine this if you have something you want each time.
       procedure YY_USER_ACTION is
       begin
          null;
-      end;
+      end YY_USER_ACTION;
 
-      -- yy_get_previous_state - get the state just before the EOB char was reached
+      --  yy_get_previous_state - get the state just before the EOB char was reached
 
       function yy_get_previous_state return yy_state_type is
          yy_current_state : yy_state_type;
-         yy_c : short;
+         yy_c : Short;
          yy_bp : constant Integer := yytext_ptr;
       begin
          yy_current_state := yy_start;
-         if yy_ch_buf(yy_bp-1) = ASCII.LF then
+         if yy_ch_buf (yy_bp - 1) = ASCII.LF then
             yy_current_state := yy_current_state + 1;
          end if;
 
          for yy_cp in yytext_ptr .. yy_c_buf_p - 1 loop
-            yy_c := yy_ec(yy_ch_buf(yy_cp));
-            if yy_accept(yy_current_state) /= 0 then
+            yy_c := yy_ec (yy_ch_buf (yy_cp));
+            if yy_accept (yy_current_state) /= 0 then
                yy_last_accepting_state := yy_current_state;
                yy_last_accepting_cpos := yy_cp;
             end if;
-            while yy_chk(yy_base(yy_current_state) + yy_c) /= yy_current_state loop
-               yy_current_state := yy_def(yy_current_state);
-               if ( yy_current_state >= 214 ) then
-                  yy_c := yy_meta(yy_c);
+            while yy_chk (yy_base (yy_current_state) + yy_c) /= yy_current_state loop
+               yy_current_state := yy_def (yy_current_state);
+               if yy_current_state >= 214 then
+                  yy_c := yy_meta (yy_c);
                end if;
             end loop;
-            yy_current_state := yy_nxt(yy_base(yy_current_state) + yy_c);
+            yy_current_state := yy_nxt (yy_base (yy_current_state) + yy_c);
          end loop;
 
          return yy_current_state;
       end yy_get_previous_state;
 
-      procedure yyrestart( input_file : file_type ) is
+      procedure yyrestart (input_file : File_Type) is
       begin
-         open_input(Text_IO.name(input_file));
+         Open_Input (Text_IO.Name (input_file));
       end yyrestart;
 
    begin -- of YYLex
       <<new_file>>
-      -- this is where we enter upon encountering an end-of-file and
-      -- yywrap() indicating that we should continue processing
+      --  this is where we enter upon encountering an end-of-file and
+      --  yyWrap () indicating that we should continue processing
 
       if yy_init then
          if yy_start = 0 then
             yy_start := 1;      -- first start state
          end if;
 
-         -- we put in the '\n' and start reading from [1] so that an
-         -- initial match-at-newline will be true.
+         --  we put in the '\n' and start reading from [1] so that an
+         --  initial match-at-newline will be true.
 
-         yy_ch_buf(0) := ASCII.LF;
+         yy_ch_buf (0) := ASCII.LF;
          yy_n_chars := 1;
 
-         -- we always need two end-of-buffer characters. The first causes
-         -- a transition to the end-of-buffer state. The second causes
-         -- a jam in that state.
+         --  we always need two end-of-buffer characters. The first causes
+         --  a transition to the end-of-buffer state. The second causes
+         --  a jam in that state.
 
-         yy_ch_buf(yy_n_chars) := YY_END_OF_BUFFER_CHAR;
-         yy_ch_buf(yy_n_chars + 1) := YY_END_OF_BUFFER_CHAR;
+         yy_ch_buf (yy_n_chars) := YY_END_OF_BUFFER_CHAR;
+         yy_ch_buf (yy_n_chars + 1) := YY_END_OF_BUFFER_CHAR;
 
-         yy_eof_has_been_seen := false;
+         yy_eof_has_been_seen := False;
 
          yytext_ptr := 1;
          yy_c_buf_p := yytext_ptr;
-         yy_hold_char := yy_ch_buf(yy_c_buf_p);
-         yy_init := false;
+         yy_hold_char := yy_ch_buf (yy_c_buf_p);
+         yy_init := False;
       end if; -- yy_init
 
       loop                -- loops until end-of-file is reached
@@ -518,46 +516,46 @@ yy_chk : constant array(0..948) of Short :=
 
          yy_cp := yy_c_buf_p;
 
-         -- support of yytext
-         yy_ch_buf(yy_cp) := yy_hold_char;
+         --  support of yytext
+         yy_ch_buf (yy_cp) := yy_hold_char;
 
-         -- yy_bp points to the position in yy_ch_buf of the start of the
-         -- current run.
+         --  yy_bp points to the position in yy_ch_buf of the start of the
+         --  current run.
          yy_bp := yy_cp;
          yy_current_state := yy_start;
-         if yy_ch_buf(yy_bp-1) = ASCII.LF then
+         if yy_ch_buf (yy_bp - 1) = ASCII.LF then
             yy_current_state := yy_current_state + 1;
          end if;
          loop
-               yy_c := yy_ec(yy_ch_buf(yy_cp));
-               if yy_accept(yy_current_state) /= 0 then
+               yy_c := yy_ec (yy_ch_buf (yy_cp));
+               if yy_accept (yy_current_state) /= 0 then
                   yy_last_accepting_state := yy_current_state;
                   yy_last_accepting_cpos := yy_cp;
                end if;
-               while yy_chk(yy_base(yy_current_state) + yy_c) /= yy_current_state loop
-                  yy_current_state := yy_def(yy_current_state);
-                  if ( yy_current_state >= 214 ) then
-                     yy_c := yy_meta(yy_c);
+               while yy_chk (yy_base (yy_current_state) + yy_c) /= yy_current_state loop
+                  yy_current_state := yy_def (yy_current_state);
+                  if yy_current_state >= 214 then
+                     yy_c := yy_meta (yy_c);
                   end if;
                end loop;
-               yy_current_state := yy_nxt(yy_base(yy_current_state) + yy_c);
+               yy_current_state := yy_nxt (yy_base (yy_current_state) + yy_c);
             yy_cp := yy_cp + 1;
-if ( yy_current_state = 213 ) then
-    exit;
-end if;
+            if yy_current_state = 213 then
+                exit;
+            end if;
          end loop;
          yy_cp := yy_last_accepting_cpos;
          yy_current_state := yy_last_accepting_state;
 
    <<next_action>>
-         yy_act := yy_accept(yy_current_state);
+         yy_act := yy_accept (yy_current_state);
          YY_DO_BEFORE_ACTION;
          YY_USER_ACTION;
 
          if aflex_debug then  -- output acceptance info. for (-d) debug mode
             Text_IO.Put (Standard_Error, "--accepting rule #");
-            Text_IO.Put (Standard_Error, INTEGER'IMAGE(yy_act));
-            Text_IO.Put_Line (Standard_Error, "(""" & yytext & """)");
+            Text_IO.Put (Standard_Error, Integer'Image (yy_act));
+            Text_IO.Put_Line (Standard_Error, "(""" & YYText & """)");
          end if;
 
 
@@ -565,7 +563,7 @@ end if;
          case yy_act is
             when 0 => -- must backtrack
             -- undo the effects of YY_DO_BEFORE_ACTION
-            yy_ch_buf(yy_cp) := yy_hold_char;
+            yy_ch_buf (yy_cp) := yy_hold_char;
             yy_cp := yy_last_accepting_cpos;
             yy_current_state := yy_last_accepting_state;
             goto next_action;
@@ -1143,57 +1141,58 @@ end if;
              YY_END_OF_BUFFER + ACTION + 1 |
              YY_END_OF_BUFFER + RECOVER + 1 |
              YY_END_OF_BUFFER + BRACEERROR + 1 |
-             YY_END_OF_BUFFER + ACTION_STRING + 1 => 
+             YY_END_OF_BUFFER + ACTION_STRING + 1 =>
                return End_Of_Input;
             when YY_END_OF_BUFFER =>
-                    -- undo the effects of YY_DO_BEFORE_ACTION
-                    yy_ch_buf(yy_cp) := yy_hold_char;
+               --  undo the effects of YY_DO_BEFORE_ACTION
+               yy_ch_buf (yy_cp) := yy_hold_char;
 
-                    yytext_ptr := yy_bp;
+               yytext_ptr := yy_bp;
 
-                    case yy_get_next_buffer is
-                        when EOB_ACT_END_OF_FILE =>
-                            if yywrap then
-                                -- note: because we've taken care in
-                                -- yy_get_next_buffer() to have set up yytext,
-                                -- we can now set up yy_c_buf_p so that if some
-                                -- total hoser (like aflex itself) wants
-                                -- to call the scanner after we return the
-                                -- End_Of_Input, it'll still work - another
-                                -- End_Of_Input will get returned.
+               case yy_get_next_buffer is
+                  when EOB_ACT_END_OF_FILE =>
+                     if yyWrap then
+                        --  note: because we've taken care in
+                        --  yy_get_next_buffer() to have set up yytext,
+                        --  we can now set up yy_c_buf_p so that if some
+                        --  total hoser (like aflex itself) wants
+                        --  to call the scanner after we return the
+                        --  End_Of_Input, it'll still work - another
+                        --  End_Of_Input will get returned.
 
-                                yy_c_buf_p := yytext_ptr;
+                        yy_c_buf_p := yytext_ptr;
 
-                                yy_act := YY_STATE_EOF((yy_start - 1) / 2);
+                        yy_act := YY_STATE_EOF ((yy_start - 1) / 2);
 
-                                goto do_action;
-                            else
-                                --  start processing a new file
-                                yy_init := true;
-                                goto new_file;
-                            end if;
+                        goto do_action;
+                     else
+                        --  start processing a new file
+                        yy_init := True;
+                        goto new_file;
+                     end if;
 
-                        when EOB_ACT_RESTART_SCAN =>
-                            yy_c_buf_p := yytext_ptr;
-                            yy_hold_char := yy_ch_buf(yy_c_buf_p);
-                        when EOB_ACT_LAST_MATCH =>
-                            yy_c_buf_p := yy_n_chars;
-                            yy_current_state := yy_get_previous_state;
+                  when EOB_ACT_RESTART_SCAN =>
+                     yy_c_buf_p := yytext_ptr;
+                     yy_hold_char := yy_ch_buf (yy_c_buf_p);
 
-                            yy_cp := yy_c_buf_p;
-                            yy_bp := yytext_ptr;
-                            goto next_action;
-                        when others =>
-                           null;
-                    end case; -- case yy_get_next_buffer()
+                  when EOB_ACT_LAST_MATCH =>
+                     yy_c_buf_p := yy_n_chars;
+                     yy_current_state := yy_get_previous_state;
+
+                     yy_cp := yy_c_buf_p;
+                     yy_bp := yytext_ptr;
+                     goto next_action;
+                  when others =>
+                     null;
+               end case; --  case yy_get_next_buffer()
 
             when others =>
-               Text_IO.put ("action # " );
-               Text_IO.put (Integer'Image (yy_act));
-               Text_IO.new_line;
+               Text_IO.Put ("action # ");
+               Text_IO.Put (Integer'Image (yy_act));
+               Text_IO.New_Line;
                raise AFLEX_INTERNAL_ERROR;
-         end case; -- case (yy_act)
-      end loop; -- end of loop waiting for end of file
+         end case; --  case (yy_act)
+      end loop; --  end of loop waiting for end of file
    end YYLex;
 --# line 382 "ascan.l"
    begin

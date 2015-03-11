@@ -171,7 +171,7 @@ end YY_INPUT;
       end if;
 
       tmp_yy_cp := tmp_yy_cp - 1;
-      yy_ch_buf(tmp_yy_cp) := c;
+      yy_ch_buf (tmp_yy_cp) := c;
 
       --  Note:  this code is the text of YY_DO_BEFORE_ACTION, only
       --         here we get different yy_cp and yy_bp's
