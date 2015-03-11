@@ -1,0 +1,63 @@
+#!/usr/bin/make -f
+# -*- makefile -*-
+# Sample debian/rules that uses debhelper.
+# This file was originally written by Joey Hess and Craig Small.
+# As a special exception, when this file is copied by dh-make into a
+# dh-make output file, you may use that output file without restriction.
+# This special exception was added by Craig Small in version 0.37 of dh-make.
+
+# Uncomment this to turn on verbose mode.
+#export DH_VERBOSE=1
+
+BIN = $(DESTDIR)/usr/bin
+
+DEB_HOST_MULTIARCH ?= $(shell dpkg-architecture -qDEB_HOST_MULTIARCH)
+
+%:
+	dh $@ 
+
+.PHONY: binary-arch build-arch
+.PHONY: aflex
+
+binary-arch: build-arch
+	: # Common to all architecture-dependent packages
+	dh_installchangelogs -a
+	dh_installdocs -a
+	dh_lintian -a
+	dh_compress -a
+	dh_fixperms -a
+	dh_makeshlibs -a
+	dh_installdeb -a
+	dh_shlibdeps -a
+	dh_gencontrol -a
+	dh_md5sums -a
+	dh_builddeb -a
+
+aflex:
+	mkdir -p $(CURDIR)/debian/tmp/usr
+	$(MAKE) prefix=$(CURDIR)/debian/tmp/usr install
+	dh_installdirs -p$@ \
+		usr/bin \
+		usr/share/man/man1
+	dh_install -p$@ debian/tmp/usr/bin/aflex /usr/bin
+	dh_installman -p$@ debian/tmp/usr/share/man/man1/aflex.1
+	dh_strip -p$@
+
+override_dh_auto_configure:
+#	dh_auto_configure --
+
+override_dh_auto_build:
+	dh_auto_build
+
+override_dh_auto_test:
+	# Ignore
+
+override_dh_auto_install: aflex
+
+override_dh_compress:
+	dh_compress
+
+override_dh_strip:
+
+override_dh_auto_clean:
+	dh_auto_clean

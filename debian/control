@@ -1,0 +1,18 @@
+Source: aflex
+Section: devel
+Priority: extra
+Maintainer: Stephane Carrez <Stephane.Carrez@gmail.com>
+Build-Depends: debhelper (>= 8.0.0), autotools-dev
+Standards-Version: 3.9.2
+Homepage: https://github.com/stcarrez/aflex
+#Vcs-Git: https://github.com/stcarrez/aflex.git
+
+Package: aflex
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: Lexical analyzer generator for Ada.
+ Aflex is a lexical analyzer generating tool similar to the Unix tool lex.
+ From a scanner description file it generates an Ada program that scans
+ the input described by the scanner description.
+
+
