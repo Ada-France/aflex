@@ -26,6 +26,7 @@ autobuild:
 clean:
 	-$(GNATCLEAN) -q -P "$(GPRPATH)"
 	-rm -rf tests
+	-rm example_io.* example example.* example_dfa.*
 
 # Check *all* sources for errors, even those not changed.
 # Does not build executables.
@@ -36,6 +37,8 @@ analyze:
 rebuild: clean build
 
 install:
+	mkdir -p ${bindir}
+	mkdir -p $(mandir)/man1
 	$(INSTALL_PROGRAM) bin/aflex ${bindir}
 	$(INSTALL) doc/aflex.man $(mandir)/man1/aflex.1
 
@@ -65,3 +68,8 @@ test:
 	@(cd tests && cmp ascan_io.ads ../src/ascan_io.ads && echo "OK") || (echo "FAILED")
 	@echo -n "Checking generated IO body..."
 	@(cd tests && cmp ascan_io.adb ../src/ascan_io.adb && echo "OK") || (echo "FAILED")
+
+example: doc/example.l bin/aflex
+	bin/aflex -s doc/example.l
+	mv example.ada example.adb
+	gnatmake example
