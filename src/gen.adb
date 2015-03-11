@@ -111,8 +111,8 @@ package body GEN is
     I, NUMROWS : INTEGER;
   begin
     TEXT_IO.PUT("      yy_ec : constant array (ASCII.NUL .. ");
-    TEXT_IO.PUT_LINE("Character'Last) of Short :="); -- GdM for >7 bit ch.
-    TEXT_IO.PUT_LINE("      (0, ");
+    TEXT_IO.PUT_LINE("Character'Last) of Short := (0,"); -- GdM for >7 bit ch.
+--      TEXT_IO.PUT_LINE("      (0, ");
 
     for CHAR_COUNT in 1 .. CSIZE loop
       if (CASEINS and ((CHAR_COUNT >= CHARACTER'POS('A')) and (CHAR_COUNT <=
@@ -125,7 +125,7 @@ package body GEN is
     end loop;
 
     -- GdM for >7 bit ch.
-    TEXT_IO.PUT_LINE(", others=> 1");
+    TEXT_IO.PUT_LINE(", others => 1");
 
     MISC.DATAEND;
 
@@ -155,7 +155,7 @@ package body GEN is
 
   procedure GEN_FIND_ACTION is
   begin
-    INDENT_PUTS("yy_act := yy_accept(yy_current_state);");
+    INDENT_PUTS("yy_act := yy_accept (yy_current_state);");
   end GEN_FIND_ACTION;
 
   -- genftbl - generates full transition table
@@ -204,7 +204,7 @@ package body GEN is
   procedure GEN_NEXT_COMPRESSED_STATE is
   begin
     if (USEECS) then
-      INDENT_PUTS("yy_c := yy_ec (yy_ch_buf(yy_cp));");
+      INDENT_PUTS("yy_c := yy_ec (yy_ch_buf (yy_cp));");
     else
       INDENT_PUTS("yy_c := yy_ch_buf (yy_cp);");
     end if;
@@ -284,16 +284,16 @@ package body GEN is
       INDENT_PUTS("yy_cp := yy_cp + 1;");
 
       if INTERACTIVE then
-        TEXT_IO.PUT("if yy_base (yy_current_state) = ");
+        TEXT_IO.PUT("            if yy_base (yy_current_state) = ");
         INT_IO.PUT(JAMBASE, 1);
       else
-        TEXT_IO.PUT("if yy_current_state = ");
+        TEXT_IO.PUT("            if yy_current_state = ");
         INT_IO.PUT(JAMSTATE, 1);
       end if;
 
       TEXT_IO.PUT_LINE(" then");
-      TEXT_IO.PUT_LINE("    exit;");
-      TEXT_IO.PUT_LINE("end if;");
+      TEXT_IO.PUT_LINE("                exit;");
+      TEXT_IO.PUT_LINE("            end if;");
 
       INDENT_DOWN;
 
@@ -578,12 +578,12 @@ package body GEN is
     -- output YYLex code up to part about tables.
     end if;
 
-    INDENT_PUTS("YY_END_OF_BUFFER : constant := ");
+    TEXT_IO.PUT("      YY_END_OF_BUFFER : constant := ");
     INT_IO.PUT(NUM_RULES + 1, 1);
     TEXT_IO.PUT_LINE(";");
 
-    INDENT_PUTS("subtype yy_state_type is Integer;");
-    INDENT_PUTS("yy_current_state : yy_state_type;");
+    INDENT_PUTS("      subtype yy_state_type is Integer;");
+    INDENT_PUTS("      yy_current_state : yy_state_type;");
 
     -- now output the constants for the various start conditions
     RESET(DEF_FILE, IN_FILE);
