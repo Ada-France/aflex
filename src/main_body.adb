@@ -494,9 +494,9 @@ package nat_io is new integer_io(natural); use nat_io; -- CvdL: gnat/gnarl
       SKELETON_MANAGER.SKELOUT;
       if not MINIMALIST_WITH then
          TEXT_IO.PUT("with " & MISC.PACKAGE_NAME & "_dfa" & "; ");
-         TEXT_IO.PUT_LINE("use " & MISC.PACKAGE_NAME & "_dfa" & "; ");
+         TEXT_IO.PUT_LINE("use " & MISC.PACKAGE_NAME & "_dfa" & ";");
          TEXT_IO.PUT("with " & MISC.PACKAGE_NAME & "_io" & "; ");
-         TEXT_IO.PUT_LINE("use " & MISC.PACKAGE_NAME & "_io" & "; ");
+         TEXT_IO.PUT_LINE("use " & MISC.PACKAGE_NAME & "_io" & ";");
       end if;
     MISC.LINE_DIRECTIVE_OUT;
 

@@ -136,7 +136,7 @@ package body MISC is
       DATAFLUSH;
 
       -- add terminator for initialization
-      TEXT_IO.PUT_LINE("    ) ;");
+      TEXT_IO.PUT_LINE("       );");
       TEXT_IO.NEW_LINE;
 
       DATALINE := 0;
