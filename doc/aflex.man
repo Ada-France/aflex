@@ -1,4 +1,4 @@
-.TH AFLEX 1 "March 2015" "Version 1.4a.2015"
+.TH AFLEX 1 "January 2017" "Version 1.5.2017"
 .SH NAME
 aflex - fast lexical analyzer generator for Ada
 .SH SYNOPSIS
