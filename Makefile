@@ -73,3 +73,8 @@ example: doc/example.l bin/aflex
 	bin/aflex -s doc/example.l
 	mv example.ada example.adb
 	gnatmake example
+
+options: doc/options.l bin/aflex
+	bin/aflex -s doc/options.l
+	mv options.ada options.adb
+	gnatmake options
