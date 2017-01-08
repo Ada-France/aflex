@@ -699,34 +699,32 @@ VSTR("")
   procedure GENERATE_DFA_FILE is
     DFA_OUT_FILE : FILE_TYPE;
   begin
-    EXTERNAL_FILE_MANAGER.GET_DFA_FILE(DFA_OUT_FILE, True);
-    Text_IO.PUT_LINE(DFA_OUT_FILE, "pragma Style_Checks (Off);");
-    Text_IO.PUT_LINE(DFA_OUT_FILE, "package " & MISC.PACKAGE_NAME &
-      "_dfa is");
+      EXTERNAL_FILE_MANAGER.GET_DFA_FILE(DFA_OUT_FILE, True);
+      Text_IO.PUT_LINE(DFA_OUT_FILE, "pragma Style_Checks (Off);");
+      Text_IO.PUT_LINE(DFA_OUT_FILE, "package " & MISC.PACKAGE_NAME & "_dfa is");
 
-    if DDEBUG then
+      if DDEBUG then
+         -- make a scanner that output acceptance information
+         Text_IO.PUT_LINE(DFA_OUT_FILE, "   aflex_debug : boolean := true;");
+      else
+         Text_IO.PUT_LINE(DFA_OUT_FILE, "   aflex_debug : boolean := false;");
+      end if;
+      if YYLINENO then
+         Text_IO.PUT_LINE(DFA_OUT_FILE, "   yylineno  : Natural := 0;");
+         Text_IO.PUT_LINE(DFA_OUT_FILE, "   yylinecol : Natural := 0;");
+      end if;
+      TEMPLATE_OUT(DFA_OUT_FILE, DFA_TEMPLATE, DFA_CURRENT_LINE);
+      Text_IO.PUT_LINE(DFA_OUT_FILE, "end " & MISC.PACKAGE_NAME & "_dfa;");
+      Text_IO.Close(DFA_OUT_FILE);
 
-      -- make a scanner that output acceptance information
-      Text_IO.PUT_LINE(DFA_OUT_FILE, "aflex_debug : boolean := true;");
-    else
-      Text_IO.PUT_LINE(DFA_OUT_FILE, "aflex_debug : boolean := false;");
-    end if;
-    TEMPLATE_OUT(DFA_OUT_FILE, DFA_TEMPLATE, DFA_CURRENT_LINE);
-    Text_IO.PUT_LINE(DFA_OUT_FILE, "end " & MISC.PACKAGE_NAME & "_dfa;"
-                    );
-    Text_IO.Close(DFA_OUT_FILE);
-
-    EXTERNAL_FILE_MANAGER.GET_DFA_FILE(DFA_OUT_FILE, False);
-    Text_IO.NEW_LINE(DFA_OUT_FILE);
-    Text_IO.PUT_LINE(DFA_OUT_FILE, "pragma Style_Checks (Off);");
-    Text_IO.PUT(DFA_OUT_FILE, "with " & MISC.PACKAGE_NAME & "_dfa" &
-      "; ");
-    Text_IO.PUT_LINE(DFA_OUT_FILE, "use " & MISC.PACKAGE_NAME & "_dfa; ");
-    Text_IO.PUT_LINE(DFA_OUT_FILE, "package body " & MISC.PACKAGE_NAME
-      & "_dfa is");
-    TEMPLATE_OUT(DFA_OUT_FILE, DFA_TEMPLATE, DFA_CURRENT_LINE);
-    Text_IO.PUT_LINE(DFA_OUT_FILE, "end " & MISC.PACKAGE_NAME & "_dfa;"
-      );
+      EXTERNAL_FILE_MANAGER.GET_DFA_FILE(DFA_OUT_FILE, False);
+      Text_IO.NEW_LINE(DFA_OUT_FILE);
+      Text_IO.PUT_LINE(DFA_OUT_FILE, "pragma Style_Checks (Off);");
+      Text_IO.PUT(DFA_OUT_FILE, "with " & MISC.PACKAGE_NAME & "_dfa" & "; ");
+      Text_IO.PUT_LINE(DFA_OUT_FILE, "use " & MISC.PACKAGE_NAME & "_dfa; ");
+      Text_IO.PUT_LINE(DFA_OUT_FILE, "package body " & MISC.PACKAGE_NAME & "_dfa is");
+      TEMPLATE_OUT(DFA_OUT_FILE, DFA_TEMPLATE, DFA_CURRENT_LINE);
+      Text_IO.PUT_LINE(DFA_OUT_FILE, "end " & MISC.PACKAGE_NAME & "_dfa;");
   end GENERATE_DFA_FILE;
 
   procedure GENERATE_IO_FILE is
