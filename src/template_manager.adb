@@ -712,6 +712,9 @@ VSTR("")
       if YYLINENO then
          Text_IO.PUT_LINE(DFA_OUT_FILE, "   yylineno  : Natural := 0;");
          Text_IO.PUT_LINE(DFA_OUT_FILE, "   yylinecol : Natural := 0;");
+         Text_IO.PUT_LINE(DFA_OUT_FILE, "   yy_last_yylineno  : Natural := 0;");
+         Text_IO.PUT_LINE(DFA_OUT_FILE, "   yy_last_yylinecol : Natural := 0;");
+
       end if;
       TEMPLATE_OUT(DFA_OUT_FILE, DFA_TEMPLATE, DFA_CURRENT_LINE);
       Text_IO.PUT_LINE(DFA_OUT_FILE, "end " & MISC.PACKAGE_NAME & "_dfa;");
