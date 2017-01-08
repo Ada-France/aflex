@@ -71,4 +71,5 @@ package MISC is
   function UNITNAME return VSTRING;
   function PACKAGE_NAME return STRING;
   procedure SET_FILENAME (STR : in VSTRING);
+  procedure SET_OPTION (OPT : in VSTRING);
 end MISC;
