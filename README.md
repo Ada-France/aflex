@@ -15,16 +15,26 @@ This version brings a number of improvements:
 - Aflex uses the lex file name to generate the package name and
   it supports child package.
 
-Build
+# NEWS
 
+- Aflex now supports the *%option* definition in lex files to control the scanner.
+  The following keywords are recognized: *case-insensitive*, *casefull*, *case-insensitive*,
+  *caseless*, *debug*, *interactive*, *full*.
+
+# Build
+
+```
   make
+```
 
-Install
-
+# Install
+```
   make install prefix=/usr
+```
 
-Example
-
+# Example
+```
   aflex doc/example.l
   gnatmake example
+```
 
