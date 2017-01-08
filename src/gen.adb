@@ -70,7 +70,11 @@ package body GEN is
 
     INDENT_UP;
     INDENT_PUTS("yy_last_accepting_state := yy_current_state;");
-    INDENT_PUTS("yy_last_accepting_cpos := yy_cp;");
+      INDENT_PUTS("yy_last_accepting_cpos := yy_cp;");
+      if YYLINENO then
+         INDENT_PUTS("yy_last_yylineno := yylineno;");
+         INDENT_PUTS("yy_last_yylinecol := yylinecol;");
+      end if;
     INDENT_DOWN;
     INDENT_PUTS("end if;");
   end GEN_BACKTRACKING;
@@ -90,13 +94,21 @@ package body GEN is
     INDENT_PUTS("yy_ch_buf (yy_cp) := yy_hold_char;");
 
     if FULLTBL then
-      INDENT_PUTS("yy_cp := yy_last_accepting_cpos + 1;");
+         INDENT_PUTS("yy_cp := yy_last_accepting_cpos + 1;");
+         if YYLINENO then
+            INDENT_PUTS("yylineno := yy_last_yylineno;");
+            INDENT_PUTS("yylinecol := yy_last_yylinecol;");
+         end if;
     else
 
       -- backtracking info for compressed tables is taken \after/
       -- yy_cp has been incremented for the next state
       INDENT_PUTS("yy_cp := yy_last_accepting_cpos;");
-    end if;
+         if YYLINENO then
+            INDENT_PUTS("yylineno := yy_last_yylineno;");
+            INDENT_PUTS("yylinecol := yy_last_yylinecol;");
+         end if;
+      end if;
 
     INDENT_PUTS("yy_current_state := yy_last_accepting_state;");
     INDENT_PUTS("goto next_action;");
@@ -327,7 +339,11 @@ package body GEN is
 
       if not INTERACTIVE then
         INDENT_PUTS("yy_cp := yy_last_accepting_cpos;");
-        INDENT_PUTS("yy_current_state := yy_last_accepting_state;");
+            INDENT_PUTS("yy_current_state := yy_last_accepting_state;");
+            if YYLINENO then
+               INDENT_PUTS("yylineno := yy_last_yylineno;");
+               INDENT_PUTS("yylinecol := yy_last_yylinecol;");
+            end if;
       end if;
     end if;
   end GEN_NEXT_MATCH;
