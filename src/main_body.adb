@@ -290,6 +290,7 @@ package nat_io is new integer_io(natural); use nat_io; -- CvdL: gnat/gnarl
     GEN_LINE_DIRS := TRUE;
     USEMECS := TRUE;
     USEECS := TRUE;
+    YYLINENO := FALSE;
 
     USE_STDOUT := FALSE;
 
