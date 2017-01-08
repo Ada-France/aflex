@@ -338,6 +338,8 @@ package body MISC is
          MISC_DEFS.USEECS := FALSE;
          MISC_DEFS.USEMECS := FALSE;
          MISC_DEFS.FULLTBL := True;
+      elsif Option = "yylineno" then
+         MISC_DEFS.YYLINENO := True;
       end if;
   end SET_OPTION;
 
