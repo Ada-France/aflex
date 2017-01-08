@@ -323,6 +323,24 @@ package body MISC is
     end if;
   end UNITNAME;
 
+   procedure SET_OPTION (OPT : in VSTRING) is
+      Option : constant String := STR (OPT);
+   begin
+      if Option = "case-sensitive" or Option = "casefull" then
+         MISC_DEFS.CASEINS := False;
+      elsif Option = "case-insensitive" or Option = "caseless" then
+         MISC_DEFS.CASEINS := True;
+      elsif Option = "debug" then
+         MISC_DEFS.DDEBUG := True;
+      elsif Option = "interactive" then
+         MISC_DEFS.INTERACTIVE := True;
+      elsif Option = "full" then
+         MISC_DEFS.USEECS := FALSE;
+         MISC_DEFS.USEMECS := FALSE;
+         MISC_DEFS.FULLTBL := True;
+      end if;
+  end SET_OPTION;
+
   -- basename - find the basename of a file
    function PACKAGE_NAME return STRING is
       Name : String := STR(BASENAME);
