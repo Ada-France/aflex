@@ -29,11 +29,13 @@
 --       generate scanner using the command 'aflex -is ascan.l'
 --  $Header: C:/CVSROOT/afay/aflex/src/ascan.l,v 1.3 2004/10/23 22:06:12 Grands Exp $ 
 --
+--  2017/01/08 Stephane Carrez
+--  + Add "%option" to support flex controlling options
 --  2004/10/16 Thierry Bernier
 --  + Add "%unit" to support Ada-95 parent/child units
 --  + Less -gnatwa warnings
 -- To be aflex'ed using "-i" : case insensitive
---# line 53 "ascan.l"
+--# line 55 "ascan.l"
 
 with Parse_Tokens;
 package scanner is
