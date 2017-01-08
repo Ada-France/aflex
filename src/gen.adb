@@ -258,7 +258,19 @@ package body GEN is
       INDENT_PUTS(
         "yy_current_state := yy_nxt (yy_current_state, yy_ch_buf (yy_cp));");
       INDENT_PUTS("while yy_current_state > 0 loop");
-      INDENT_UP;
+         INDENT_UP;
+         if YYLINENO then
+            INDENT_PUTS("if yy_ch_buf (yy_cp) = ASCII.LF then");
+            INDENT_UP;
+            INDENT_PUTS("yylineno := yylineno + 1;");
+            INDENT_PUTS("yylinecol := 1;");
+            INDENT_DOWN;
+            INDENT_PUTS("else");
+            INDENT_UP;
+            INDENT_PUTS("yylinecol := yylinecol + 1;");
+            INDENT_DOWN;
+            INDENT_PUTS("end if;");
+         end if;
       INDENT_PUTS("yy_cp := yy_cp + 1;");
       INDENT_PUTS(
         "yy_current_state := yy_nxt (yy_current_state, yy_ch_buf (yy_cp));");
@@ -280,6 +292,18 @@ package body GEN is
       INDENT_UP;
 
       GEN_NEXT_STATE;
+         if YYLINENO then
+            INDENT_PUTS("if yy_ch_buf (yy_cp) = ASCII.LF then");
+            INDENT_UP;
+            INDENT_PUTS("yylineno := yylineno + 1;");
+            INDENT_PUTS("yylinecol := 1;");
+            INDENT_DOWN;
+            INDENT_PUTS("else");
+            INDENT_UP;
+            INDENT_PUTS("yylinecol := yylinecol + 1;");
+            INDENT_DOWN;
+            INDENT_PUTS("end if;");
+         end if;
 
       INDENT_PUTS("yy_cp := yy_cp + 1;");
 
