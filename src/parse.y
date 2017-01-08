@@ -26,7 +26,7 @@
 -- + Add "%unit" for Ada-95 parent/child units support
 
 %token CHAR NUMBER SECTEND SCDECL XSCDECL WHITESPACE NAME PREVCCL EOF_OP
-%token USCDECL UNAME
+%token USCDECL OPTDECL UNAME
 %token NEWLINE
 
 -- %with TEXT_IO
@@ -82,6 +82,10 @@ sect1		:  sect1 startconddecl WHITESPACE namelist1 NEWLINE
 		|  sect1 USCDECL WHITESPACE unit_name NEWLINE
 			{
 			misc.set_unitname (nmstr);
+			}
+		|  sect1 OPTDECL WHITESPACE unit_name NEWLINE
+			{
+			misc.set_option (nmstr);
 			}
 		|
 		|  error NEWLINE
