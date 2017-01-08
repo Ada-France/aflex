@@ -26,6 +26,8 @@
 --       generate scanner using the command 'aflex -is ascan.l'
 --  $Header: C:/CVSROOT/afay/aflex/src/ascan.l,v 1.3 2004/10/23 22:06:12 Grands Exp $ 
 --
+--  2017/01/08 Stephane Carrez
+--  + Add "%option" to support flex controlling options
 --  2004/10/16 Thierry Bernier
 --  + Add "%unit" to support Ada-95 parent/child units
 --  + Less -gnatwa warnings
@@ -60,6 +62,7 @@ ESCSEQ      \\([^\n]|[0-9]{1,3})
 ^"%s"(tart)?        { return SCDECL; }
 ^"%x"           { return XSCDECL; }
 ^"%u"(nit)?     { return USCDECL; }
+^"%o"(ption)?   { return OPTDECL; }
 
 {WS}            { return WHITESPACE; }
 
