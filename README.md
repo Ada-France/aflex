@@ -1,3 +1,9 @@
+# Aflex
+
+[![Build Status](https://img.shields.io/jenkins/s/http/jenkins.vacs.fr/Aflex.svg)](http://jenkins.vacs.fr/job/Aflex/)
+[![License](http://img.shields.io/badge/license-UCI-blue.svg)](LICENSE)
+
+
 Aflex is a lexical analyzer generating tool similar to the Unix tool lex.
 
 The first implementation was written by John Self of the Arcadia project
