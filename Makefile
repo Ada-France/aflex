@@ -1,6 +1,7 @@
 MODE=distrib
 GNATMAKE=gnatmake
 GNATCLEAN=gnatclean
+GPRBUILD=gprbuild
 GPRPATH=aflex.gpr
 
 INSTALL = /usr/bin/install -c
@@ -13,7 +14,7 @@ bindir = ${prefix}/bin
 mandir = ${prefix}/share/man
 
 all build:
-	$(GNATMAKE) -p -P "$(GPRPATH)" $(MAKE_ARGS)
+	$(GPRBUILD) -p -P "$(GPRPATH)" $(MAKE_ARGS)
 
 # Not intended for manual invocation.
 # Invoked if automatic builds are enabled.
