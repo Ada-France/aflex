@@ -2,7 +2,7 @@ Source: aflex
 Section: devel
 Priority: extra
 Maintainer: Stephane Carrez <Stephane.Carrez@gmail.com>
-Build-Depends: debhelper (>= 10), autotools-dev, gnat, gnat-8,
+Build-Depends: debhelper (>= 10), autotools-dev, gnat,
  gprbuild (>= 2015-2),
 Standards-Version: 4.1.4
 Homepage: https://github.com/Ada-France/aflex
