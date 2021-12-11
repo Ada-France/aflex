@@ -26,11 +26,9 @@
 with MISC_DEFS, MISC, COMMAND_LINE_INTERFACE, ECS, TEXT_IO, PARSER;
 with MAIN_BODY, TSTRING, PARSE_TOKENS, SKELETON_MANAGER, EXTERNAL_FILE_MANAGER;
 with INT_IO; use MISC_DEFS, COMMAND_LINE_INTERFACE,
-  TSTRING, EXTERNAL_FILE_MANAGER, text_io;
+  TSTRING, text_io;
 
 package body MAIN_BODY is
-
-package nat_io is new integer_io(natural); use nat_io; -- CvdL: gnat/gnarl
 
   AFLEX_VERSION      : CONSTANT STRING := "1.5";
   STARTTIME, ENDTIME : VSTRING;
@@ -245,7 +243,7 @@ package nat_io is new integer_io(natural); use nat_io; -- CvdL: gnat/gnarl
    --  Print aflex usage.
    procedure Usage is
    begin
-      Put_Line (Standard_Error, "aflex version 1.5.2017");
+      Put_Line (Standard_Error, "aflex version 1.5.2021");
       Put_Line (Standard_Error, "");
       Put_Line (Standard_Error, "Usage: aflex [-bdfimpstvEILT] [-Sskeleton] [filename]");
       Put_Line (Standard_Error, "-b         Generate backtracking information");
