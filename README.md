@@ -21,7 +21,14 @@ This version brings a number of improvements:
 - Aflex uses the lex file name to generate the package name and
   it supports child package.
 
-# NEWS
+## Version 1.5.2021 - Dec 2021
+
+- Fix crash when the scanner file uses characters in range 128..255,
+- Fixed various compilation warnings,
+- Use `gprbuild` to build and support `alr`,
+- Reduced number of style compilation warnings in generated code
+
+## Version 1.5.2017 - Jan 2017
 
 - Aflex now supports the *%option* definition in lex files to control the scanner.
   The following keywords are recognized: *case-insensitive*, *casefull*, *case-insensitive*,
@@ -41,6 +48,6 @@ This version brings a number of improvements:
 # Example
 ```
   aflex doc/example.l
-  gnatmake example
+  gnatmake example.ada
 ```
 
