@@ -2,6 +2,7 @@ description = "An Ada Lexical Analyzer Generator"
 name = "aflex"
 version = "1.5.2021"
 licenses = "Unlicense"
+authors = ["John Self"]
 maintainers = ["Stephane.Carrez@gmail.com"]
 maintainers-logins = ["stcarrez"]
 project-files = ["aflex.gpr"]
