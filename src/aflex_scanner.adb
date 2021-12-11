@@ -21,7 +21,7 @@
 -- DESCRIPTION causes parser to call augmented version of YYLex.
 -- $Header: /co/ua/self/arcadia/aflex/ada/src/RCS/aflex_scanner.a,v 1.3 90/01/12 15:19:33 self Exp Locker: self $ 
 
-with SCANNER; use SCANNER; 
+with SCANNER;
 
 package body AFLEX_SCANNER is 
   function YYLEX return TOKEN is 
