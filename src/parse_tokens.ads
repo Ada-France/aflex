@@ -1,11 +1,10 @@
-pragma Style_Checks (Off);
 package Parse_Tokens is
 
 
   subtype YYSType is Integer;
 
-    YYLVal, YYVal : YYSType; 
-    type Token is
+   YYLVal, YYVal : YYSType;
+   type Token is
         (End_Of_Input, Error, Char, Number,
          Sectend, Scdecl, Xscdecl,
          Whitespace, Name, Prevccl,
@@ -16,8 +15,8 @@ package Parse_Tokens is
          '*', '+', '?',
          '{', '}', '.',
          '"', '(', ')',
-         '[', ']', '-' );
+         '[', ']', '-');
 
-    Syntax_Error : exception;
+   Syntax_Error : exception;
 
 end Parse_Tokens;
