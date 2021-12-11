@@ -38,10 +38,10 @@ analyze:
 rebuild: clean build
 
 install:
-	mkdir -p ${bindir}
-	mkdir -p $(mandir)/man1
-	$(INSTALL_PROGRAM) bin/aflex ${bindir}
-	$(INSTALL) doc/aflex.man $(mandir)/man1/aflex.1
+	mkdir -p $(DESTDIR)${bindir}
+	mkdir -p $(DESTDIR)$(mandir)/man1
+	$(INSTALL_PROGRAM) bin/aflex $(DESTDIR)${bindir}
+	$(INSTALL) doc/aflex.man $(DESTDIR)$(mandir)/man1/aflex.1
 
 
 # Targets to rebuild some files from ascan.l and parse.y
@@ -50,7 +50,7 @@ lexer:	  bin/aflex
 	cd src && gnatchop -w ascan.ada && rm ascan.ada
 
 parser:
-	cd src && ayacc -s -n 300 -e .ada parse.y
+	cd src && ayacc -s -E -C -n 300 -e .ada parse.y
 	cd src && gnatchop -w parse.ada && rm parse.ada
 
 test:
