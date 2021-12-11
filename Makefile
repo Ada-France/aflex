@@ -26,8 +26,9 @@ autobuild:
 # Clean the root project of all build products.
 clean:
 	-$(GNATCLEAN) -q -P "$(GPRPATH)"
-	-rm -rf tests
-	-rm example_io.* example example.* example_dfa.*
+	-@rm -rf tests
+	-@rm -f example_io.* example example.* example_dfa.*
+	-@rm -f doc/aflex_user_man.aux doc/aflex_user_man.dvi doc/aflex_user_man.toc
 
 # Check *all* sources for errors, even those not changed.
 # Does not build executables.
