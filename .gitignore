@@ -16,4 +16,6 @@ autom4te.cache
 *.txt
 lib/
 obj/
-							       
+bin/
+alire/
+config/
