@@ -155,8 +155,8 @@ package MISC_DEFS is
   UNIQUE : constant INTEGER := - 1; -- marks a symbol as an e.c. representative
   INFINITY : constant INTEGER := - 1; -- for x{5,} constructions
 
-  -- size of input alphabet - should be size of ASCII set
-  CSIZE : constant INTEGER := 127;
+  -- size of input alphabet - should be size of ASCII set (extended to cover a full byte)
+  CSIZE : constant INTEGER := 255;
 
   INITIAL_MAX_CCLS : constant INTEGER := 100; -- max number of unique character
                                               --  classes
