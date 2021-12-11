@@ -54,21 +54,21 @@ package body scanner is
       YY_END_OF_BUFFER : constant := 85;
       subtype yy_state_type is Integer;
       yy_current_state : yy_state_type;
-INITIAL : constant := 0;
-SECT2 : constant := 1;
-SECT2PROLOG : constant := 2;
-SECT3 : constant := 3;
-PICKUPDEF : constant := 4;
-SC : constant := 5;
-CARETISBOL : constant := 6;
-NUM : constant := 7;
-QUOTE : constant := 8;
-FIRSTCCL : constant := 9;
-CCL : constant := 10;
-ACTION : constant := 11;
-RECOVER : constant := 12;
-BRACEERROR : constant := 13;
-ACTION_STRING : constant := 14;
+      INITIAL : constant := 0;
+      SECT2 : constant := 1;
+      SECT2PROLOG : constant := 2;
+      SECT3 : constant := 3;
+      PICKUPDEF : constant := 4;
+      SC : constant := 5;
+      CARETISBOL : constant := 6;
+      NUM : constant := 7;
+      QUOTE : constant := 8;
+      FIRSTCCL : constant := 9;
+      CCL : constant := 10;
+      ACTION : constant := 11;
+      RECOVER : constant := 12;
+      BRACEERROR : constant := 13;
+      ACTION_STRING : constant := 14;
       yy_accept : constant array (0 .. 219) of Short :=
           (0,
         0,    0,    0,    0,    0,    0,   83,   83,    0,    0,
@@ -111,7 +111,21 @@ ACTION_STRING : constant := 14;
 
        25,   26,   23,   23,   27,   23,   23,   23,   23,   28,
        29,   30,   23,   31,   32,   33,   34,   23,   23,   35,
-       23,   23,   36,   37,   38,    1,    1, others => 1
+       23,   23,   36,   37,   38,    1,    1,    1,    1,    1,
+        1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
+        1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
+        1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
+        1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
+        1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
+        1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
+        1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
+
+        1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
+        1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
+        1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
+        1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
+        1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
+        1,    1,    1,    1,    1, others => 1
 
        );
 
@@ -580,41 +594,41 @@ ACTION_STRING : constant := 14;
 
 
 
-         when 1 => 
+         when 1 =>
 --# line 57 "ascan.l"
              indented_code := True; 
 
-         when 2 => 
+         when 2 =>
 --# line 58 "ascan.l"
              linenum := linenum + 1; ECHO;
                 -- treat as a comment;
             
 
-         when 3 => 
+         when 3 =>
 --# line 61 "ascan.l"
              linenum := linenum + 1; ECHO; 
 
-         when 4 => 
+         when 4 =>
 --# line 62 "ascan.l"
              return SCDECL; 
 
-         when 5 => 
+         when 5 =>
 --# line 63 "ascan.l"
              return XSCDECL; 
 
-         when 6 => 
+         when 6 =>
 --# line 64 "ascan.l"
              return USCDECL; 
 
-         when 7 => 
+         when 7 =>
 --# line 65 "ascan.l"
              return OPTDECL; 
 
-         when 8 => 
+         when 8 =>
 --# line 67 "ascan.l"
              return WHITESPACE; 
 
-         when 9 => 
+         when 9 =>
 --# line 69 "ascan.l"
             
             sectnum := 2;
@@ -623,7 +637,7 @@ ACTION_STRING : constant := 14;
             return SECTEND;
             
 
-         when 10 => 
+         when 10 =>
 --# line 76 "ascan.l"
             
             Ada.Text_IO.Put( Standard_Error, "old-style lex command at line " );
@@ -635,7 +649,7 @@ ACTION_STRING : constant := 14;
             linenum := linenum + 1;
             
 
-         when 11 => 
+         when 11 =>
 --# line 86 "ascan.l"
             
             nmstr := vstr(yytext(1..YYLength));
@@ -643,39 +657,39 @@ ACTION_STRING : constant := 14;
             ENTER(PICKUPDEF);
             
 
-         when 12 => 
+         when 12 =>
 --# line 92 "ascan.l"
              nmstr := vstr(yytext(1..YYLength));
               return UNAME;
             
 
-         when 13 => 
+         when 13 =>
 --# line 96 "ascan.l"
              nmstr := vstr(yytext(1..YYLength));
               return NAME;
             
 
-         when 14 => 
+         when 14 =>
 --# line 99 "ascan.l"
              linenum := linenum + 1;
               -- allows blank lines in section 1;
             
 
-         when 15 => 
+         when 15 =>
 --# line 102 "ascan.l"
              linenum := linenum + 1; return Newline; 
 
-         when 16 => 
+         when 16 =>
 --# line 103 "ascan.l"
              misc.synerr( "illegal character" );ENTER(RECOVER);
 
-         when 17 => 
+         when 17 =>
 --# line 105 "ascan.l"
              null;
               -- separates name and definition;
             
 
-         when 18 => 
+         when 18 =>
 --# line 109 "ascan.l"
             
             nmdef := vstr(yytext(1..YYLength));
@@ -694,7 +708,7 @@ ACTION_STRING : constant := 14;
             didadef := True;
             
 
-         when 19 => 
+         when 19 =>
 --# line 126 "ascan.l"
             
             if not didadef then
@@ -704,7 +718,7 @@ ACTION_STRING : constant := 14;
             linenum := linenum + 1;
             
 
-         when 20 => 
+         when 20 =>
 --# line 134 "ascan.l"
              linenum := linenum + 1;
               ENTER(0);
@@ -712,7 +726,7 @@ ACTION_STRING : constant := 14;
               return NAME;
             
 
-         when 21 => 
+         when 21 =>
             yy_ch_buf (yy_cp) := yy_hold_char; -- undo effects of setting up yytext
             yy_cp := yy_cp - 1;
             yy_c_buf_p := yy_cp;
@@ -725,7 +739,7 @@ ACTION_STRING : constant := 14;
             ENTER(SECT2);
             
 
-         when 22 => 
+         when 22 =>
 --# line 147 "ascan.l"
              linenum := linenum + 1; ACTION_ECHO; 
 
@@ -736,33 +750,33 @@ ACTION_STRING : constant := 14;
               return End_Of_Input;
             
 
-         when 24 => 
+         when 24 =>
 --# line 153 "ascan.l"
              linenum := linenum + 1;
               -- allow blank lines in sect2;
 
             -- this rule matches indented lines which
             -- are not comments.
-         when 25 => 
+         when 25 =>
 --# line 158 "ascan.l"
             
             misc.synerr("indented code found outside of action");
             linenum := linenum + 1;
             
 
-         when 26 => 
+         when 26 =>
 --# line 163 "ascan.l"
              ENTER(SC); return ( '<' ); 
 
-         when 27 => 
+         when 27 =>
 --# line 164 "ascan.l"
              return ( '^' );  
 
-         when 28 => 
+         when 28 =>
 --# line 165 "ascan.l"
              ENTER(QUOTE); return ( '"' ); 
 
-         when 29 => 
+         when 29 =>
             yy_ch_buf (yy_cp) := yy_hold_char; -- undo effects of setting up yytext
             yy_cp := yy_bp + 1;
             yy_c_buf_p := yy_cp;
@@ -770,11 +784,11 @@ ACTION_STRING : constant := 14;
 --# line 166 "ascan.l"
              ENTER(NUM); return ( '{' ); 
 
-         when 30 => 
+         when 30 =>
 --# line 167 "ascan.l"
              ENTER(BRACEERROR); 
 
-         when 31 => 
+         when 31 =>
             yy_ch_buf (yy_cp) := yy_hold_char; -- undo effects of setting up yytext
             yy_cp := yy_bp + 1;
             yy_c_buf_p := yy_cp;
@@ -782,18 +796,18 @@ ACTION_STRING : constant := 14;
 --# line 168 "ascan.l"
              return '$'; 
 
-         when 32 => 
+         when 32 =>
 --# line 170 "ascan.l"
              continued_action := True;
               linenum := linenum + 1;
               return Newline;
             
 
-         when 33 => 
+         when 33 =>
 --# line 175 "ascan.l"
              linenum := linenum + 1; ACTION_ECHO; 
 
-         when 34 => 
+         when 34 =>
 --# line 177 "ascan.l"
             
             -- this rule is separate from the one below because
@@ -806,7 +820,7 @@ ACTION_STRING : constant := 14;
             return Newline;
             
 
-         when 35 => 
+         when 35 =>
             yy_ch_buf (yy_cp) := yy_hold_char; -- undo effects of setting up yytext
             yy_cp := yy_cp - 1;
             yy_c_buf_p := yy_cp;
@@ -819,15 +833,15 @@ ACTION_STRING : constant := 14;
             return Newline;
             
 
-         when 36 => 
+         when 36 =>
 --# line 195 "ascan.l"
              linenum := linenum + 1; return Newline; 
 
-         when 37 => 
+         when 37 =>
 --# line 197 "ascan.l"
              return EOF_OP; 
 
-         when 38 => 
+         when 38 =>
 --# line 199 "ascan.l"
             
             sectnum := 3;
@@ -836,7 +850,7 @@ ACTION_STRING : constant := 14;
             -- to stop the parser
             
 
-         when 39 => 
+         when 39 =>
 --# line 206 "ascan.l"
             
 
@@ -863,7 +877,7 @@ ACTION_STRING : constant := 14;
             end if;
             
 
-         when 40 => 
+         when 40 =>
 --# line 231 "ascan.l"
             
             nmstr := vstr(yytext(1..YYLength));
@@ -882,7 +896,7 @@ ACTION_STRING : constant := 14;
             end if;
             
 
-         when 41 => 
+         when 41 =>
 --# line 248 "ascan.l"
              tmpbuf := vstr(yytext(1..YYLength));
               case tstring.CHAR(tmpbuf,1) is
@@ -899,26 +913,26 @@ ACTION_STRING : constant := 14;
               end case;
             
 
-         when 42 => 
+         when 42 =>
 --# line 262 "ascan.l"
              tmpbuf := vstr(yytext(1..YYLength));
               YYLVal := CHARACTER'POS(CHAR(tmpbuf,1));
               return CHAR;
             
 
-         when 43 => 
+         when 43 =>
 --# line 266 "ascan.l"
              linenum := linenum + 1; return Newline; 
 
-         when 44 => 
+         when 44 =>
 --# line 269 "ascan.l"
              return ( ',' ); 
 
-         when 45 => 
+         when 45 =>
 --# line 270 "ascan.l"
              ENTER(SECT2); return ( '>' ); 
 
-         when 46 => 
+         when 46 =>
             yy_ch_buf (yy_cp) := yy_hold_char; -- undo effects of setting up yytext
             yy_cp := yy_bp + 1;
             yy_c_buf_p := yy_cp;
@@ -926,32 +940,32 @@ ACTION_STRING : constant := 14;
 --# line 271 "ascan.l"
              ENTER(CARETISBOL); return ( '>' ); 
 
-         when 47 => 
+         when 47 =>
 --# line 272 "ascan.l"
              nmstr := vstr(yytext(1..YYLength));
               return NAME;
             
 
-         when 48 => 
+         when 48 =>
 --# line 275 "ascan.l"
              misc.synerr( "bad start condition name" ); 
 
-         when 49 => 
+         when 49 =>
 --# line 277 "ascan.l"
              ENTER(SECT2); return '^'; 
 
-         when 50 => 
+         when 50 =>
 --# line 280 "ascan.l"
              tmpbuf := vstr(yytext(1..YYLength));
               YYLVal := CHARACTER'POS(CHAR(tmpbuf,1));
               return CHAR;
             
 
-         when 51 => 
+         when 51 =>
 --# line 284 "ascan.l"
              ENTER(SECT2); return '"'; 
 
-         when 52 => 
+         when 52 =>
 --# line 286 "ascan.l"
             
             misc.synerr( "missing quote" );
@@ -960,7 +974,7 @@ ACTION_STRING : constant := 14;
             return '"';
             
 
-         when 53 => 
+         when 53 =>
             yy_ch_buf (yy_cp) := yy_hold_char; -- undo effects of setting up yytext
             yy_cp := yy_bp + 1;
             yy_c_buf_p := yy_cp;
@@ -968,7 +982,7 @@ ACTION_STRING : constant := 14;
 --# line 294 "ascan.l"
              ENTER(CCL); return '^'; 
 
-         when 54 => 
+         when 54 =>
             yy_ch_buf (yy_cp) := yy_hold_char; -- undo effects of setting up yytext
             yy_cp := yy_bp + 1;
             yy_c_buf_p := yy_cp;
@@ -976,11 +990,11 @@ ACTION_STRING : constant := 14;
 --# line 295 "ascan.l"
              return '^'; 
 
-         when 55 => 
+         when 55 =>
 --# line 296 "ascan.l"
              ENTER(CCL); YYLVal := CHARACTER'POS('-'); return ( CHAR ); 
 
-         when 56 => 
+         when 56 =>
 --# line 297 "ascan.l"
              ENTER(CCL);
               tmpbuf := vstr(yytext(1..YYLength));
@@ -988,7 +1002,7 @@ ACTION_STRING : constant := 14;
               return CHAR;
             
 
-         when 57 => 
+         when 57 =>
             yy_ch_buf (yy_cp) := yy_hold_char; -- undo effects of setting up yytext
             yy_cp := yy_bp + 1;
             yy_c_buf_p := yy_cp;
@@ -996,33 +1010,33 @@ ACTION_STRING : constant := 14;
 --# line 303 "ascan.l"
              return '-'; 
 
-         when 58 => 
+         when 58 =>
 --# line 304 "ascan.l"
              tmpbuf := vstr(yytext(1..YYLength));
               YYLVal := CHARACTER'POS(CHAR(tmpbuf,1));
               return CHAR;
             
 
-         when 59 => 
+         when 59 =>
 --# line 308 "ascan.l"
              ENTER(SECT2); return ']'; 
 
-         when 60 => 
+         when 60 =>
 --# line 311 "ascan.l"
             
             YYLVal := misc.myctoi( vstr(yytext(1..YYLength)) );
             return NUMBER;
             
 
-         when 61 => 
+         when 61 =>
 --# line 316 "ascan.l"
              return ','; 
 
-         when 62 => 
+         when 62 =>
 --# line 317 "ascan.l"
              ENTER(SECT2); return '}'; 
 
-         when 63 => 
+         when 63 =>
 --# line 319 "ascan.l"
             
             misc.synerr( "bad character inside {}'s" );
@@ -1030,7 +1044,7 @@ ACTION_STRING : constant := 14;
             return '}';
             
 
-         when 64 => 
+         when 64 =>
 --# line 325 "ascan.l"
             
             misc.synerr( "missing }" );
@@ -1039,48 +1053,48 @@ ACTION_STRING : constant := 14;
             return '}';
             
 
-         when 65 => 
+         when 65 =>
 --# line 333 "ascan.l"
              misc.synerr( "bad name in {}'s" ); ENTER(SECT2); 
 
-         when 66 => 
+         when 66 =>
 --# line 334 "ascan.l"
              misc.synerr( "missing }" );
               linenum := linenum + 1;
               ENTER(SECT2);
             
 
-         when 67 => 
+         when 67 =>
 --# line 339 "ascan.l"
              bracelevel := bracelevel + 1; 
 
-         when 68 => 
+         when 68 =>
 --# line 340 "ascan.l"
              bracelevel := bracelevel - 1; 
 
-         when 69 => 
+         when 69 =>
 --# line 341 "ascan.l"
              ACTION_ECHO; 
 
-         when 70 => 
+         when 70 =>
 --# line 342 "ascan.l"
              ACTION_ECHO; 
 
-         when 71 => 
+         when 71 =>
 --# line 343 "ascan.l"
              linenum := linenum + 1; ACTION_ECHO; 
 
-         when 72 => 
+         when 72 =>
 --# line 344 "ascan.l"
              ACTION_ECHO;
                   -- character constant;
             
 
-         when 73 => 
+         when 73 =>
 --# line 348 "ascan.l"
              ACTION_ECHO; ENTER(ACTION_STRING); 
 
-         when 74 => 
+         when 74 =>
 --# line 350 "ascan.l"
             
             linenum := linenum + 1;
@@ -1091,38 +1105,38 @@ ACTION_STRING : constant := 14;
                     end if;
             
 
-         when 75 => 
+         when 75 =>
 --# line 358 "ascan.l"
              ACTION_ECHO; 
 
-         when 76 => 
+         when 76 =>
 --# line 360 "ascan.l"
              ACTION_ECHO; 
 
-         when 77 => 
+         when 77 =>
 --# line 361 "ascan.l"
              ACTION_ECHO; 
 
-         when 78 => 
+         when 78 =>
 --# line 362 "ascan.l"
              linenum := linenum + 1; ACTION_ECHO; 
 
-         when 79 => 
+         when 79 =>
 --# line 363 "ascan.l"
              ACTION_ECHO; ENTER(ACTION); 
 
-         when 80 => 
+         when 80 =>
 --# line 364 "ascan.l"
              ACTION_ECHO; 
 
-         when 81 => 
+         when 81 =>
 --# line 367 "ascan.l"
             
             YYLVal := CHARACTER'POS(misc.myesc( vstr(yytext(1..YYLength)) ));
             return ( CHAR );
             
 
-         when 82 => 
+         when 82 =>
 --# line 372 "ascan.l"
             
             YYLVal := CHARACTER'POS(misc.myesc( vstr(yytext(1..YYLength)) ));
@@ -1130,7 +1144,7 @@ ACTION_STRING : constant := 14;
             return CHAR;
             
 
-         when 83 => 
+         when 83 =>
 --# line 379 "ascan.l"
              if check_yylex_here then
                 return End_Of_Input;
@@ -1139,72 +1153,69 @@ ACTION_STRING : constant := 14;
               end if;
             
 
-         when 84 => 
+         when 84 =>
 --# line 385 "ascan.l"
-                        ECHO;
+            ECHO;
          when YY_END_OF_BUFFER + INITIAL + 1 |
-             YY_END_OF_BUFFER + SECT2 + 1 |
-             YY_END_OF_BUFFER + SECT3 + 1 |
-             YY_END_OF_BUFFER + PICKUPDEF + 1 |
-             YY_END_OF_BUFFER + SC + 1 |
-             YY_END_OF_BUFFER + CARETISBOL + 1 |
-             YY_END_OF_BUFFER + NUM + 1 |
-             YY_END_OF_BUFFER + QUOTE + 1 |
-             YY_END_OF_BUFFER + FIRSTCCL + 1 |
-             YY_END_OF_BUFFER + CCL + 1 |
-             YY_END_OF_BUFFER + ACTION + 1 |
-             YY_END_OF_BUFFER + RECOVER + 1 |
-             YY_END_OF_BUFFER + BRACEERROR + 1 |
-             YY_END_OF_BUFFER + ACTION_STRING + 1 =>
-               return End_Of_Input;
-            when YY_END_OF_BUFFER =>
-               --  undo the effects of YY_DO_BEFORE_ACTION
-               yy_ch_buf (yy_cp) := yy_hold_char;
+              YY_END_OF_BUFFER + SECT2 + 1 |
+              YY_END_OF_BUFFER + SECT3 + 1 |
+              YY_END_OF_BUFFER + PICKUPDEF + 1 |
+              YY_END_OF_BUFFER + SC + 1 |
+              YY_END_OF_BUFFER + CARETISBOL + 1 |
+              YY_END_OF_BUFFER + NUM + 1 |
+              YY_END_OF_BUFFER + QUOTE + 1 |
+              YY_END_OF_BUFFER + FIRSTCCL + 1 |
+              YY_END_OF_BUFFER + CCL + 1 |
+              YY_END_OF_BUFFER + ACTION + 1 |
+              YY_END_OF_BUFFER + RECOVER + 1 |
+              YY_END_OF_BUFFER + BRACEERROR + 1 |
+              YY_END_OF_BUFFER + ACTION_STRING + 1 =>
+            return End_Of_Input;
+         when YY_END_OF_BUFFER =>
+            --  undo the effects of YY_DO_BEFORE_ACTION
+            yy_ch_buf (yy_cp) := yy_hold_char;
 
-               yytext_ptr := yy_bp;
+            yytext_ptr := yy_bp;
 
-               case yy_get_next_buffer is
-                  when EOB_ACT_END_OF_FILE =>
-                     if yyWrap then
-                        --  note: because we've taken care in
-                        --  yy_get_next_buffer() to have set up yytext,
-                        --  we can now set up yy_c_buf_p so that if some
-                        --  total hoser (like aflex itself) wants
-                        --  to call the scanner after we return the
-                        --  End_Of_Input, it'll still work - another
-                        --  End_Of_Input will get returned.
+            case yy_get_next_buffer is
+               when EOB_ACT_END_OF_FILE =>
+                  if yyWrap then
+                     --  note: because we've taken care in
+                     --  yy_get_next_buffer() to have set up yytext,
+                     --  we can now set up yy_c_buf_p so that if some
+                     --  total hoser (like aflex itself) wants
+                     --  to call the scanner after we return the
+                     --  End_Of_Input, it'll still work - another
+                     --  End_Of_Input will get returned.
 
-                        yy_c_buf_p := yytext_ptr;
-
-                        yy_act := YY_STATE_EOF ((yy_start - 1) / 2);
-
-                        goto do_action;
-                     else
-                        --  start processing a new file
-                        yy_init := True;
-                        goto new_file;
-                     end if;
-
-                  when EOB_ACT_RESTART_SCAN =>
                      yy_c_buf_p := yytext_ptr;
-                     yy_hold_char := yy_ch_buf (yy_c_buf_p);
 
-                  when EOB_ACT_LAST_MATCH =>
-                     yy_c_buf_p := yy_n_chars;
-                     yy_current_state := yy_get_previous_state;
+                     yy_act := YY_STATE_EOF ((yy_start - 1) / 2);
 
-                     yy_cp := yy_c_buf_p;
-                     yy_bp := yytext_ptr;
-                     goto next_action;
-                  when others =>
-                     null;
-               end case; --  case yy_get_next_buffer()
+                     goto do_action;
+                  else
+                     --  start processing a new file
+                     yy_init := True;
+                     goto new_file;
+                  end if;
 
-            when others =>
-               Text_IO.Put ("action # ");
-               Text_IO.Put (Integer'Image (yy_act));
-               Text_IO.New_Line;
-               raise AFLEX_INTERNAL_ERROR;
+               when EOB_ACT_RESTART_SCAN =>
+                  yy_c_buf_p := yytext_ptr;
+                  yy_hold_char := yy_ch_buf (yy_c_buf_p);
+
+               when EOB_ACT_LAST_MATCH =>
+                  yy_c_buf_p := yy_n_chars;
+                  yy_current_state := yy_get_previous_state;
+                  yy_cp := yy_c_buf_p;
+                  yy_bp := yytext_ptr;
+                  goto next_action;
+            end case; --  case yy_get_next_buffer()
+
+         when others =>
+            Text_IO.Put ("action # ");
+            Text_IO.Put (Integer'Image (yy_act));
+            Text_IO.New_Line;
+            raise AFLEX_INTERNAL_ERROR;
          end case; --  case (yy_act)
       end loop; --  end of loop waiting for end of file
    end YYLex;
