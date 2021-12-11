@@ -1,4 +1,4 @@
-.TH AFLEX 1 "January 2017" "Version 1.5.2017"
+.TH AFLEX 1 "December 2021" "Version 1.5.2021"
 .SH NAME
 aflex - fast lexical analyzer generator for Ada
 .SH SYNOPSIS
@@ -360,6 +360,7 @@ backtracking information for
 .B -b
 .SH "SEE ALSO"
 .BR lex (1)
+.BR ayacc (1)
 .LP
 M. E. Lesk and E. Schmidt,
 .I LEX - Lexical Analyzer Generator.
