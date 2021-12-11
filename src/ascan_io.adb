@@ -259,17 +259,6 @@ package body ascan_io is
       end if;
    end Output_Column;
 
-   function Input_Line return Text_IO.Count is
-      l : Text_IO.Count := 1;
-   begin
-      return l; -- from file, always 1
-      --  if is_open(user_input_file) then
-      --    return Text_IO.Line(user_input_file);
-      --  else
-      --    return Text_IO.Line;
-      --  end if;
-   end Input_Line;
-
    --  default yywrap function - always treat EOF as an EOF
    function yyWrap return Boolean is
    begin

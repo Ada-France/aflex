@@ -32,7 +32,6 @@ package ascan_io is
    procedure Output (c : Character);
    procedure Output_New_Line;
    function Output_Column return Text_IO.Count;
-   function Input_Line return Text_IO.Count;
    function yyWrap return Boolean;
    procedure Open_Input (fname : in String);
    procedure Close_Input;
