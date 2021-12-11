@@ -24,7 +24,7 @@
 --       This version is for the VADS 5.5 Ada development system.
 -- $Header: /co/ua/self/arcadia/aflex/ada/src/RCS/file_managerB.a,v 1.5 90/01/12 15:19:58 self Exp Locker: self $
 
-with MISC_DEFS, TSTRING, MISC; use MISC_DEFS, TSTRING, MISC;
+with MISC_DEFS, TSTRING, MISC; use MISC_DEFS, TSTRING;
 
 package body EXTERNAL_FILE_MANAGER is
 
