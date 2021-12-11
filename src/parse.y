@@ -60,9 +60,9 @@ goal            :  initlex sect1 sect1end sect2 initforrule
 			
 			if ( spprdflt ) then
 			    Text_IO.Put (temp_action_file,
-						"            raise AFLEX_SCANNER_JAMMED;");
+						"raise AFLEX_SCANNER_JAMMED;");
 			else
-			    Text_IO.Put (temp_action_file, "            ECHO");
+			    Text_IO.Put (temp_action_file, "ECHO");
 
 			text_io.put_line( temp_action_file, ";" );
 			end if;
