@@ -95,8 +95,9 @@ package body ECS is
                    LENCCL   : in INTEGER;
                    FWD, BCK : in out UNBOUNDED_INT_ARRAY;
                    LLSIZ    : in INTEGER) is
-    use MISC;
-    CCLP, OLDEC, NEWEC, CCLM, I, J : INTEGER;
+      subtype Oldec_Type is Integer range Fwd'First .. Fwd'last;
+      CCLP, NEWEC, CCLM, I, J : INTEGER;
+      Oldec : Oldec_Type;
     PROC_ARRAY                     : BOOLEAN_PTR;
   begin
 
@@ -173,6 +174,10 @@ package body ECS is
   exception
     when STORAGE_ERROR =>
       MISC.AFLEXFATAL("dynamic memory failure in mkeccl()");
+
+    when Constraint_Error =>
+      MISC.AFLEXFATAL("index out of bounds: may be CSIZE is not correct");
+
   end MKECCL;
 
 
