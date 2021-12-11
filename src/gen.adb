@@ -572,6 +572,7 @@ package body GEN is
     end loop;
 
     MISC.DATAEND;
+
   exception
     when STORAGE_ERROR =>
       MISC.AFLEXFATAL("dynamic memory failure in gentabs()");
@@ -630,7 +631,7 @@ package body GEN is
 
     while (not TEXT_IO.END_OF_FILE(DEF_FILE)) loop
       TSTRING.GET_LINE(DEF_FILE, BUF);
-      TSTRING.PUT_LINE(BUF);
+      TSTRING.PUT_LINE("      " & BUF);
     end loop;
 
     if (FULLTBL) then
@@ -690,7 +691,7 @@ package body GEN is
           TEXT_IO.PUT("         when ");
         else
           TEXT_IO.PUT_LINE("|");
-          TEXT_IO.PUT("             ");
+          TEXT_IO.PUT("              ");
         end if;
         TEXT_IO.PUT("YY_END_OF_BUFFER + ");
         TSTRING.PUT(SCNAME(I));
@@ -704,7 +705,7 @@ package body GEN is
 
     if DID_EOF_RULE then
       INDENT_UP;
-      INDENT_PUTS("            return End_Of_Input;");
+      INDENT_PUTS("         return End_Of_Input;");
       INDENT_DOWN;
     end if;
 
