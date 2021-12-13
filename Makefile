@@ -1,13 +1,14 @@
-MODE=distrib
+AFLEX_BUILD=distrib
 GNATMAKE=gnatmake
 GNATCLEAN=gnatclean
 GPRBUILD=gprbuild
 GPRPATH=aflex.gpr
+PROCESSORS=1
 
 INSTALL = /usr/bin/install -c
 INSTALL_PROGRAM = $(INSTALL) -m 755
 
-MAKE_ARGS=-XMODE=${MODE}
+MAKE_ARGS=-XAFLEX_BUILD=${AFLEX_BUILD} -XPROCESSORS=$(PROCESSORS)
 
 prefix = /usr/local
 bindir = ${prefix}/bin
