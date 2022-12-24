@@ -619,7 +619,7 @@ package body Template_Manager is
          Text_Io.Put (Dfa_Out_File, "private ");
       end if;
       Text_Io.Put_Line
-        (Dfa_Out_File, "package " & Misc.Package_Name & "_dfa is");
+        (Dfa_Out_File, "package " & Misc.Package_Name & "_DFA is");
       Text_Io.New_Line (Dfa_Out_File);
 
       if Ddebug then
@@ -642,7 +642,7 @@ package body Template_Manager is
 
       end if;
       Template_Out (Dfa_Out_File, Dfa_Template, Dfa_Current_Line);
-      Text_Io.Put_Line (Dfa_Out_File, "end " & Misc.Package_Name & "_dfa;");
+      Text_Io.Put_Line (Dfa_Out_File, "end " & Misc.Package_Name & "_DFA;");
       Text_Io.Close (Dfa_Out_File);
 
       External_File_Manager.Get_Dfa_File (Dfa_Out_File, False);
@@ -654,12 +654,12 @@ package body Template_Manager is
          "--           It is useless to modify it. Change the "".Y"" & "".L"" files instead.");
       Text_Io.New_Line (Dfa_Out_File);
       --  Text_IO.PUT_LINE(DFA_OUT_FILE, "pragma Style_Checks (Off);");
-      Text_Io.Put (Dfa_Out_File, "with " & Misc.Package_Name & "_dfa" & "; ");
-      Text_Io.Put_Line (Dfa_Out_File, "use " & Misc.Package_Name & "_dfa;");
+      Text_Io.Put (Dfa_Out_File, "with " & Misc.Package_Name & "_DFA" & "; ");
+      Text_Io.Put_Line (Dfa_Out_File, "use " & Misc.Package_Name & "_DFA;");
       Text_Io.Put_Line
-        (Dfa_Out_File, "package body " & Misc.Package_Name & "_dfa is");
+        (Dfa_Out_File, "package body " & Misc.Package_Name & "_DFA is");
       Template_Out (Dfa_Out_File, Dfa_Template, Dfa_Current_Line);
-      Text_Io.Put_Line (Dfa_Out_File, "end " & Misc.Package_Name & "_dfa;");
+      Text_Io.Put_Line (Dfa_Out_File, "end " & Misc.Package_Name & "_DFA;");
    end Generate_Dfa_File;
 
    procedure Generate_Io_File is
@@ -673,16 +673,16 @@ package body Template_Manager is
         (Io_Out_File,
          "--           It is useless to modify it. Change the "".Y"" & "".L"" files instead.");
       --  Text_IO.PUT_LINE(IO_OUT_FILE, "pragma Style_Checks (Off);");
-      Text_Io.Put (Io_Out_File, "with " & Misc.Package_Name & "_dfa; ");
-      Text_Io.Put_Line (Io_Out_File, "use " & Misc.Package_Name & "_dfa;");
+      Text_Io.Put (Io_Out_File, "with " & Misc.Package_Name & "_DFA; ");
+      Text_Io.Put_Line (Io_Out_File, "use " & Misc.Package_Name & "_DFA;");
       Template_Out (Io_Out_File, Io_Template, Io_Current_Line);
       if Private_Package then
          Text_Io.Put (Io_Out_File, "private ");
       end if;
       Text_Io.Put_Line
-        (Io_Out_File, "package " & Misc.Package_Name & "_io is");
+        (Io_Out_File, "package " & Misc.Package_Name & "_IO is");
       Template_Out (Io_Out_File, Io_Template, Io_Current_Line);
-      Text_Io.Put_Line (Io_Out_File, "end " & Misc.Package_Name & "_io;");
+      Text_Io.Put_Line (Io_Out_File, "end " & Misc.Package_Name & "_IO;");
       Text_Io.Close (Io_Out_File);
 
       External_File_Manager.Get_Io_File (Io_Out_File, False);
@@ -694,7 +694,7 @@ package body Template_Manager is
          "--           It is useless to modify it. Change the "".Y"" & "".L"" files instead.");
       --  Text_IO.PUT_LINE(IO_OUT_FILE, "pragma Style_Checks (Off);");
       Text_Io.Put_Line
-        (Io_Out_File, "package body " & Misc.Package_Name & "_io is");
+        (Io_Out_File, "package body " & Misc.Package_Name & "_IO is");
       Template_Out (Io_Out_File, Io_Template, Io_Current_Line);
       -- If we're generating a scanner for interactive mode we need to generate
       -- a YY_INPUT that stops at the end of each line
@@ -707,7 +707,7 @@ package body Template_Manager is
             "            exit; -- in interactive mode return at end of line.");
       end if;
       Template_Out (Io_Out_File, Io_Template, Io_Current_Line);
-      Text_Io.Put_Line (Io_Out_File, "end " & Misc.Package_Name & "_io;");
+      Text_Io.Put_Line (Io_Out_File, "end " & Misc.Package_Name & "_IO;");
    end Generate_Io_File;
 
 end Template_Manager;

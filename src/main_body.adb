@@ -520,10 +520,10 @@ package body Main_Body is
    begin
       Skeleton_Manager.Skelout;
       if not Minimalist_With then
-         Text_Io.Put ("with " & Misc.Package_Name & "_dfa" & "; ");
-         Text_Io.Put_Line ("use " & Misc.Package_Name & "_dfa" & ";");
-         Text_Io.Put ("with " & Misc.Package_Name & "_io" & "; ");
-         Text_Io.Put_Line ("use " & Misc.Package_Name & "_io" & ";");
+         Text_Io.Put ("with " & Misc.Package_Name & "_DFA" & "; ");
+         Text_Io.Put_Line ("use " & Misc.Package_Name & "_DFA" & ";");
+         Text_Io.Put ("with " & Misc.Package_Name & "_IO" & "; ");
+         Text_Io.Put_Line ("use " & Misc.Package_Name & "_IO" & ";");
       end if;
       Misc.Line_Directive_Out;
 
