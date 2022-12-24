@@ -1,10 +1,10 @@
-.TH AFLEX 1 "December 2021" "Version 1.5.2021"
+.TH AFLEX 1 "December 2022" "Version 1.6"
 .SH NAME
 aflex - fast lexical analyzer generator for Ada
 .SH SYNOPSIS
 .B aflex
 [
-.B -bdfimpstvEILT -Sskeleton_file
+.B -bdfimpstvEILPT -Sskeleton_file
 ] [ 
 .I filename
 ]
@@ -160,6 +160,12 @@ flag.
 instructs aflex to not generate
 .B #line
 directives (see below).
+.TP
+.B -P
+instructs aflex to generate a private Ada package for the DFA and IO packages.
+This option is useful to prevent access to the lexer package variables
+and can be used when the main scanner package is also declared as a private Ada package
+in the input source file.
 .TP
 .B -T
 makes aflex run in
