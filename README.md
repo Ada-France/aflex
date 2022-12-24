@@ -21,6 +21,11 @@ This version brings a number of improvements:
 - Aflex uses the lex file name to generate the package name and
   it supports child package.
 
+## Version 1.6 - Under development
+
+- New option -P to generate a private Ada package for DFA and IO
+- Reformat code using `gnatpp`
+
 ## Version 1.5.2021 - Dec 2021
 
 - Fix crash when the scanner file uses characters in range 128..255,
