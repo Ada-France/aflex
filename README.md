@@ -1,6 +1,6 @@
 # Aflex
 
-[![Build Status](https://img.shields.io/jenkins/s/http/jenkins.vacs.fr/Aflex.svg)](http://jenkins.vacs.fr/job/Aflex/)
+[![Build Status](https://img.shields.io/endpoint?url=https://porion.vacs.fr/porion/api/v1/projects/aflex/badges/build.json)](https://porion.vacs.fr/porion/projects/view/aflex/summary)
 [![License](http://img.shields.io/badge/license-UCI-blue.svg)](LICENSE)
 
 
