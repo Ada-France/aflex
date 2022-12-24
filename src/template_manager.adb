@@ -615,6 +615,9 @@ package body Template_Manager is
       Text_Io.Put_Line
         (Dfa_Out_File,
          "--           It is useless to modify it. Change the "".Y"" & "".L"" files instead.");
+      if Private_Package then
+         Text_Io.Put (Dfa_Out_File, "private ");
+      end if;
       Text_Io.Put_Line
         (Dfa_Out_File, "package " & Misc.Package_Name & "_dfa is");
       Text_Io.New_Line (Dfa_Out_File);
@@ -673,6 +676,9 @@ package body Template_Manager is
       Text_Io.Put (Io_Out_File, "with " & Misc.Package_Name & "_dfa; ");
       Text_Io.Put_Line (Io_Out_File, "use " & Misc.Package_Name & "_dfa;");
       Template_Out (Io_Out_File, Io_Template, Io_Current_Line);
+      if Private_Package then
+         Text_Io.Put (Io_Out_File, "private ");
+      end if;
       Text_Io.Put_Line
         (Io_Out_File, "package " & Misc.Package_Name & "_io is");
       Template_Out (Io_Out_File, Io_Template, Io_Current_Line);

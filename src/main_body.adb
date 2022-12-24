@@ -29,7 +29,7 @@ use Misc_Defs, Command_Line_Interface, Tstring, Text_Io;
 
 package body Main_Body is
 
-   Aflex_Version      : constant String := "1.5";
+   Aflex_Version      : constant String := "1.6";
    Starttime, Endtime : Vstring;
    Minimalist_With    : Boolean         := False;
 
@@ -248,7 +248,7 @@ package body Main_Body is
    --  Print aflex usage.
    procedure Usage is
    begin
-      Put_Line (Standard_Error, "aflex version 1.5.2021");
+      Put_Line (Standard_Error, "aflex version 1.6");
       Put_Line (Standard_Error, "");
       Put_Line
         (Standard_Error,
@@ -278,6 +278,9 @@ package body Main_Body is
       Put_Line
         (Standard_Error,
          "-E         Generate additional information about tokens for ayacc");
+      Put_Line
+        (Standard_Error,
+         "-P         Generate private Ada package for the scanner");
       Put_Line (Standard_Error, "-I         Generate an interactive scanner");
       Put_Line (Standard_Error, "-L         Do not generate #line directives");
       Put_Line (Standard_Error, "-T         Run in trace mode");
@@ -311,6 +314,7 @@ package body Main_Body is
       Usemecs            := True;
       Useecs             := True;
       Yylineno           := False;
+      Private_Package    := False;
 
       Use_Stdout := False;
 
@@ -363,6 +367,8 @@ package body Main_Body is
                   Spprdflt := True;
                when 't' =>
                   Use_Stdout := True;
+               when 'P' =>
+                  Private_Package := True;
                when 'T' =>
                   Trace := True;
                when 'v' =>

@@ -335,7 +335,7 @@ package Misc_Defs is
 
    Printstats, Ddebug, Spprdflt, Interactive, Caseins, Useecs, Fulltbl,
    Usemecs, Gen_Line_Dirs, Performance_Report, Backtrack_Report, Trace,
-   Eofseen, Continued_Action : Boolean;
+   Eofseen, Continued_Action, Private_Package : Boolean;
 
    --  Generate support for yylineno
    Yylineno : Boolean;
