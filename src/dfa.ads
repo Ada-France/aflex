@@ -1,4 +1,3 @@
-
 -- Copyright (c) 1990 Regents of the University of California.
 -- All rights reserved.
 --
@@ -22,45 +21,39 @@
 -- DESCRIPTION converts non-deterministic finite automatons to finite ones.
 -- $Header: /co/ua/self/arcadia/aflex/ada/src/RCS/dfaS.a,v 1.4 90/01/12 15:19:52 self Exp Locker: self $
 
-with MISC_DEFS;
-with TEXT_IO;
-package DFA is
-  use MISC_DEFS, TEXT_IO;
-  procedure CHECK_FOR_BACKTRACKING(DS    : in INTEGER;
-                                   STATE : in UNBOUNDED_INT_ARRAY);
-  procedure CHECK_TRAILING_CONTEXT(NFA_STATES : in INT_PTR;
-                                   NUM_STATES : in INTEGER;
-                                   ACCSET     : in INT_PTR;
-                                   NACC       : in INTEGER);
+with Misc_Defs;
+with Text_Io;
+package Dfa is
+   use Misc_Defs, Text_Io;
+   procedure Check_For_Backtracking
+     (Ds : in Integer; State : in Unbounded_Int_Array);
+   procedure Check_Trailing_Context
+     (Nfa_States : in Int_Ptr; Num_States : in Integer; Accset : in Int_Ptr;
+      Nacc       : in Integer);
 
-  procedure DUMP_ASSOCIATED_RULES(F  : in FILE_TYPE;
-                                  DS : in INTEGER);
+   procedure Dump_Associated_Rules (F : in File_Type; Ds : in Integer);
 
-  procedure DUMP_TRANSITIONS(F     : in FILE_TYPE;
-                             STATE : in UNBOUNDED_INT_ARRAY);
+   procedure Dump_Transitions
+     (F : in File_Type; State : in Unbounded_Int_Array);
 
-  procedure EPSCLOSURE(T                  : in out INT_PTR;
-                       NS_ADDR            : in out INTEGER;
-                       ACCSET             : in     INT_PTR;
-                       NACC_ADDR, HV_ADDR : out INTEGER);
+   procedure Epsclosure
+     (T : in out Int_Ptr; Ns_Addr : in out Integer; Accset : in Int_Ptr;
+      Nacc_Addr, Hv_Addr :    out Integer);
 
-  procedure INCREASE_MAX_DFAS;
+   procedure Increase_Max_Dfas;
 
-  procedure NTOD;
+   procedure Ntod;
 
-  procedure SNSTODS(SNS           : in INT_PTR;
-                    NUMSTATES     : in INTEGER;
-                    ACCSET        : in INT_PTR;
-                    NACC, HASHVAL : in INTEGER;
-                    NEWDS_ADDR    : out INTEGER;
-                    RESULT        : out BOOLEAN);
+   procedure Snstods
+     (Sns           : in Int_Ptr; Numstates : in Integer; Accset : in Int_Ptr;
+      Nacc, Hashval : in     Integer; Newds_Addr : out Integer;
+      Result        :    out Boolean);
 
-  function SYMFOLLOWSET(DS              : in INT_PTR;
-                        DSIZE, TRANSSYM : in INTEGER;
-                        NSET            : in INT_PTR) return INTEGER;
+   function Symfollowset
+     (Ds : in Int_Ptr; Dsize, Transsym : in Integer; Nset : in Int_Ptr)
+      return Integer;
 
-  procedure SYMPARTITION(DS        : in INT_PTR;
-                         NUMSTATES : in INTEGER;
-                         SYMLIST   : in out C_SIZE_BOOL_ARRAY;
-                         DUPLIST   : in out C_SIZE_ARRAY);
-end DFA;
+   procedure Sympartition
+     (Ds      : in     Int_Ptr; Numstates : in Integer;
+      Symlist : in out C_Size_Bool_Array; Duplist : in out C_Size_Array);
+end Dfa;

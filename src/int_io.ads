@@ -19,8 +19,7 @@
 -- TITLE integer IO
 -- AUTHOR: John Self (UCI)
 -- DESCRIPTION instantiation of integer IO generic for integers
--- $Header: /co/ua/self/arcadia/aflex/ada/src/RCS/int_io.a,v 1.3 90/01/12 15:20:09 self Exp Locker: self $ 
+-- $Header: /co/ua/self/arcadia/aflex/ada/src/RCS/int_io.a,v 1.3 90/01/12 15:20:09 self Exp Locker: self $
 
-with TEXT_IO; 
-package INT_IO is 
-  new TEXT_IO.INTEGER_IO(INTEGER); 
+with Text_Io;
+package Int_Io is new Text_Io.Integer_IO (Integer);

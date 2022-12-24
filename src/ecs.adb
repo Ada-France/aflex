@@ -21,184 +21,182 @@
 -- DESCRIPTION finds equivalence classes so DFA will be smaller
 -- $Header: /co/ua/self/arcadia/aflex/ada/src/RCS/ecsB.a,v 1.7 90/01/12 15:19:54 self Exp Locker: self $
 
-with MISC;
+with Misc;
 
-package body ECS is
+package body Ecs is
 
 -- ccl2ecl - convert character classes to set of equivalence classes
 
-  procedure CCL2ECL is
-    ICH, NEWLEN, CCLP, CCLMEC : INTEGER;
-  begin
-    for I in 1 .. LASTCCL loop
+   procedure Ccl2ecl is
+      Ich, Newlen, Cclp, Cclmec : Integer;
+   begin
+      for I in 1 .. Lastccl loop
 
-      -- we loop through each character class, and for each character
-      -- in the class, add the character's equivalence class to the
-      -- new "character" class we are creating.  Thus when we are all
-      -- done, character classes will really consist of collections
-      -- of equivalence classes
-      NEWLEN := 0;
-      CCLP := CCLMAP(I);
+         -- we loop through each character class, and for each character
+         -- in the class, add the character's equivalence class to the
+         -- new "character" class we are creating.  Thus when we are all
+         -- done, character classes will really consist of collections
+         -- of equivalence classes
+         Newlen := 0;
+         Cclp   := Cclmap (I);
 
-      for CCLS in 0 .. CCLLEN(I) - 1 loop
-        ICH := CHARACTER'POS(CCLTBL(CCLP + CCLS));
-        CCLMEC := ECGROUP(ICH);
-        if (CCLMEC > 0) then
-          CCLTBL(CCLP + NEWLEN) := CHARACTER'VAL(CCLMEC);
-          NEWLEN := NEWLEN + 1;
-        end if;
+         for Ccls in 0 .. Ccllen (I) - 1 loop
+            Ich    := Character'Pos (Ccltbl (Cclp + Ccls));
+            Cclmec := Ecgroup (Ich);
+            if (Cclmec > 0) then
+               Ccltbl (Cclp + Newlen) := Character'Val (Cclmec);
+               Newlen                 := Newlen + 1;
+            end if;
+         end loop;
+
+         Ccllen (I) := Newlen;
+      end loop;
+   end Ccl2ecl;
+
+   -- cre8ecs - associate equivalence class numbers with class members
+   --  fwd is the forward linked-list of equivalence class members.  bck
+   --  is the backward linked-list, and num is the number of class members.
+   --  Returned is the number of classes.
+
+   procedure Cre8ecs
+     (Fwd    : in C_Size_Array; Bck : in out C_Size_Array; Num : in Integer;
+      Result :    out Integer)
+   is
+      J, Numcl : Integer;
+   begin
+      Numcl := 0;
+
+      -- create equivalence class numbers.  From now on, abs( bck(x) )
+      -- is the equivalence class number for object x.  If bck(x)
+      -- is positive, then x is the representative of its equivalence
+      -- class.
+      for I in 1 .. Num loop
+         if Bck (I) = Nil then
+            Numcl   := Numcl + 1;
+            Bck (I) := Numcl;
+            J       := Fwd (I);
+            while J /= Nil loop
+               Bck (J) := -Numcl;
+               J       := Fwd (J);
+            end loop;
+         end if;
+      end loop;
+      Result := Numcl;
+   end Cre8ecs;
+
+-- mkeccl - update equivalence classes based on character class xtions
+-- where ccls contains the elements of the character class, lenccl is the
+-- number of elements in the ccl, fwd is the forward link-list of equivalent
+-- characters, bck is the backward link-list, and llsiz size of the link-list
+
+   procedure Mkeccl
+     (Ccls     : in     Char_Array; Lenccl : in Integer;
+      Fwd, Bck : in out Unbounded_Int_Array; Llsiz : in Integer)
+   is
+      subtype Oldec_Type is Integer range Fwd'First .. Fwd'Last;
+      Cclp, Newec, Cclm, I, J : Integer;
+      Oldec                   : Oldec_Type;
+      Proc_Array              : Boolean_Ptr;
+   begin
+
+      -- note that it doesn't matter whether or not the character class is
+      -- negated.  The same results will be obtained in either case.
+      Cclp := Ccls'First;
+
+      -- this array tells whether or not a character class has been processed.
+      Proc_Array := new Boolean_Array (Ccls'First .. Ccls'Last);
+      for Ccl_Index in Ccls'First .. Ccls'Last loop
+         Proc_Array (Ccl_Index) := False;
       end loop;
 
-      CCLLEN(I) := NEWLEN;
-    end loop;
-  end CCL2ECL;
+      while Cclp < Lenccl + Ccls'First loop
+         Cclm  := Character'Pos (Ccls (Cclp));
+         Oldec := Bck (Cclm);
+         Newec := Cclm;
 
+         J := Cclp + 1;
 
-  -- cre8ecs - associate equivalence class numbers with class members
-  --  fwd is the forward linked-list of equivalence class members.  bck
-  --  is the backward linked-list, and num is the number of class members.
-  --  Returned is the number of classes.
+         I := Fwd (Cclm);
+         while (I /= Nil) and (I <= Llsiz) loop
 
-  procedure CRE8ECS(FWD      : in     C_SIZE_ARRAY;
-                    BCK      : in out C_SIZE_ARRAY;
-                    NUM      : in     INTEGER;
-                    RESULT   : out    INTEGER) is
-    J, NUMCL : INTEGER;
-  begin
-    NUMCL := 0;
+            -- look for the symbol in the character class
+            while (J < Lenccl + Ccls'First) and
+              ((Ccls (J) <= Character'Val (I)) or Proc_Array (J))
+            loop
+               if Ccls (J) = Character'Val (I) then
 
-    -- create equivalence class numbers.  From now on, abs( bck(x) )
-    -- is the equivalence class number for object x.  If bck(x)
-    -- is positive, then x is the representative of its equivalence
-    -- class.
-    for I in 1 .. NUM loop
-      if BCK(I) = NIL then
-        NUMCL := NUMCL + 1;
-        BCK(I) := NUMCL;
-        J := FWD(I);
-        while J /= NIL loop
-          BCK(J) :=  -NUMCL;
-          J := FWD(J);
-        end loop;
+                  -- we found an old companion of cclm in the ccl.
+                  -- link it into the new equivalence class and flag it as
+                  -- having been processed
+                  Bck (I)        := Newec;
+                  Fwd (Newec)    := I;
+                  Newec          := I;
+                  Proc_Array (J) := True;
+
+                  -- set flag so we don't reprocess
+
+                  -- get next equivalence class member
+                  -- continue 2
+                  goto Next_Pt;
+               end if;
+               J := J + 1;
+            end loop;
+
+            -- symbol isn't in character class.  Put it in the old equivalence
+            -- class
+            Bck (I) := Oldec;
+
+            if Oldec /= Nil then
+               Fwd (Oldec) := I;
+            end if;
+
+            Oldec := I;
+            <<Next_Pt>>
+            I := Fwd (I);
+         end loop;
+
+         if Bck (Cclm) /= Nil or Oldec /= Bck (Cclm) then
+            Bck (Cclm)  := Nil;
+            Fwd (Oldec) := Nil;
+         end if;
+
+         Fwd (Newec) := Nil;
+
+         -- find next ccl member to process
+         Cclp := Cclp + 1;
+
+         while Cclp < Lenccl + Ccls'First and Proc_Array (Cclp) loop
+            -- reset "doesn't need processing" flag
+            Proc_Array (Cclp) := False;
+            Cclp              := Cclp + 1;
+         end loop;
+      end loop;
+   exception
+      when Storage_Error =>
+         Misc.Aflexfatal ("dynamic memory failure in mkeccl()");
+
+      when Constraint_Error =>
+         Misc.Aflexfatal ("index out of bounds: may be CSIZE is not correct");
+
+   end Mkeccl;
+
+   -- mkechar - create equivalence class for single character
+
+   procedure Mkechar (Tch : in Integer; Fwd, Bck : in out C_Size_Array) is
+   begin
+
+      -- if until now the character has been a proper subset of
+      -- an equivalence class, break it away to create a new ec
+      if Fwd (Tch) /= Nil then
+         Bck (Fwd (Tch)) := Bck (Tch);
       end if;
-    end loop;
-    RESULT := NUMCL;
-  end CRE8ECS;
 
-
-  -- mkeccl - update equivalence classes based on character class xtions
-  -- where ccls contains the elements of the character class, lenccl is the
-  -- number of elements in the ccl, fwd is the forward link-list of equivalent
-  -- characters, bck is the backward link-list, and llsiz size of the link-list
-
-  procedure MKECCL(CCLS     : in CHAR_ARRAY;
-                   LENCCL   : in INTEGER;
-                   FWD, BCK : in out UNBOUNDED_INT_ARRAY;
-                   LLSIZ    : in INTEGER) is
-      subtype Oldec_Type is Integer range Fwd'First .. Fwd'last;
-      CCLP, NEWEC, CCLM, I, J : INTEGER;
-      Oldec : Oldec_Type;
-    PROC_ARRAY                     : BOOLEAN_PTR;
-  begin
-
-    -- note that it doesn't matter whether or not the character class is
-    -- negated.  The same results will be obtained in either case.
-    CCLP := CCLS'FIRST;
-
-    -- this array tells whether or not a character class has been processed.
-    PROC_ARRAY := new BOOLEAN_ARRAY(CCLS'FIRST .. CCLS'LAST);
-    for CCL_INDEX in CCLS'FIRST .. CCLS'LAST loop
-      PROC_ARRAY(CCL_INDEX) := FALSE;
-    end loop;
-
-    while CCLP < LENCCL + CCLS'FIRST loop
-      CCLM := CHARACTER'POS(CCLS(CCLP));
-      OLDEC := BCK(CCLM);
-      NEWEC := CCLM;
-
-      J := CCLP + 1;
-
-      I := FWD(CCLM);
-      while (I /= NIL) and (I <= LLSIZ) loop
-
-        -- look for the symbol in the character class
-        while (J < LENCCL + CCLS'FIRST) and ((CCLS(J) <= CHARACTER'VAL(I)) or
-          PROC_ARRAY(J)) loop
-          if CCLS(J) = CHARACTER'VAL(I) then
-
-            -- we found an old companion of cclm in the ccl.
-            -- link it into the new equivalence class and flag it as
-            -- having been processed
-            BCK(I) := NEWEC;
-            FWD(NEWEC) := I;
-            NEWEC := I;
-            PROC_ARRAY(J) := TRUE;
-
-            -- set flag so we don't reprocess
-
-            -- get next equivalence class member
-            -- continue 2
-            goto NEXT_PT;
-          end if;
-          J := J + 1;
-        end loop;
-
-        -- symbol isn't in character class.  Put it in the old equivalence
-        -- class
-        BCK(I) := OLDEC;
-
-        if OLDEC /= NIL then
-          FWD(OLDEC) := I;
-        end if;
-
-        OLDEC := I;
-        <<NEXT_PT>> I := FWD(I);
-      end loop;
-
-      if BCK(CCLM) /= NIL or OLDEC /= BCK(CCLM) then
-        BCK(CCLM) := NIL;
-        FWD(OLDEC) := NIL;
+      if Bck (Tch) /= Nil then
+         Fwd (Bck (Tch)) := Fwd (Tch);
       end if;
 
-      FWD(NEWEC) := NIL;
+      Fwd (Tch) := Nil;
+      Bck (Tch) := Nil;
+   end Mkechar;
 
-      -- find next ccl member to process
-      CCLP := CCLP + 1;
-
-      while CCLP < LENCCL + CCLS'FIRST and PROC_ARRAY(CCLP) loop
-        -- reset "doesn't need processing" flag
-        PROC_ARRAY(CCLP) := FALSE;
-        CCLP := CCLP + 1;
-      end loop;
-    end loop;
-  exception
-    when STORAGE_ERROR =>
-      MISC.AFLEXFATAL("dynamic memory failure in mkeccl()");
-
-    when Constraint_Error =>
-      MISC.AFLEXFATAL("index out of bounds: may be CSIZE is not correct");
-
-  end MKECCL;
-
-
-  -- mkechar - create equivalence class for single character
-
-  procedure MKECHAR(TCH      : in INTEGER;
-                    FWD, BCK : in out C_SIZE_ARRAY) is
-  begin
-
-    -- if until now the character has been a proper subset of
-    -- an equivalence class, break it away to create a new ec
-    if FWD(TCH) /= NIL then
-      BCK(FWD(TCH)) := BCK(TCH);
-    end if;
-
-    if BCK(TCH) /= NIL then
-      FWD(BCK(TCH)) := FWD(TCH);
-    end if;
-
-    FWD(TCH) := NIL;
-    BCK(TCH) := NIL;
-  end MKECHAR;
-
-end ECS;
+end Ecs;

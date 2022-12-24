@@ -25,9 +25,9 @@
 --       templates like the skeleton manager.  This would save memory at the
 --       cost of a slight reduction in speed and the necessity of keeping
 --       copies of the template files in a known place.
--- $Header: /co/ua/self/arcadia/aflex/ada/src/RCS/template_managerS.a,v 1.3 90/01/12 15:20:49 self Exp Locker: self $ 
+-- $Header: /co/ua/self/arcadia/aflex/ada/src/RCS/template_managerS.a,v 1.3 90/01/12 15:20:49 self Exp Locker: self $
 
-package TEMPLATE_MANAGER is 
-  procedure GENERATE_DFA_FILE; 
-  procedure GENERATE_IO_FILE; 
-end TEMPLATE_MANAGER; 
+package Template_Manager is
+   procedure Generate_Dfa_File;
+   procedure Generate_Io_File;
+end Template_Manager;

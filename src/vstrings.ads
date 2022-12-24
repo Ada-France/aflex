@@ -29,7 +29,7 @@
 --                 type STRING.
 --
 --               INPUT/OUTPUT PROCEDURES: GET, GET_LINE, PUT, PUT_LINE
---                                        
+--
 --                 The input/output procedures are similar to those for the
 --                 predefined type STRING, with the following exceptions:
 --
@@ -75,11 +75,11 @@
 --                 defined for it, and that the TO type has a function equiv-
 --                 elent to VSTR defined for it.  This provides a means for
 --                 converting between VSTRINGs declared in separate instant-
---                 iations of VSTRINGS.  When instantiating CONVERT for 
+--                 iations of VSTRINGS.  When instantiating CONVERT for
 --                 VSTRINGs, the STR and VSTR functions are implicitly defined,
 --                 provided that they have been made visible (by a use clause).
 --
---                 Note:  CONVERT is NOT implicitly associated with the type 
+--                 Note:  CONVERT is NOT implicitly associated with the type
 --                 VSTRING declared in this package (since it would not be a
 --                 derivable function (see RM 3.4(11))).
 --
@@ -102,46 +102,46 @@
 --                 "+" is equivelent to VSTR.  It is supplied as a short-hand
 --                 notation for the function.  The "+" operator cannot immed-
 --                 iately follow the "&" operator; use ... & (+ ...) instead.
-pragma PAGE;
-
+pragma Page;
+
 --  DISCUSSION:
 --
---	This package implements the type "variable-length string" (vstring)
---	using generics.  The alternative approaches are to use a discriminant 
---	record in which the discriminant controls the length of a STRING inside
---	the record, or a record containing an access type which points to a
+--      This package implements the type "variable-length string" (vstring)
+--      using generics.  The alternative approaches are to use a discriminant
+--      record in which the discriminant controls the length of a STRING inside
+--      the record, or a record containing an access type which points to a
 --      string, which can be deallocated and reallocated when necessary.
 --
---	Advantages of this package:
---	  * The other approaches force the vstring to be a limited private 
+--      Advantages of this package:
+--        * The other approaches force the vstring to be a limited private
 --          type.  Thus, their vstrings cannot appear on the left side of
 --          the assignment operator; ie., their vstrings cannot be given
 --          initial values or values by direct assignment.  This package
 --          uses a private type; therefore, these things can be done.
---         
---	  * The other approach stores the vstring in a string whose length
---	    is determined dynamically.  This package uses a fixed length 
+--
+--        * The other approach stores the vstring in a string whose length
+--          is determined dynamically.  This package uses a fixed length
 --          string.  This difference might be reflected in faster and more
 --          consistent execution times (this has NOT been verified).
 --
---	Disadvantages of this package:
---	  * Different instantiations must be used to declare vstrings with
---	    different maximum lengths (this may be desirable, since
---	    CONSTRAINT_ERROR will be raised if the maximum is exceeded).
+--      Disadvantages of this package:
+--        * Different instantiations must be used to declare vstrings with
+--          different maximum lengths (this may be desirable, since
+--          CONSTRAINT_ERROR will be raised if the maximum is exceeded).
 --
---	  * A second declaration is required to give the type declared by
---	    the instantiation a name other than "VSTRING."
+--        * A second declaration is required to give the type declared by
+--          the instantiation a name other than "VSTRING."
 --
---	  * The storage required for a vstring is determined by the generic
---	    parameter LAST and not the actual length of its contents.  Thus,
+--        * The storage required for a vstring is determined by the generic
+--          parameter LAST and not the actual length of its contents.  Thus,
 --          each object is allocated the maximum amount of storage, regardless
 --          of its actual size.
 --
 --  MISCELLANEOUS:
 --     Constraint checking is done explicitly in the code; thus, it cannot
 --     be suppressed.  On the other hand, constraint checking is not lost
---     if pragma suppress is supplied to the compilation (-S option) 
---     (The robustness of the explicit constraint checking has NOT been 
+--     if pragma suppress is supplied to the compilation (-S option)
+--     (The robustness of the explicit constraint checking has NOT been
 --     determined).
 --
 --     Compiling with the optimizer (-O option) may significantly reduce
@@ -156,144 +156,154 @@ pragma PAGE;
 --  USAGE: with VSTRINGS;
 --         package package_name is new VSTRINGS(maximum_length);
 -- .......................................................................... --
-pragma PAGE;
-
-with TEXT_IO; use TEXT_IO;
-generic
-  LAST : NATURAL;
-package VSTRINGS is
+pragma Page;
 
-  subtype STRINDEX is NATURAL;
-  FIRST : constant STRINDEX := STRINDEX'FIRST + 1;
-  type VSTRING is private;
-  NUL : constant VSTRING;
+with Text_Io; use Text_Io;
+generic
+   Last : Natural;
+package Vstrings is
+
+   subtype Strindex is Natural;
+   First : constant Strindex := Strindex'First + 1;
+   type Vstring is private;
+   Nul : constant Vstring;
 
 -- Attributes of a VSTRING
 
-  function LEN(FROM : VSTRING) return STRINDEX;
+   function Len (From : Vstring) return Strindex;
 --  function MAX(FROM : VSTRING) return STRINDEX;
-  function STR(FROM : VSTRING) return STRING;
-  function CHAR(FROM: VSTRING; POSITION : STRINDEX := FIRST)
-                return CHARACTER;
+   function Str (From : Vstring) return String;
+   function Char
+     (From : Vstring; Position : Strindex := First) return Character;
 
 -- Comparisons
 
-  function "<" (LEFT: VSTRING; RIGHT: VSTRING) return BOOLEAN;
-  function ">" (LEFT: VSTRING; RIGHT: VSTRING) return BOOLEAN;
-  function "<=" (LEFT: VSTRING; RIGHT: VSTRING) return BOOLEAN;
-  function ">=" (LEFT: VSTRING; RIGHT: VSTRING) return BOOLEAN;
-  -- "=" and "/=" are predefined
+   function "<" (Left : Vstring; Right : Vstring) return Boolean;
+   function ">" (Left : Vstring; Right : Vstring) return Boolean;
+   function "<=" (Left : Vstring; Right : Vstring) return Boolean;
+   function ">=" (Left : Vstring; Right : Vstring) return Boolean;
+   -- "=" and "/=" are predefined
 
 -- Input/Output
 
-  procedure PUT(FILE : in FILE_TYPE; ITEM : in VSTRING);
-  procedure PUT(ITEM : in VSTRING);
+   procedure Put (File : in File_Type; Item : in Vstring);
+   procedure Put (Item : in Vstring);
 
-  procedure PUT_LINE(FILE : in FILE_TYPE; ITEM : in VSTRING);
-  procedure PUT_LINE(ITEM : in VSTRING);
+   procedure Put_Line (File : in File_Type; Item : in Vstring);
+   procedure Put_Line (Item : in Vstring);
 
-  procedure GET(FILE : in FILE_TYPE; ITEM : out VSTRING;
-                LENGTH : in STRINDEX := LAST);
-  procedure GET(ITEM : out VSTRING; LENGTH : in STRINDEX := LAST);
+   procedure Get
+     (File : in File_Type; Item : out Vstring; Length : in Strindex := Last);
+   procedure Get (Item : out Vstring; Length : in Strindex := Last);
 
-  procedure GET_LINE(FILE : in FILE_TYPE; ITEM : in out VSTRING);
-  procedure GET_LINE(ITEM : in out VSTRING);
+   procedure Get_Line (File : in File_Type; Item : in out Vstring);
+   procedure Get_Line (Item : in out Vstring);
 
 -- Extraction
 
-  function SLICE(FROM: VSTRING; FRONT, BACK : STRINDEX) return VSTRING;
-  function SUBSTR(FROM: VSTRING; START, LENGTH: STRINDEX) return VSTRING;
-  function DELETE(FROM: VSTRING; FRONT, BACK : STRINDEX) return VSTRING;
+   function Slice (From : Vstring; Front, Back : Strindex) return Vstring;
+   function Substr (From : Vstring; Start, Length : Strindex) return Vstring;
+   function Delete (From : Vstring; Front, Back : Strindex) return Vstring;
 
 -- Editing
 
-  function INSERT(TARGET: VSTRING; ITEM: VSTRING;
-                  POSITION: STRINDEX := FIRST) return VSTRING;
-  function INSERT(TARGET: VSTRING; ITEM: STRING;
-                  POSITION: STRINDEX := FIRST) return VSTRING;
-  function INSERT(TARGET: VSTRING; ITEM: CHARACTER;
-                  POSITION: STRINDEX := FIRST) return VSTRING;
+   function Insert
+     (Target : Vstring; Item : Vstring; Position : Strindex := First)
+      return Vstring;
+   function Insert
+     (Target : Vstring; Item : String; Position : Strindex := First)
+      return Vstring;
+   function Insert
+     (Target : Vstring; Item : Character; Position : Strindex := First)
+      return Vstring;
 
-  function APPEND(TARGET: VSTRING; ITEM: VSTRING; POSITION: STRINDEX)
-                  return VSTRING;
-  function APPEND(TARGET: VSTRING; ITEM: STRING; POSITION: STRINDEX)
-                  return VSTRING;
-  function APPEND(TARGET: VSTRING; ITEM: CHARACTER; POSITION: STRINDEX)
-                  return VSTRING;
+   function Append
+     (Target : Vstring; Item : Vstring; Position : Strindex) return Vstring;
+   function Append
+     (Target : Vstring; Item : String; Position : Strindex) return Vstring;
+   function Append
+     (Target : Vstring; Item : Character; Position : Strindex) return Vstring;
 
-  function APPEND(TARGET: VSTRING; ITEM: VSTRING) return VSTRING;
-  function APPEND(TARGET: VSTRING; ITEM: STRING) return VSTRING;
-  function APPEND(TARGET: VSTRING; ITEM: CHARACTER) return VSTRING;
+   function Append (Target : Vstring; Item : Vstring) return Vstring;
+   function Append (Target : Vstring; Item : String) return Vstring;
+   function Append (Target : Vstring; Item : Character) return Vstring;
 
-  function REPLACE(TARGET: VSTRING; ITEM: VSTRING;
-                   POSITION: STRINDEX := FIRST) return VSTRING;
-  function REPLACE(TARGET: VSTRING; ITEM: STRING;
-                   POSITION: STRINDEX := FIRST) return VSTRING;
-  function REPLACE(TARGET: VSTRING; ITEM: CHARACTER;
-                   POSITION: STRINDEX := FIRST) return VSTRING;
+   function Replace
+     (Target : Vstring; Item : Vstring; Position : Strindex := First)
+      return Vstring;
+   function Replace
+     (Target : Vstring; Item : String; Position : Strindex := First)
+      return Vstring;
+   function Replace
+     (Target : Vstring; Item : Character; Position : Strindex := First)
+      return Vstring;
 
 -- Concatenation
 
-  function "&" (LEFT: VSTRING; RIGHT : VSTRING) return VSTRING;
-  function "&" (LEFT: VSTRING; RIGHT : STRING) return VSTRING;
-  function "&" (LEFT: VSTRING; RIGHT : CHARACTER) return VSTRING;
-  function "&" (LEFT: STRING; RIGHT : VSTRING) return VSTRING;
-  function "&" (LEFT: CHARACTER; RIGHT : VSTRING) return VSTRING;
+   function "&" (Left : Vstring; Right : Vstring) return Vstring;
+   function "&" (Left : Vstring; Right : String) return Vstring;
+   function "&" (Left : Vstring; Right : Character) return Vstring;
+   function "&" (Left : String; Right : Vstring) return Vstring;
+   function "&" (Left : Character; Right : Vstring) return Vstring;
 
 -- Determine the position of a substring
 
-  function INDEX(WHOLE: VSTRING; PART: VSTRING; OCCURRENCE : NATURAL := 1)
-                 return STRINDEX;
-  function INDEX(WHOLE : VSTRING; PART : STRING; OCCURRENCE : NATURAL := 1)
-                 return STRINDEX;
-  function INDEX(WHOLE : VSTRING; PART : CHARACTER; OCCURRENCE : NATURAL := 1)
-                 return STRINDEX;
+   function Index
+     (Whole : Vstring; Part : Vstring; Occurrence : Natural := 1)
+      return Strindex;
+   function Index
+     (Whole : Vstring; Part : String; Occurrence : Natural := 1)
+      return Strindex;
+   function Index
+     (Whole : Vstring; Part : Character; Occurrence : Natural := 1)
+      return Strindex;
 
-
-  function RINDEX(WHOLE: VSTRING; PART: VSTRING; OCCURRENCE : NATURAL := 1)
-                 return STRINDEX;
-  function RINDEX(WHOLE : VSTRING; PART : STRING; OCCURRENCE : NATURAL := 1)
-                 return STRINDEX;
-  function RINDEX(WHOLE : VSTRING; PART : CHARACTER; OCCURRENCE : NATURAL := 1)
-                 return STRINDEX;
+   function Rindex
+     (Whole : Vstring; Part : Vstring; Occurrence : Natural := 1)
+      return Strindex;
+   function Rindex
+     (Whole : Vstring; Part : String; Occurrence : Natural := 1)
+      return Strindex;
+   function Rindex
+     (Whole : Vstring; Part : Character; Occurrence : Natural := 1)
+      return Strindex;
 
 -- Conversion from other associated types
 
-  function VSTR(FROM : STRING) return VSTRING;
-  function VSTR(FROM : CHARACTER) return VSTRING;
-  function "+" (FROM : STRING) return VSTRING;
-  function "+" (FROM : CHARACTER) return VSTRING;
+   function Vstr (From : String) return Vstring;
+   function Vstr (From : Character) return Vstring;
+   function "+" (From : String) return Vstring;
+   function "+" (From : Character) return Vstring;
 
-  generic
-    type FROM is private;
-    type TO is private;
-    with function STR(X : FROM) return STRING is <>;
-    with function VSTR(Y : STRING) return TO is <>;
-   function CONVERT(X : FROM) return TO;
+   generic
+      type From is private;
+      type To is private;
+      with function Str (X : From) return String is <>;
+      with function Vstr (Y : String) return To is <>;
+   function Convert (X : From) return To;
 
-pragma PAGE;
-
-  private
-    type VSTRING is
-      record 
-        LEN : STRINDEX := STRINDEX'FIRST;
-        VALUE : STRING(FIRST .. LAST) := (others => ASCII.NUL);
-      end record;
- 
-    NUL : constant VSTRING := (STRINDEX'FIRST, (others => ASCII.NUL));
-end VSTRINGS;
+   pragma Page;
+
+private
+   type Vstring is record
+      Len   : Strindex               := Strindex'First;
+      Value : String (First .. Last) := (others => ASCII.NUL);
+   end record;
+
+   Nul : constant Vstring := (Strindex'First, (others => ASCII.NUL));
+end Vstrings;
 --
 -- .......................................................................... --
 --
 -- DISTRIBUTION AND COPYRIGHT:
---                                                           
+--
 -- This software is released to the Public Domain (note:
 --   software released to the Public Domain is not subject
 --   to copyright protection).
 -- Restrictions on use or distribution:  NONE
---                                                           
+--
 -- DISCLAIMER:
---                                                           
+--
 -- This software and its documentation are provided "AS IS" and
 -- without any expressed or implied warranties whatsoever.
 -- No warranties as to performance, merchantability, or fitness
@@ -341,7 +351,7 @@ end VSTRINGS;
 --                 type STRING.
 --
 --               INPUT/OUTPUT PROCEDURES: GET, GET_LINE, PUT, PUT_LINE
---                                        
+--
 --                 The input/output procedures are similar to those for the
 --                 predefined type STRING, with the following exceptions:
 --
@@ -387,11 +397,11 @@ end VSTRINGS;
 --                 defined for it, and that the TO type has a function equiv-
 --                 elent to VSTR defined for it.  This provides a means for
 --                 converting between VSTRINGs declared in separate instant-
---                 iations of VSTRINGS.  When instantiating CONVERT for 
+--                 iations of VSTRINGS.  When instantiating CONVERT for
 --                 VSTRINGs, the STR and VSTR functions are implicitly defined,
 --                 provided that they have been made visible (by a use clause).
 --
---                 Note:  CONVERT is NOT implicitly associated with the type 
+--                 Note:  CONVERT is NOT implicitly associated with the type
 --                 VSTRING declared in this package (since it would not be a
 --                 derivable function (see RM 3.4(11))).
 --
@@ -414,46 +424,46 @@ end VSTRINGS;
 --                 "+" is equivelent to VSTR.  It is supplied as a short-hand
 --                 notation for the function.  The "+" operator cannot immed-
 --                 iately follow the "&" operator; use ... & (+ ...) instead.
-pragma PAGE;
-
+pragma Page;
+
 --  DISCUSSION:
 --
---	This package implements the type "variable-length string" (vstring)
---	using generics.  The alternative approaches are to use a discriminant 
---	record in which the discriminant controls the length of a STRING inside
---	the record, or a record containing an access type which points to a
+--      This package implements the type "variable-length string" (vstring)
+--      using generics.  The alternative approaches are to use a discriminant
+--      record in which the discriminant controls the length of a STRING inside
+--      the record, or a record containing an access type which points to a
 --      string, which can be deallocated and reallocated when necessary.
 --
---	Advantages of this package:
---	  * The other approaches force the vstring to be a limited private 
+--      Advantages of this package:
+--        * The other approaches force the vstring to be a limited private
 --          type.  Thus, their vstrings cannot appear on the left side of
 --          the assignment operator; ie., their vstrings cannot be given
 --          initial values or values by direct assignment.  This package
 --          uses a private type; therefore, these things can be done.
---         
---	  * The other approach stores the vstring in a string whose length
---	    is determined dynamically.  This package uses a fixed length 
+--
+--        * The other approach stores the vstring in a string whose length
+--          is determined dynamically.  This package uses a fixed length
 --          string.  This difference might be reflected in faster and more
 --          consistent execution times (this has NOT been verified).
 --
---	Disadvantages of this package:
---	  * Different instantiations must be used to declare vstrings with
---	    different maximum lengths (this may be desirable, since
---	    CONSTRAINT_ERROR will be raised if the maximum is exceeded).
+--      Disadvantages of this package:
+--        * Different instantiations must be used to declare vstrings with
+--          different maximum lengths (this may be desirable, since
+--          CONSTRAINT_ERROR will be raised if the maximum is exceeded).
 --
---	  * A second declaration is required to give the type declared by
---	    the instantiation a name other than "VSTRING."
+--        * A second declaration is required to give the type declared by
+--          the instantiation a name other than "VSTRING."
 --
---	  * The storage required for a vstring is determined by the generic
---	    parameter LAST and not the actual length of its contents.  Thus,
+--        * The storage required for a vstring is determined by the generic
+--          parameter LAST and not the actual length of its contents.  Thus,
 --          each object is allocated the maximum amount of storage, regardless
 --          of its actual size.
 --
 --  MISCELLANEOUS:
 --     Constraint checking is done explicitly in the code; thus, it cannot
 --     be suppressed.  On the other hand, constraint checking is not lost
---     if pragma suppress is supplied to the compilation (-S option) 
---     (The robustness of the explicit constraint checking has NOT been 
+--     if pragma suppress is supplied to the compilation (-S option)
+--     (The robustness of the explicit constraint checking has NOT been
 --     determined).
 --
 --     Compiling with the optimizer (-O option) may significantly reduce
@@ -468,4 +478,4 @@ pragma PAGE;
 --  USAGE: with VSTRINGS;
 --         package package_name is new VSTRINGS(maximum_length);
 -- .......................................................................... --
-pragma PAGE;
+pragma Page;

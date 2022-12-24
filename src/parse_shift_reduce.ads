@@ -1,4 +1,4 @@
-package Parse_Shift_Reduce is
+private package Parse_Shift_Reduce is
 
    type Small_Integer is range -32_000 .. 32_000;
 

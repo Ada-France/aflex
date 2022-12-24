@@ -1,4 +1,3 @@
-
 -- Copyright (c) 1990 Regents of the University of California.
 -- All rights reserved.
 --
@@ -21,26 +20,25 @@
 -- AUTHOR: John Self (UCI)
 -- DESCRIPTION builds the NFA.
 -- NOTES this file mirrors flex as closely as possible.
--- $Header: /co/ua/self/arcadia/aflex/ada/src/RCS/nfaS.a,v 1.4 90/01/12 15:20:30 self Exp Locker: self $ 
+-- $Header: /co/ua/self/arcadia/aflex/ada/src/RCS/nfaS.a,v 1.4 90/01/12 15:20:30 self Exp Locker: self $
 
-package NFA is 
-  procedure ADD_ACCEPT(MACH             : in out INTEGER; 
-                       ACCEPTING_NUMBER : in INTEGER); 
-  function COPYSINGL(SINGL, NUM : in INTEGER) return INTEGER; 
-  procedure DUMPNFA(STATE1 : in INTEGER); 
-  function DUPMACHINE(MACH : in INTEGER) return INTEGER; 
-  procedure FINISH_RULE(MACH                : in INTEGER; 
-                        VARIABLE_TRAIL_RULE : in BOOLEAN; 
-                        HEADCNT, TRAILCNT   : in INTEGER); 
-  function LINK_MACHINES(FIRST, LAST : in INTEGER) return INTEGER; 
-  procedure MARK_BEGINNING_AS_NORMAL(MACH : in INTEGER); 
-  function MKBRANCH(FIRST, SECOND : in INTEGER) return INTEGER; 
-  function MKCLOS(STATE : in INTEGER) return INTEGER; 
-  function MKOPT(MACH : in INTEGER) return INTEGER; 
-  function MKOR(FIRST, SECOND : in INTEGER) return INTEGER; 
-  function MKPOSCL(STATE : in INTEGER) return INTEGER; 
-  function MKREP(MACH, LB, UB : in INTEGER) return INTEGER; 
-  function MKSTATE(SYM : in INTEGER) return INTEGER; 
-  procedure MKXTION(STATEFROM, STATETO : in INTEGER); 
-  procedure NEW_RULE; 
-end NFA; 
+package Nfa is
+   procedure Add_Accept (Mach : in out Integer; Accepting_Number : in Integer);
+   function Copysingl (Singl, Num : in Integer) return Integer;
+   procedure Dumpnfa (State1 : in Integer);
+   function Dupmachine (Mach : in Integer) return Integer;
+   procedure Finish_Rule
+     (Mach              : in Integer; Variable_Trail_Rule : in Boolean;
+      Headcnt, Trailcnt : in Integer);
+   function Link_Machines (First, Last : in Integer) return Integer;
+   procedure Mark_Beginning_As_Normal (Mach : in Integer);
+   function Mkbranch (First, Second : in Integer) return Integer;
+   function Mkclos (State : in Integer) return Integer;
+   function Mkopt (Mach : in Integer) return Integer;
+   function Mkor (First, Second : in Integer) return Integer;
+   function Mkposcl (State : in Integer) return Integer;
+   function Mkrep (Mach, Lb, Ub : in Integer) return Integer;
+   function Mkstate (Sym : in Integer) return Integer;
+   procedure Mkxtion (Statefrom, Stateto : in Integer);
+   procedure New_Rule;
+end Nfa;

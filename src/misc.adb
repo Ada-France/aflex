@@ -26,329 +26,334 @@
 -- + Add support for Ada95 parent/child units
 -- + Less GNAT warnings
 
-with MISC, MAIN_BODY, INT_IO, CALENDAR;
+with Misc, Main_Body, Int_Io, Calendar;
 
-package body MISC is
+package body Misc is
 
-  -- action_out - write the actions from the temporary file to lex.yy.c
-  UNITNAME_DEFINED : Boolean := False;
-   UNITNAME_VALUE   : VSTRING;
-   LEX_FILENAME     : VSTRING;
+   -- action_out - write the actions from the temporary file to lex.yy.c
+   Unitname_Defined : Boolean := False;
+   Unitname_Value   : Vstring;
+   Lex_Filename     : Vstring;
 
-  procedure ACTION_OUT is
-    BUF : VSTRING;
-  begin
-    while not TEXT_IO.END_OF_FILE(TEMP_ACTION_FILE) loop
-      TSTRING.GET_LINE(TEMP_ACTION_FILE, BUF);
-      if ((TSTRING.LEN(BUF) >= 2) and then ((CHAR(BUF, 1) = '%') and (CHAR(BUF,
-        2) = '%'))) then
-        exit;
-      else
-        TSTRING.PUT_LINE(BUF);
-      end if;
-    end loop;
-  end ACTION_OUT;
-
-  -- bubble - bubble sort an integer array in increasing order
-  --
-  -- description
-  --   sorts the first n elements of array v and replaces them in
-  --   increasing order.
-  --
-  -- passed
-  --   v - the array to be sorted
-  --   n - the number of elements of 'v' to be sorted
-
-  procedure BUBBLE(V : in INT_PTR;
-                   N : in INTEGER) is
-    K : INTEGER;
-  begin
-    for I in reverse 2 .. N loop
-      for J in 1 .. I - 1 loop
-        if V(J) > V(J + 1) then
-
-          -- compare
-          K := V(J);
-
-          -- exchange
-          V(J) := V(J + 1);
-          V(J + 1) := K;
-        end if;
-      end loop;
-    end loop;
-  end BUBBLE;
-
-
-  -- clower - replace upper-case letter to lower-case
-
-  function CLOWER(C : in INTEGER) return INTEGER is
-  begin
-    if ISUPPER(CHARACTER'VAL(C)) then
-      return TOLOWER(C);
-    else
-      return C;
-    end if;
-  end CLOWER;
-
-
-  -- cshell - shell sort a character array in increasing order
-  --
-  -- description
-  --   does a shell sort of the first n elements of array v.
-  --
-  -- passed
-  --   v - array to be sorted
-  --   n - number of elements of v to be sorted
-
-  procedure CSHELL(V : in out CHAR_ARRAY;
-                   N : in INTEGER) is
-    GAP, J, JG  : INTEGER;
-    K           : CHARACTER;
-    LOWER_BOUND : constant INTEGER := V'FIRST;
-  begin
-    GAP := N/2;
-    while GAP > 0 loop
-      for I in GAP .. N - 1 loop
-        J := I - GAP;
-        while (J >= 0) loop
-          JG := J + GAP;
-
-          if V(J + LOWER_BOUND) <= V(JG + LOWER_BOUND) then
+   procedure Action_Out is
+      Buf : Vstring;
+   begin
+      while not Text_Io.End_Of_File (Temp_Action_File) loop
+         Tstring.Get_Line (Temp_Action_File, Buf);
+         if
+           ((Tstring.Len (Buf) >= 2)
+            and then ((Char (Buf, 1) = '%') and (Char (Buf, 2) = '%')))
+         then
             exit;
-          end if;
-
-          K := V(J + LOWER_BOUND);
-          V(J + LOWER_BOUND) := V(JG + LOWER_BOUND);
-          V(JG + LOWER_BOUND) := K;
-          J := J - GAP;
-        end loop;
+         else
+            Tstring.Put_Line (Buf);
+         end if;
       end loop;
-      GAP := GAP/2;
-    end loop;
-  end CSHELL;
+   end Action_Out;
 
+   -- bubble - bubble sort an integer array in increasing order
+   --
+   -- description
+   --   sorts the first n elements of array v and replaces them in
+   --   increasing order.
+   --
+   -- passed
+   --   v - the array to be sorted
+   --   n - the number of elements of 'v' to be sorted
 
-  -- dataend - finish up a block of data declarations
+   procedure Bubble (V : in Int_Ptr; N : in Integer) is
+      K : Integer;
+   begin
+      for I in reverse 2 .. N loop
+         for J in 1 .. I - 1 loop
+            if V (J) > V (J + 1) then
 
-  procedure DATAEND is
-  begin
-    if DATAPOS > 0 then
-      DATAFLUSH;
+               -- compare
+               K := V (J);
 
-      -- add terminator for initialization
-      TEXT_IO.PUT_LINE("       );");
-      TEXT_IO.NEW_LINE;
+               -- exchange
+               V (J)     := V (J + 1);
+               V (J + 1) := K;
+            end if;
+         end loop;
+      end loop;
+   end Bubble;
 
-      DATALINE := 0;
-    end if;
-  end DATAEND;
+   -- clower - replace upper-case letter to lower-case
 
+   function Clower (C : in Integer) return Integer is
+   begin
+      if Isupper (Character'Val (C)) then
+         return Tolower (C);
+      else
+         return C;
+      end if;
+   end Clower;
 
-  -- dataflush - flush generated data statements
+   -- cshell - shell sort a character array in increasing order
+   --
+   -- description
+   --   does a shell sort of the first n elements of array v.
+   --
+   -- passed
+   --   v - array to be sorted
+   --   n - number of elements of v to be sorted
 
-  procedure DATAFLUSH(FILE : in FILE_TYPE) is
-  begin
-    TEXT_IO.NEW_LINE(FILE);
-    DATALINE := DATALINE + 1;
-    if DATALINE >= NUMDATALINES then
+   procedure Cshell (V : in out Char_Array; N : in Integer) is
+      Gap, J, Jg  : Integer;
+      K           : Character;
+      Lower_Bound : constant Integer := V'First;
+   begin
+      Gap := N / 2;
+      while Gap > 0 loop
+         for I in Gap .. N - 1 loop
+            J := I - Gap;
+            while (J >= 0) loop
+               Jg := J + Gap;
 
-      -- put out a blank line so that the table is grouped into
-      -- large blocks that enable the user to find elements easily
-      TEXT_IO.NEW_LINE(FILE);
-      DATALINE := 0;
-    end if;
+               if V (J + Lower_Bound) <= V (Jg + Lower_Bound) then
+                  exit;
+               end if;
 
-    -- reset the number of characters written on the current line
-    DATAPOS := 0;
-  end DATAFLUSH;
+               K                    := V (J + Lower_Bound);
+               V (J + Lower_Bound)  := V (Jg + Lower_Bound);
+               V (Jg + Lower_Bound) := K;
+               J                    := J - Gap;
+            end loop;
+         end loop;
+         Gap := Gap / 2;
+      end loop;
+   end Cshell;
 
-  procedure DATAFLUSH is
-  begin
-    DATAFLUSH(CURRENT_OUTPUT);
-  end DATAFLUSH;
-  -- aflex_gettime - return current time
+   -- dataend - finish up a block of data declarations
 
-  function AFLEX_GETTIME return VSTRING is
-    use CALENDAR;
-    CURRENT_TIME                                            : TIME;
-    CURRENT_YEAR                                            : YEAR_NUMBER;
-    CURRENT_MONTH                                           : MONTH_NUMBER;
-    CURRENT_DAY                                             : DAY_NUMBER;
-    CURRENT_SECONDS                                         : DAY_DURATION;
-    MONTH_STRING, HOUR_STRING, MINUTE_STRING, SECOND_STRING : VSTRING;
-    HOUR, MINUTE, SECOND                                    : INTEGER;
-    SECONDS_PER_HOUR                                        : constant
-      DAY_DURATION := 3600.0;
-  begin
-    CURRENT_TIME := CLOCK;
-    SPLIT(CURRENT_TIME, CURRENT_YEAR, CURRENT_MONTH, CURRENT_DAY,
-      CURRENT_SECONDS);
-    case CURRENT_MONTH is
-      when 1 =>
-        MONTH_STRING := VSTR("Jan");
-      when 2 =>
-        MONTH_STRING := VSTR("Feb");
-      when 3 =>
-        MONTH_STRING := VSTR("Mar");
-      when 4 =>
-        MONTH_STRING := VSTR("Apr");
-      when 5 =>
-        MONTH_STRING := VSTR("May");
-      when 6 =>
-        MONTH_STRING := VSTR("Jun");
-      when 7 =>
-        MONTH_STRING := VSTR("Jul");
-      when 8 =>
-        MONTH_STRING := VSTR("Aug");
-      when 9 =>
-        MONTH_STRING := VSTR("Sep");
-      when 10 =>
-        MONTH_STRING := VSTR("Oct");
-      when 11 =>
-        MONTH_STRING := VSTR("Nov");
-      when 12 =>
-        MONTH_STRING := VSTR("Dec");
-    end case;
+   procedure Dataend is
+   begin
+      if Datapos > 0 then
+         Dataflush;
 
-    HOUR := INTEGER(CURRENT_SECONDS)/INTEGER(SECONDS_PER_HOUR);
-    MINUTE := INTEGER((CURRENT_SECONDS - (HOUR*SECONDS_PER_HOUR))/60);
-    SECOND := INTEGER(CURRENT_SECONDS - HOUR*SECONDS_PER_HOUR - MINUTE*60.0);
+         -- add terminator for initialization
+         Text_Io.Put_Line ("       );");
+         Text_Io.New_Line;
 
-    if HOUR >= 10 then
-      HOUR_STRING := VSTR(INTEGER'IMAGE(HOUR));
-    else
-      HOUR_STRING := VSTR("0" & INTEGER'IMAGE(HOUR));
-    end if;
+         Dataline := 0;
+      end if;
+   end Dataend;
 
-    if MINUTE >= 10 then
-      MINUTE_STRING := VSTR(INTEGER'IMAGE(MINUTE)(2 .. INTEGER'IMAGE(MINUTE)'
-        LENGTH));
-    else
-      MINUTE_STRING := VSTR("0" & INTEGER'IMAGE(MINUTE)(2 .. INTEGER'IMAGE(
-        MINUTE)'LENGTH));
-    end if;
+   -- dataflush - flush generated data statements
 
-    if SECOND >= 10 then
-      SECOND_STRING := VSTR(INTEGER'IMAGE(SECOND)(2 .. INTEGER'IMAGE(SECOND)'
-        LENGTH));
-    else
-      SECOND_STRING := VSTR("0" & INTEGER'IMAGE(SECOND)(2 .. INTEGER'IMAGE(
-        SECOND)'LENGTH));
-    end if;
+   procedure Dataflush (File : in File_Type) is
+   begin
+      Text_Io.New_Line (File);
+      Dataline := Dataline + 1;
+      if Dataline >= Numdatalines then
 
-    return MONTH_STRING & VSTR(INTEGER'IMAGE(CURRENT_DAY)) & HOUR_STRING & ":"
-      & MINUTE_STRING & ":" & SECOND_STRING & INTEGER'IMAGE(CURRENT_YEAR);
-  end AFLEX_GETTIME;
+         -- put out a blank line so that the table is grouped into
+         -- large blocks that enable the user to find elements easily
+         Text_Io.New_Line (File);
+         Dataline := 0;
+      end if;
 
-  -- aflexerror - report an error message and terminate
-  -- overloaded function, one for vstring, one for string.
-  procedure AFLEXERROR(MSG : in VSTRING) is
-  begin
-    TSTRING.PUT(STANDARD_ERROR, "aflex: " & MSG);
-    TEXT_IO.NEW_LINE(STANDARD_ERROR);
-    MAIN_BODY.AFLEXEND(1);
-  end AFLEXERROR;
+      -- reset the number of characters written on the current line
+      Datapos := 0;
+   end Dataflush;
 
-  procedure AFLEXERROR(MSG : in STRING) is
-  begin
-    TEXT_IO.PUT(STANDARD_ERROR, "aflex: " & MSG);
-    TEXT_IO.NEW_LINE(STANDARD_ERROR);
-    MAIN_BODY.AFLEXEND(1);
-  end AFLEXERROR;
+   procedure Dataflush is
+   begin
+      Dataflush (Current_Output);
+   end Dataflush;
+   -- aflex_gettime - return current time
 
-  -- aflexfatal - report a fatal error message and terminate
-  -- overloaded function, one for vstring, one for string.
-  procedure AFLEXFATAL(MSG : in VSTRING) is
-  begin
-    TSTRING.PUT(STANDARD_ERROR, "aflex: fatal internal error " & MSG);
-    TEXT_IO.NEW_LINE(STANDARD_ERROR);
-    MAIN_BODY.AFLEXEND(1);
-  end AFLEXFATAL;
+   function Aflex_Gettime return Vstring is
+      use Calendar;
+      Current_Time                                            : Time;
+      Current_Year                                            : Year_Number;
+      Current_Month                                           : Month_Number;
+      Current_Day                                             : Day_Number;
+      Current_Seconds                                         : Day_Duration;
+      Month_String, Hour_String, Minute_String, Second_String : Vstring;
+      Hour, Minute, Second                                    : Integer;
+      Seconds_Per_Hour : constant Day_Duration := 3_600.0;
+   begin
+      Current_Time := Clock;
+      Split
+        (Current_Time, Current_Year, Current_Month, Current_Day,
+         Current_Seconds);
+      case Current_Month is
+         when 1 =>
+            Month_String := Vstr ("Jan");
+         when 2 =>
+            Month_String := Vstr ("Feb");
+         when 3 =>
+            Month_String := Vstr ("Mar");
+         when 4 =>
+            Month_String := Vstr ("Apr");
+         when 5 =>
+            Month_String := Vstr ("May");
+         when 6 =>
+            Month_String := Vstr ("Jun");
+         when 7 =>
+            Month_String := Vstr ("Jul");
+         when 8 =>
+            Month_String := Vstr ("Aug");
+         when 9 =>
+            Month_String := Vstr ("Sep");
+         when 10 =>
+            Month_String := Vstr ("Oct");
+         when 11 =>
+            Month_String := Vstr ("Nov");
+         when 12 =>
+            Month_String := Vstr ("Dec");
+      end case;
 
-  procedure AFLEXFATAL(MSG : in STRING) is
-  begin
-    TEXT_IO.PUT(STANDARD_ERROR, "aflex: fatal internal error " & MSG);
-    TEXT_IO.NEW_LINE(STANDARD_ERROR);
-    MAIN_BODY.AFLEXEND(1);
-  end AFLEXFATAL;
+      Hour   := Integer (Current_Seconds) / Integer (Seconds_Per_Hour);
+      Minute := Integer ((Current_Seconds - (Hour * Seconds_Per_Hour)) / 60);
+      Second :=
+        Integer (Current_Seconds - Hour * Seconds_Per_Hour - Minute * 60.0);
 
-  -- basename - find the basename of a file
-  function BASENAME return VSTRING is
-    END_CHAR_POS : INTEGER := LEN(INFILENAME);
-    START_CHAR_POS : INTEGER;
-  begin
-    if END_CHAR_POS = 0 then
-      -- if reading standard input give everything this name
-      return VSTR("aflex_yy");
-    end if;
+      if Hour >= 10 then
+         Hour_String := Vstr (Integer'Image (Hour));
+      else
+         Hour_String := Vstr ("0" & Integer'Image (Hour));
+      end if;
 
-    -- find out where the end of the basename is
-    while ((END_CHAR_POS >= 1) and then
-           (CHAR(INFILENAME, END_CHAR_POS) /= '.')) loop
-      END_CHAR_POS := END_CHAR_POS - 1;
-    end loop;
+      if Minute >= 10 then
+         Minute_String :=
+           Vstr (Integer'Image (Minute) (2 .. Integer'Image (Minute)'Length));
+      else
+         Minute_String :=
+           Vstr
+             ("0" &
+              Integer'Image (Minute) (2 .. Integer'Image (Minute)'Length));
+      end if;
 
-    -- find out where the beginning of the basename is
-    START_CHAR_POS := END_CHAR_POS; -- start at the end of the basename
-    while ((START_CHAR_POS > 1) and then
-           (CHAR(INFILENAME, START_CHAR_POS) /= '/')) loop
-        START_CHAR_POS := START_CHAR_POS - 1;
-    end loop;
+      if Second >= 10 then
+         Second_String :=
+           Vstr (Integer'Image (Second) (2 .. Integer'Image (Second)'Length));
+      else
+         Second_String :=
+           Vstr
+             ("0" &
+              Integer'Image (Second) (2 .. Integer'Image (Second)'Length));
+      end if;
 
-    if CHAR(INFILENAME, START_CHAR_POS) = '/' then
-        START_CHAR_POS := START_CHAR_POS + 1;
-    end if;
+      return
+        Month_String & Vstr (Integer'Image (Current_Day)) & Hour_String & ":" &
+        Minute_String & ":" & Second_String & Integer'Image (Current_Year);
+   end Aflex_Gettime;
 
-    if END_CHAR_POS >= 1 then
-      return SLICE(INFILENAME, START_CHAR_POS,  END_CHAR_POS - 1);
-    else
-      return INFILENAME;
-    end if;
-  end BASENAME;
+   -- aflexerror - report an error message and terminate
+   -- overloaded function, one for vstring, one for string.
+   procedure Aflexerror (Msg : in Vstring) is
+   begin
+      Tstring.Put (Standard_Error, "aflex: " & Msg);
+      Text_Io.New_Line (Standard_Error);
+      Main_Body.Aflexend (1);
+   end Aflexerror;
 
-  procedure SET_UNITNAME (STR : in VSTRING) is
-  begin
-    UNITNAME_VALUE   := STR;
-    UNITNAME_DEFINED := True;
-  end SET_UNITNAME;
+   procedure Aflexerror (Msg : in String) is
+   begin
+      Text_Io.Put (Standard_Error, "aflex: " & Msg);
+      Text_Io.New_Line (Standard_Error);
+      Main_Body.Aflexend (1);
+   end Aflexerror;
 
-  -- unitname - finds the parent unit name of the parser
-  function UNITNAME return VSTRING is
-  begin
-    -- if no unitname is defined, use the file name
-    if not UNITNAME_DEFINED then
-      return BASENAME & "_";
-    else
-      return UNITNAME_VALUE;
-    end if;
-  end UNITNAME;
+   -- aflexfatal - report a fatal error message and terminate
+   -- overloaded function, one for vstring, one for string.
+   procedure Aflexfatal (Msg : in Vstring) is
+   begin
+      Tstring.Put (Standard_Error, "aflex: fatal internal error " & Msg);
+      Text_Io.New_Line (Standard_Error);
+      Main_Body.Aflexend (1);
+   end Aflexfatal;
 
-   procedure SET_OPTION (OPT : in VSTRING) is
-      Option : constant String := STR (OPT);
+   procedure Aflexfatal (Msg : in String) is
+   begin
+      Text_Io.Put (Standard_Error, "aflex: fatal internal error " & Msg);
+      Text_Io.New_Line (Standard_Error);
+      Main_Body.Aflexend (1);
+   end Aflexfatal;
+
+   -- basename - find the basename of a file
+   function Basename return Vstring is
+      End_Char_Pos   : Integer := Len (Infilename);
+      Start_Char_Pos : Integer;
+   begin
+      if End_Char_Pos = 0 then
+         -- if reading standard input give everything this name
+         return Vstr ("aflex_yy");
+      end if;
+
+      -- find out where the end of the basename is
+      while
+        ((End_Char_Pos >= 1) and then (Char (Infilename, End_Char_Pos) /= '.'))
+      loop
+         End_Char_Pos := End_Char_Pos - 1;
+      end loop;
+
+      -- find out where the beginning of the basename is
+      Start_Char_Pos := End_Char_Pos; -- start at the end of the basename
+      while
+        ((Start_Char_Pos > 1)
+         and then (Char (Infilename, Start_Char_Pos) /= '/'))
+      loop
+         Start_Char_Pos := Start_Char_Pos - 1;
+      end loop;
+
+      if Char (Infilename, Start_Char_Pos) = '/' then
+         Start_Char_Pos := Start_Char_Pos + 1;
+      end if;
+
+      if End_Char_Pos >= 1 then
+         return Slice (Infilename, Start_Char_Pos, End_Char_Pos - 1);
+      else
+         return Infilename;
+      end if;
+   end Basename;
+
+   procedure Set_Unitname (Str : in Vstring) is
+   begin
+      Unitname_Value   := Str;
+      Unitname_Defined := True;
+   end Set_Unitname;
+
+   -- unitname - finds the parent unit name of the parser
+   function Unitname return Vstring is
+   begin
+      -- if no unitname is defined, use the file name
+      if not Unitname_Defined then
+         return Basename & "_";
+      else
+         return Unitname_Value;
+      end if;
+   end Unitname;
+
+   procedure Set_Option (Opt : in Vstring) is
+      Option : constant String := Str (Opt);
    begin
       if Option = "case-sensitive" or Option = "casefull" then
-         MISC_DEFS.CASEINS := False;
+         Misc_Defs.Caseins := False;
       elsif Option = "case-insensitive" or Option = "caseless" then
-         MISC_DEFS.CASEINS := True;
+         Misc_Defs.Caseins := True;
       elsif Option = "debug" then
-         MISC_DEFS.DDEBUG := True;
+         Misc_Defs.Ddebug := True;
       elsif Option = "interactive" then
-         MISC_DEFS.INTERACTIVE := True;
+         Misc_Defs.Interactive := True;
       elsif Option = "full" then
-         MISC_DEFS.USEECS := FALSE;
-         MISC_DEFS.USEMECS := FALSE;
-         MISC_DEFS.FULLTBL := True;
+         Misc_Defs.Useecs  := False;
+         Misc_Defs.Usemecs := False;
+         Misc_Defs.Fulltbl := True;
       elsif Option = "yylineno" then
-         MISC_DEFS.YYLINENO := True;
+         Misc_Defs.Yylineno := True;
       end if;
-  end SET_OPTION;
+   end Set_Option;
 
-  -- basename - find the basename of a file
-   function PACKAGE_NAME return STRING is
-      Name : String := STR(BASENAME);
+   -- basename - find the basename of a file
+   function Package_Name return String is
+      Name : String := Str (Basename);
    begin
-      if UNITNAME_DEFINED then
-         return TSTRING.STR (UNITNAME_VALUE);
+      if Unitname_Defined then
+         return Tstring.Str (Unitname_Value);
       end if;
       for I in Name'Range loop
          if Name (I) = '-' then
@@ -356,323 +361,322 @@ package body MISC is
          end if;
       end loop;
       return Name;
-   end PACKAGE_NAME;
+   end Package_Name;
 
-  -- line_directive_out - spit out a "# line" statement
+   -- line_directive_out - spit out a "# line" statement
 
-  procedure LINE_DIRECTIVE_OUT(OUTPUT_FILE_NAME : in FILE_TYPE) is
-  begin
-    if GEN_LINE_DIRS then
-      TEXT_IO.PUT(OUTPUT_FILE_NAME, "--# line ");
-      INT_IO.PUT(OUTPUT_FILE_NAME, LINENUM, 1);
-      TEXT_IO.PUT(OUTPUT_FILE_NAME, " """);
-      TSTRING.PUT(OUTPUT_FILE_NAME, INFILENAME);
-      TEXT_IO.PUT_LINE(OUTPUT_FILE_NAME, """");
-    end if;
-  end LINE_DIRECTIVE_OUT;
-
-
-  procedure LINE_DIRECTIVE_OUT is
-  begin
-    if GEN_LINE_DIRS then
-      TEXT_IO.PUT("--# line ");
-      INT_IO.PUT(LINENUM, 1);
-      TEXT_IO.PUT(" """);
-      TSTRING.PUT(INFILENAME);
-      TEXT_IO.PUT_LINE("""");
-    end if;
-  end LINE_DIRECTIVE_OUT;
-
-  -- all_upper - returns true if a string is all upper-case
-  function ALL_UPPER(STR : in VSTRING) return BOOLEAN is
-  begin
-    for I in 1 .. LEN(STR) loop
-      if (not ((CHAR(STR, I) >= 'A') and (CHAR(STR, I) <= 'Z'))) then
-        return FALSE;
+   procedure Line_Directive_Out (Output_File_Name : in File_Type) is
+   begin
+      if Gen_Line_Dirs then
+         Text_Io.Put (Output_File_Name, "--# line ");
+         Int_Io.Put (Output_File_Name, Linenum, 1);
+         Text_Io.Put (Output_File_Name, " """);
+         Tstring.Put (Output_File_Name, Infilename);
+         Text_Io.Put_Line (Output_File_Name, """");
       end if;
-    end loop;
-    return TRUE;
-  end ALL_UPPER;
+   end Line_Directive_Out;
 
-  -- all_lower - returns true if a string is all lower-case
-  function ALL_LOWER(STR : in VSTRING) return BOOLEAN is
-  begin
-    for I in 1 .. LEN(STR) loop
-      if (not ((CHAR(STR, I) >= 'a') and (CHAR(STR, I) <= 'z'))) then
-        return FALSE;
+   procedure Line_Directive_Out is
+   begin
+      if Gen_Line_Dirs then
+         Text_Io.Put ("--# line ");
+         Int_Io.Put (Linenum, 1);
+         Text_Io.Put (" """);
+         Tstring.Put (Infilename);
+         Text_Io.Put_Line ("""");
       end if;
-    end loop;
-    return TRUE;
-  end ALL_LOWER;
+   end Line_Directive_Out;
 
-  -- mk2data - generate a data statement for a two-dimensional array
-  --
-  --  generates a data statement initializing the current 2-D array to "value"
+   -- all_upper - returns true if a string is all upper-case
+   function All_Upper (Str : in Vstring) return Boolean is
+   begin
+      for I in 1 .. Len (Str) loop
+         if (not ((Char (Str, I) >= 'A') and (Char (Str, I) <= 'Z'))) then
+            return False;
+         end if;
+      end loop;
+      return True;
+   end All_Upper;
 
-  procedure MK2DATA(FILE  : in FILE_TYPE;
-                    VALUE : in INTEGER) is
-  begin
+   -- all_lower - returns true if a string is all lower-case
+   function All_Lower (Str : in Vstring) return Boolean is
+   begin
+      for I in 1 .. Len (Str) loop
+         if (not ((Char (Str, I) >= 'a') and (Char (Str, I) <= 'z'))) then
+            return False;
+         end if;
+      end loop;
+      return True;
+   end All_Lower;
 
-    if DATAPOS >= NUMDATAITEMS then
-      TEXT_IO.PUT(FILE, ',');
-      DATAFLUSH(FILE);
-    end if;
+   -- mk2data - generate a data statement for a two-dimensional array
+   --
+   --  generates a data statement initializing the current 2-D array to "value"
 
-    if DATAPOS = 0 then
+   procedure Mk2data (File : in File_Type; Value : in Integer) is
+   begin
 
-      -- indent
-      TEXT_IO.PUT(FILE, "    ");
-    else
-      TEXT_IO.PUT(FILE, ',');
-    end if;
+      if Datapos >= Numdataitems then
+         Text_Io.Put (File, ',');
+         Dataflush (File);
+      end if;
 
-    DATAPOS := DATAPOS + 1;
+      if Datapos = 0 then
 
-    INT_IO.PUT(FILE, VALUE, 5);
-  end MK2DATA;
+         -- indent
+         Text_Io.Put (File, "    ");
+      else
+         Text_Io.Put (File, ',');
+      end if;
 
-  procedure MK2DATA(VALUE : in INTEGER) is
-  begin
-    MK2DATA(CURRENT_OUTPUT, VALUE);
-  end MK2DATA;
+      Datapos := Datapos + 1;
 
-  --
-  --  generates a data statement initializing the current array element to
-  --  "value"
+      Int_Io.Put (File, Value, 5);
+   end Mk2data;
 
-  procedure MKDATA(VALUE : in INTEGER) is
-  begin
-    if DATAPOS >= NUMDATAITEMS then
-      TEXT_IO.PUT(',');
-      DATAFLUSH;
-    end if;
+   procedure Mk2data (Value : in Integer) is
+   begin
+      Mk2data (Current_Output, Value);
+   end Mk2data;
 
-    if DATAPOS = 0 then
+   --
+   --  generates a data statement initializing the current array element to
+   --  "value"
 
-      -- indent
-      TEXT_IO.PUT("    ");
-    else
-      TEXT_IO.PUT(',');
-    end if;
+   procedure Mkdata (Value : in Integer) is
+   begin
+      if Datapos >= Numdataitems then
+         Text_Io.Put (',');
+         Dataflush;
+      end if;
 
-    DATAPOS := DATAPOS + 1;
+      if Datapos = 0 then
 
-    INT_IO.PUT(VALUE, 5);
-  end MKDATA;
+         -- indent
+         Text_Io.Put ("    ");
+      else
+         Text_Io.Put (',');
+      end if;
 
+      Datapos := Datapos + 1;
 
-  -- myctoi - return the integer represented by a string of digits
+      Int_Io.Put (Value, 5);
+   end Mkdata;
 
-  function MYCTOI(NUM_ARRAY : in VSTRING) return INTEGER is
-    TOTAL : INTEGER := 0;
-    CNT   : INTEGER := TSTRING.FIRST;
-  begin
-    while (CNT <= TSTRING.LEN(NUM_ARRAY)) loop
-      TOTAL := TOTAL*10;
-      TOTAL := TOTAL + CHARACTER'POS(CHAR(NUM_ARRAY, CNT)) - CHARACTER'POS('0')
-        ;
-      CNT := CNT + 1;
-    end loop;
-    return TOTAL;
-  end MYCTOI;
+   -- myctoi - return the integer represented by a string of digits
 
+   function Myctoi (Num_Array : in Vstring) return Integer is
+      Total : Integer := 0;
+      Cnt   : Integer := Tstring.First;
+   begin
+      while (Cnt <= Tstring.Len (Num_Array)) loop
+         Total := Total * 10;
+         Total :=
+           Total + Character'Pos (Char (Num_Array, Cnt)) - Character'Pos ('0');
+         Cnt := Cnt + 1;
+      end loop;
+      return Total;
+   end Myctoi;
 
-  -- myesc - return character corresponding to escape sequence
+   -- myesc - return character corresponding to escape sequence
 
-  function MYESC(ARR : in VSTRING) return CHARACTER is
-  begin
-    case (CHAR(ARR, TSTRING.FIRST + 1)) is
-      when 'a' =>
-        return ASCII.BEL;
-      when 'b' =>
-        return ASCII.BS;
-      when 'f' =>
-        return ASCII.FF;
-      when 'n' =>
-        return ASCII.LF;
-      when 'r' =>
-        return ASCII.CR;
-      when 't' =>
-        return ASCII.HT;
-      when 'v' =>
-        return ASCII.VT;
+   function Myesc (Arr : in Vstring) return Character is
+   begin
+      case (Char (Arr, Tstring.First + 1)) is
+         when 'a' =>
+            return Ascii.Bel;
+         when 'b' =>
+            return Ascii.Bs;
+         when 'f' =>
+            return Ascii.Ff;
+         when 'n' =>
+            return Ascii.Lf;
+         when 'r' =>
+            return Ascii.Cr;
+         when 't' =>
+            return Ascii.Ht;
+         when 'v' =>
+            return Ascii.Vt;
 
-      when '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9' =>
+         when '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9' =>
 
-        -- \<octal>
-        declare
-          ESC_CHAR : CHARACTER;
-          -- SPTR        : INTEGER := TSTRING.FIRST + 1;
-        begin
-          ESC_CHAR := OTOI(TSTRING.SLICE(ARR, TSTRING.FIRST + 1, TSTRING.LEN(ARR
-            )));
-          if ESC_CHAR = ASCII.NUL then
-            MISC.SYNERR("escape sequence for null not allowed");
-            return ASCII.SOH;
-          end if;
+            -- \<octal>
+            declare
+               Esc_Char : Character;
+               -- SPTR        : INTEGER := TSTRING.FIRST + 1;
+            begin
+               Esc_Char :=
+                 Otoi
+                   (Tstring.Slice (Arr, Tstring.First + 1, Tstring.Len (Arr)));
+               if Esc_Char = Ascii.Nul then
+                  Misc.Synerr ("escape sequence for null not allowed");
+                  return Ascii.Soh;
+               end if;
 
-          return ESC_CHAR;
-        end;
-      when others =>
-        return CHAR(ARR, TSTRING.FIRST + 1);
-    end case;
-  end MYESC;
-
-
-  -- otoi - convert an octal digit string to an integer value
-
-  function OTOI(STR : in VSTRING) return CHARACTER is
-    TOTAL : INTEGER := 0;
-    CNT   : INTEGER := TSTRING.FIRST;
-  begin
-    while (CNT <= TSTRING.LEN(STR)) loop
-      TOTAL := TOTAL*8;
-      TOTAL := TOTAL + CHARACTER'POS(CHAR(STR, CNT)) - CHARACTER'POS('0');
-      CNT := CNT + 1;
-    end loop;
-    return CHARACTER'VAL(TOTAL);
-  end OTOI;
-
-
-  -- readable_form - return the the human-readable form of a character
-  --
-  -- The returned string is in static storage.
-
-  function READABLE_FORM(C : in CHARACTER) return VSTRING is
-  begin
-    if ((CHARACTER'POS(C) >= 0 and CHARACTER'POS(C) < 32) or (C = ASCII.DEL))
-      then
-      case C is
-        when ASCII.LF =>
-          return (VSTR("\n"));
-
-        -- Newline
-        when ASCII.HT =>
-          return (VSTR("\t"));
-
-        -- Horizontal Tab
-        when ASCII.FF =>
-          return (VSTR("\f"));
-
-        -- Form Feed
-        when ASCII.CR =>
-          return (VSTR("\r"));
-
-        -- Carriage Return
-        when ASCII.BS =>
-          return (VSTR("\b"));
-
-        -- Backspace
-        when others =>
-          return VSTR("\" & INTEGER'IMAGE(CHARACTER'POS(C)));
+               return Esc_Char;
+            end;
+         when others =>
+            return Char (Arr, Tstring.First + 1);
       end case;
-    elsif C = ' ' then
-      return VSTR("' '");
-    else
-      return VSTR(C);
-    end if;
-  end READABLE_FORM;
+   end Myesc;
 
-  -- transition_struct_out - output a yy_trans_info structure
-  --
-  -- outputs the yy_trans_info structure with the two elements, element_v and
-  -- element_n.  Formats the output with spaces and carriage returns.
+   -- otoi - convert an octal digit string to an integer value
 
-  procedure TRANSITION_STRUCT_OUT(ELEMENT_V, ELEMENT_N : in INTEGER) is
-  begin
-    INT_IO.PUT(ELEMENT_V, 7);
-    TEXT_IO.PUT(", ");
-    INT_IO.PUT(ELEMENT_N, 5);
-    TEXT_IO.PUT(",");
-    DATAPOS := DATAPOS + TRANS_STRUCT_PRINT_LENGTH;
+   function Otoi (Str : in Vstring) return Character is
+      Total : Integer := 0;
+      Cnt   : Integer := Tstring.First;
+   begin
+      while (Cnt <= Tstring.Len (Str)) loop
+         Total := Total * 8;
+         Total :=
+           Total + Character'Pos (Char (Str, Cnt)) - Character'Pos ('0');
+         Cnt := Cnt + 1;
+      end loop;
+      return Character'Val (Total);
+   end Otoi;
 
-    if DATAPOS >= 75 then
-      TEXT_IO.NEW_LINE;
+   -- readable_form - return the the human-readable form of a character
+   --
+   -- The returned string is in static storage.
 
-      DATALINE := DATALINE + 1;
-      if DATALINE mod 10 = 0 then
-        TEXT_IO.NEW_LINE;
+   function Readable_Form (C : in Character) return Vstring is
+   begin
+      if
+        ((Character'Pos (C) >= 0 and Character'Pos (C) < 32) or
+         (C = Ascii.Del))
+      then
+         case C is
+            when Ascii.Lf =>
+               return (Vstr ("\n"));
+
+               -- Newline
+            when Ascii.Ht =>
+               return (Vstr ("\t"));
+
+               -- Horizontal Tab
+            when Ascii.Ff =>
+               return (Vstr ("\f"));
+
+               -- Form Feed
+            when Ascii.Cr =>
+               return (Vstr ("\r"));
+
+               -- Carriage Return
+            when Ascii.Bs =>
+               return (Vstr ("\b"));
+
+               -- Backspace
+            when others =>
+               return Vstr ("\" & Integer'Image (Character'Pos (C)));
+         end case;
+      elsif C = ' ' then
+         return Vstr ("' '");
+      else
+         return Vstr (C);
       end if;
+   end Readable_Form;
 
-      DATAPOS := 0;
-    end if;
-  end TRANSITION_STRUCT_OUT;
+   -- transition_struct_out - output a yy_trans_info structure
+   --
+   -- outputs the yy_trans_info structure with the two elements, element_v and
+   -- element_n.  Formats the output with spaces and carriage returns.
 
-  function SET_YY_TRAILING_HEAD_MASK(SRC : in INTEGER) return INTEGER is
-  begin
-    if CHECK_YY_TRAILING_HEAD_MASK(SRC) = 0 then
-      return SRC + YY_TRAILING_HEAD_MASK;
-    else
-      return SRC;
-    end if;
-  end SET_YY_TRAILING_HEAD_MASK;
+   procedure Transition_Struct_Out (Element_V, Element_N : in Integer) is
+   begin
+      Int_Io.Put (Element_V, 7);
+      Text_Io.Put (", ");
+      Int_Io.Put (Element_N, 5);
+      Text_Io.Put (",");
+      Datapos := Datapos + Trans_Struct_Print_Length;
 
-  function CHECK_YY_TRAILING_HEAD_MASK(SRC : in INTEGER) return INTEGER is
-  begin
-    if SRC >= YY_TRAILING_HEAD_MASK then
-      return YY_TRAILING_HEAD_MASK;
-    else
-      return 0;
-    end if;
-  end CHECK_YY_TRAILING_HEAD_MASK;
+      if Datapos >= 75 then
+         Text_Io.New_Line;
 
-  function SET_YY_TRAILING_MASK(SRC : in INTEGER) return INTEGER is
-  begin
-    if CHECK_YY_TRAILING_MASK(SRC) = 0 then
-      return SRC + YY_TRAILING_MASK;
-    else
-      return SRC;
-    end if;
-  end SET_YY_TRAILING_MASK;
+         Dataline := Dataline + 1;
+         if Dataline mod 10 = 0 then
+            Text_Io.New_Line;
+         end if;
 
-  function CHECK_YY_TRAILING_MASK(SRC : in INTEGER) return INTEGER is
-  begin
+         Datapos := 0;
+      end if;
+   end Transition_Struct_Out;
+
+   function Set_Yy_Trailing_Head_Mask (Src : in Integer) return Integer is
+   begin
+      if Check_Yy_Trailing_Head_Mask (Src) = 0 then
+         return Src + Yy_Trailing_Head_Mask;
+      else
+         return Src;
+      end if;
+   end Set_Yy_Trailing_Head_Mask;
+
+   function Check_Yy_Trailing_Head_Mask (Src : in Integer) return Integer is
+   begin
+      if Src >= Yy_Trailing_Head_Mask then
+         return Yy_Trailing_Head_Mask;
+      else
+         return 0;
+      end if;
+   end Check_Yy_Trailing_Head_Mask;
+
+   function Set_Yy_Trailing_Mask (Src : in Integer) return Integer is
+   begin
+      if Check_Yy_Trailing_Mask (Src) = 0 then
+         return Src + Yy_Trailing_Mask;
+      else
+         return Src;
+      end if;
+   end Set_Yy_Trailing_Mask;
+
+   function Check_Yy_Trailing_Mask (Src : in Integer) return Integer is
+   begin
 
 -- this test is whether both bits are on, or whether onlyy TRAIL_MASK is set
-    if ((SRC >= YY_TRAILING_HEAD_MASK + YY_TRAILING_MASK) or ((
-      CHECK_YY_TRAILING_HEAD_MASK(SRC) = 0) and (SRC >= YY_TRAILING_MASK)))
+      if
+        ((Src >= Yy_Trailing_Head_Mask + Yy_Trailing_Mask) or
+         ((Check_Yy_Trailing_Head_Mask (Src) = 0) and
+          (Src >= Yy_Trailing_Mask)))
       then
-      return YY_TRAILING_MASK;
-    else
-      return 0;
-    end if;
-  end CHECK_YY_TRAILING_MASK;
+         return Yy_Trailing_Mask;
+      else
+         return 0;
+      end if;
+   end Check_Yy_Trailing_Mask;
 
-  function ISLOWER(C : in CHARACTER) return BOOLEAN is
-  begin
-    return C in 'a' .. 'z';
-  end ISLOWER;
-
-
-  function ISUPPER(C : in CHARACTER) return BOOLEAN is
-  begin
-    return C in 'A' .. 'Z';
-  end ISUPPER;
-
-  function ISDIGIT(C : in CHARACTER) return BOOLEAN is
-  begin
-    return C in '0' .. '9';
-  end ISDIGIT;
-
-  function TOLOWER(C : in INTEGER) return INTEGER is
-  begin
-    return C - CHARACTER'POS('A') + CHARACTER'POS('a');
-  end TOLOWER;
-
-   procedure SYNERR(STR : in STRING) is
+   function Islower (C : in Character) return Boolean is
    begin
-      SYNTAXERROR := TRUE;
-      PUT(STANDARD_ERROR, LEX_FILENAME);
-      Text_IO.PUT(STANDARD_ERROR, ":");
-      PUT(STANDARD_ERROR, Integer'Image (LINENUM));
-      TEXT_IO.PUT(STANDARD_ERROR, ": syntax error: ");
-      TEXT_IO.PUT(STANDARD_ERROR, STR);
-      TEXT_IO.NEW_LINE(STANDARD_ERROR);
-   end SYNERR;
+      return C in 'a' .. 'z';
+   end Islower;
 
-   procedure SET_FILENAME (STR : in VSTRING) is
+   function Isupper (C : in Character) return Boolean is
    begin
-      LEX_FILENAME := STR;
-   end SET_FILENAME;
+      return C in 'A' .. 'Z';
+   end Isupper;
 
-end MISC;
+   function Isdigit (C : in Character) return Boolean is
+   begin
+      return C in '0' .. '9';
+   end Isdigit;
+
+   function Tolower (C : in Integer) return Integer is
+   begin
+      return C - Character'Pos ('A') + Character'Pos ('a');
+   end Tolower;
+
+   procedure Synerr (Str : in String) is
+   begin
+      Syntaxerror := True;
+      Put (Standard_Error, Lex_Filename);
+      Text_Io.Put (Standard_Error, ":");
+      Put (Standard_Error, Integer'Image (Linenum));
+      Text_Io.Put (Standard_Error, ": syntax error: ");
+      Text_Io.Put (Standard_Error, Str);
+      Text_Io.New_Line (Standard_Error);
+   end Synerr;
+
+   procedure Set_Filename (Str : in Vstring) is
+   begin
+      Lex_Filename := Str;
+   end Set_Filename;
+
+end Misc;

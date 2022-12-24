@@ -20,18 +20,17 @@
 -- AUTHOR: John Self (UCI)
 -- DESCRIPTION command line interface body for use with the VERDIX VADS system.
 -- NOTES this file is system dependent
--- $Header: /dc/uc/self/tmp/gnat_aflex/src/RCS/command_line_interface.adb,v 1.1 1995/02/06 19:30:01 self Exp self $ 
+-- $Header: /dc/uc/self/tmp/gnat_aflex/src/RCS/command_line_interface.adb,v 1.1 1995/02/06 19:30:01 self Exp self $
 
 with Ada.Command_Line; use Ada.Command_Line;
 
-package body COMMAND_LINE_INTERFACE is 
-  procedure INITIALIZE_COMMAND_LINE is 
-  begin
-      for i in 1 .. Ada.Command_Line.Argument_Count
-      loop
-        ARGV(i):= vstr(Argument(i));
+package body Command_Line_Interface is
+   procedure Initialize_Command_Line is
+   begin
+      for I in 1 .. Ada.Command_Line.Argument_Count loop
+         Argv (I) := Vstr (Argument (I));
       end loop;
-      ARGC := Ada.Command_Line.Argument_Count + 1;
-  end INITIALIZE_COMMAND_LINE; 
+      Argc := Ada.Command_Line.Argument_Count + 1;
+   end Initialize_Command_Line;
 
-end COMMAND_LINE_INTERFACE; 
+end Command_Line_Interface;

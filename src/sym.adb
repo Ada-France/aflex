@@ -20,196 +20,192 @@
 -- AUTHOR: John Self (UCI)
 -- DESCRIPTION implements only a simple symbol table using open hashing
 -- NOTES could be faster, but it isn't used much
--- $Header: /co/ua/self/arcadia/aflex/ada/src/RCS/symB.a,v 1.6 90/01/12 15:20:39 self Exp Locker: self $ 
+-- $Header: /co/ua/self/arcadia/aflex/ada/src/RCS/symB.a,v 1.6 90/01/12 15:20:39 self Exp Locker: self $
 
-with MISC, NFA, TEXT_IO, INT_IO; 
+with Misc, Nfa, Text_Io, Int_Io;
 
-package body SYM is 
+package body Sym is
 
-  -- addsym - add symbol and definitions to symbol table
-  --
-  -- true is returned if the symbol already exists, and the change not made.
+   -- addsym - add symbol and definitions to symbol table
+   --
+   -- true is returned if the symbol already exists, and the change not made.
 
-  procedure ADDSYM(SYM, STR_DEF : in VSTRING; 
-                   INT_DEF      : in INTEGER; 
-                   TABLE        : in out HASH_TABLE; 
-                   TABLE_SIZE   : in INTEGER; 
-                   RESULT       : out BOOLEAN) is 
-    HASH_VAL             : constant INTEGER := HASHFUNCT(SYM, TABLE_SIZE); 
-    SYM_ENTRY            : HASH_LINK := TABLE(HASH_VAL); 
-    NEW_ENTRY, SUCCESSOR : HASH_LINK; 
-  begin
-    while SYM_ENTRY /= null loop
-      if SYM = SYM_ENTRY.NAME then 
-        -- entry already exists
-        RESULT := TRUE; 
-        return; 
-      end if; 
+   procedure Addsym
+     (Sym, Str_Def : in     Vstring; Int_Def : in Integer;
+      Table : in out Hash_Table; Table_Size : in Integer; Result : out Boolean)
+   is
+      Hash_Val             : constant Integer := Hashfunct (Sym, Table_Size);
+      Sym_Entry            : Hash_Link        := Table (Hash_Val);
+      New_Entry, Successor : Hash_Link;
+   begin
+      while Sym_Entry /= null loop
+         if Sym = Sym_Entry.Name then
+            -- entry already exists
+            Result := True;
+            return;
+         end if;
 
-      SYM_ENTRY := SYM_ENTRY.NEXT; 
-    end loop; 
+         Sym_Entry := Sym_Entry.Next;
+      end loop;
 
-    -- create new entry
-    NEW_ENTRY := new HASH_ENTRY; 
+      -- create new entry
+      New_Entry := new Hash_Entry;
 
-    SUCCESSOR := TABLE(HASH_VAL); 
-    if SUCCESSOR /= null then 
-      NEW_ENTRY.NEXT := SUCCESSOR; 
-      SUCCESSOR.PREV := NEW_ENTRY; 
-    else 
-      NEW_ENTRY.NEXT := null; 
-    end if; 
+      Successor := Table (Hash_Val);
+      if Successor /= null then
+         New_Entry.Next := Successor;
+         Successor.Prev := New_Entry;
+      else
+         New_Entry.Next := null;
+      end if;
 
-    NEW_ENTRY.PREV := null; 
-    NEW_ENTRY.NAME := SYM; 
-    NEW_ENTRY.STR_VAL := STR_DEF; 
-    NEW_ENTRY.INT_VAL := INT_DEF; 
+      New_Entry.Prev    := null;
+      New_Entry.Name    := Sym;
+      New_Entry.Str_Val := Str_Def;
+      New_Entry.Int_Val := Int_Def;
 
-    TABLE(HASH_VAL) := NEW_ENTRY; 
+      Table (Hash_Val) := New_Entry;
 
-    RESULT := FALSE; 
+      Result := False;
 
-  exception
-    when STORAGE_ERROR => 
-      MISC.AFLEXFATAL("symbol table memory allocation failed"); 
-  end ADDSYM; 
+   exception
+      when Storage_Error =>
+         Misc.Aflexfatal ("symbol table memory allocation failed");
+   end Addsym;
 
+   -- cclinstal - save the text of a character class
 
-  -- cclinstal - save the text of a character class
+   procedure Cclinstal (Ccltxt : in Vstring; Cclnum : in Integer) is
+      -- we don't bother checking the return status because we are not called
+      -- unless the symbol is new
+      Dummy : Boolean;
+   begin
+      Addsym (Ccltxt, Nul, Cclnum, Ccltab, Ccl_Hash_Size, Dummy);
+   end Cclinstal;
 
-  procedure CCLINSTAL(CCLTXT : in VSTRING; 
-                      CCLNUM : in INTEGER) is 
-  -- we don't bother checking the return status because we are not called
-  -- unless the symbol is new
-    DUMMY : BOOLEAN; 
-  begin
-    ADDSYM(CCLTXT, NUL, CCLNUM, CCLTAB, CCL_HASH_SIZE, DUMMY); 
-  end CCLINSTAL; 
+   -- ccllookup - lookup the number associated with character class text
 
+   function Ccllookup (Ccltxt : in Vstring) return Integer is
+   begin
+      return Findsym (Ccltxt, Ccltab, Ccl_Hash_Size).Int_Val;
+   end Ccllookup;
 
-  -- ccllookup - lookup the number associated with character class text
+   -- findsym - find symbol in symbol table
 
-  function CCLLOOKUP(CCLTXT : in VSTRING) return INTEGER is 
-  begin
-    return FINDSYM(CCLTXT, CCLTAB, CCL_HASH_SIZE).INT_VAL; 
-  end CCLLOOKUP; 
+   function Findsym
+     (Symbol : in Vstring; Table : in Hash_Table; Table_Size : in Integer)
+      return Hash_Link
+   is
+      Sym_Entry   : Hash_Link := Table (Hashfunct (Symbol, Table_Size));
+      Empty_Entry : Hash_Link;
+   begin
+      while Sym_Entry /= null loop
+         if Symbol = Sym_Entry.Name then
+            return Sym_Entry;
+         end if;
+         Sym_Entry := Sym_Entry.Next;
+      end loop;
+      Empty_Entry     := new Hash_Entry;
+      Empty_Entry.all := (null, null, Nul, Nul, 0);
 
-  -- findsym - find symbol in symbol table
+      return Empty_Entry;
+   exception
+      when Storage_Error =>
+         Misc.Aflexfatal ("dynamic memory failure in findsym()");
+         return Empty_Entry;
+   end Findsym;
 
-  function FINDSYM(SYMBOL     : in VSTRING; 
-                   TABLE      : in HASH_TABLE; 
-                   TABLE_SIZE : in INTEGER) return HASH_LINK is 
-    SYM_ENTRY   : HASH_LINK := TABLE(HASHFUNCT(SYMBOL, TABLE_SIZE)); 
-    EMPTY_ENTRY : HASH_LINK; 
-  begin
-    while SYM_ENTRY /= null loop
-      if SYMBOL = SYM_ENTRY.NAME then 
-        return SYM_ENTRY; 
-      end if; 
-      SYM_ENTRY := SYM_ENTRY.NEXT; 
-    end loop; 
-    EMPTY_ENTRY := new HASH_ENTRY; 
-    EMPTY_ENTRY.all := (null, null, NUL, NUL, 0); 
+   -- hashfunct - compute the hash value for "str" and hash size "hash_size"
 
-    return EMPTY_ENTRY; 
-  exception
-    when STORAGE_ERROR => 
-      MISC.AFLEXFATAL("dynamic memory failure in findsym()"); 
-      return EMPTY_ENTRY; 
-  end FINDSYM; 
+   function Hashfunct (Str : in Vstring; Hash_Size : in Integer) return Integer
+   is
+      Hashval, Locstr : Integer;
+   begin
+      Hashval := 0;
+      Locstr  := Tstring.First;
 
-  -- hashfunct - compute the hash value for "str" and hash size "hash_size"
+      while Locstr <= Tstring.Len (Str) loop
+         Hashval :=
+           ((Hashval * 2) + Character'Pos (Char (Str, Locstr))) mod Hash_Size;
+         Locstr := Locstr + 1;
+      end loop;
 
-  function HASHFUNCT(STR       : in VSTRING; 
-                     HASH_SIZE : in INTEGER) return INTEGER is 
-    HASHVAL, LOCSTR : INTEGER; 
-  begin
-    HASHVAL := 0; 
-    LOCSTR := TSTRING.FIRST; 
+      return Hashval;
+   end Hashfunct;
 
-    while LOCSTR <= TSTRING.LEN(STR) loop
-      HASHVAL := ((HASHVAL*2) + CHARACTER'POS(CHAR(STR, LOCSTR))) mod HASH_SIZE; 
-      LOCSTR := LOCSTR + 1; 
-    end loop; 
+   --ndinstal - install a name definition
 
-    return HASHVAL; 
-  end HASHFUNCT; 
+   procedure Ndinstal (Nd, Def : in Vstring) is
+      Result : Boolean;
+   begin
+      Addsym (Nd, Def, 0, Ndtbl, Name_Table_Hash_Size, Result);
+      if Result then
+         Misc.Synerr ("name defined twice");
+      end if;
+   end Ndinstal;
 
+   -- ndlookup - lookup a name definition
 
-  --ndinstal - install a name definition
+   function Ndlookup (Nd : in Vstring) return Vstring is
+   begin
+      return Findsym (Nd, Ndtbl, Name_Table_Hash_Size).Str_Val;
+   end Ndlookup;
 
-  procedure NDINSTAL(ND, DEF : in VSTRING) is 
-    RESULT : BOOLEAN; 
-  begin
-    ADDSYM(ND, DEF, 0, NDTBL, NAME_TABLE_HASH_SIZE, RESULT); 
-    if RESULT then 
-      MISC.SYNERR("name defined twice"); 
-    end if; 
-  end NDINSTAL; 
+   -- scinstal - make a start condition
+   --
+   -- NOTE
+   --    the start condition is Exclusive if xcluflg is true
 
-  -- ndlookup - lookup a name definition
+   procedure Scinstal (Str : in Vstring; Xcluflg : in Boolean) is
+      -- bit of a hack.  We know how the default start-condition is
+      -- declared, and don't put out a define for it, because it
+      -- would come out as "#define 0 1"
 
-  function NDLOOKUP(ND : in VSTRING) return VSTRING is 
-  begin
-    return FINDSYM(ND, NDTBL, NAME_TABLE_HASH_SIZE).STR_VAL; 
-  end NDLOOKUP; 
+      -- actually, this is no longer the case.  The default start-condition
+      -- is now called "INITIAL".  But we keep the following for the sake
+      -- of future robustness.
+      Result : Boolean;
+   begin
+      if Str /= Vstr ("0") then
+         Tstring.Put (Def_File, Str);
+         Text_Io.Put (Def_File, " : constant := ");
+         Int_Io.Put (Def_File, Lastsc, 1);
+         Text_Io.Put_Line (Def_File, ";");
+      end if;
 
-  -- scinstal - make a start condition
-  --
-  -- NOTE
-  --    the start condition is Exclusive if xcluflg is true
+      Lastsc := Lastsc + 1;
+      if Lastsc >= Current_Max_Scs then
+         Current_Max_Scs := Current_Max_Scs + Max_Scs_Increment;
 
-  procedure SCINSTAL(STR     : in VSTRING; 
-                     XCLUFLG : in BOOLEAN) is 
-  -- bit of a hack.  We know how the default start-condition is
-  -- declared, and don't put out a define for it, because it
-  -- would come out as "#define 0 1"
+         Num_Reallocs := Num_Reallocs + 1;
 
-  -- actually, this is no longer the case.  The default start-condition
-  -- is now called "INITIAL".  But we keep the following for the sake
-  -- of future robustness.
-    RESULT : BOOLEAN; 
-  begin
-    if STR /= VSTR("0") then 
-      TSTRING.PUT(DEF_FILE, STR); 
-      TEXT_IO.PUT(DEF_FILE, " : constant := "); 
-      INT_IO.PUT(DEF_FILE, LASTSC, 1); 
-      TEXT_IO.PUT_LINE(DEF_FILE, ";"); 
-    end if; 
+         Reallocate_Integer_Array (Scset, Current_Max_Scs);
+         Reallocate_Integer_Array (Scbol, Current_Max_Scs);
+         Reallocate_Boolean_Array (Scxclu, Current_Max_Scs);
+         Reallocate_Boolean_Array (Sceof, Current_Max_Scs);
+         Reallocate_Vstring_Array (Scname, Current_Max_Scs);
+         Reallocate_Integer_Array (Actvsc, Current_Max_Scs);
+      end if;
 
-    LASTSC := LASTSC + 1; 
-    if LASTSC >= CURRENT_MAX_SCS then 
-      CURRENT_MAX_SCS := CURRENT_MAX_SCS + MAX_SCS_INCREMENT; 
+      Scname (Lastsc) := Str;
 
-      NUM_REALLOCS := NUM_REALLOCS + 1; 
+      Addsym
+        (Scname (Lastsc), Nul, Lastsc, Sctbl, Start_Cond_Hash_Size, Result);
+      if Result then
+         Misc.Aflexerror ("start condition " & Str & " declared twice");
+      end if;
 
-      REALLOCATE_INTEGER_ARRAY(SCSET, CURRENT_MAX_SCS); 
-      REALLOCATE_INTEGER_ARRAY(SCBOL, CURRENT_MAX_SCS); 
-      REALLOCATE_BOOLEAN_ARRAY(SCXCLU, CURRENT_MAX_SCS); 
-      REALLOCATE_BOOLEAN_ARRAY(SCEOF, CURRENT_MAX_SCS); 
-      REALLOCATE_VSTRING_ARRAY(SCNAME, CURRENT_MAX_SCS); 
-      REALLOCATE_INTEGER_ARRAY(ACTVSC, CURRENT_MAX_SCS); 
-    end if; 
+      Scset (Lastsc)  := Nfa.Mkstate (Sym_Epsilon);
+      Scbol (Lastsc)  := Nfa.Mkstate (Sym_Epsilon);
+      Scxclu (Lastsc) := Xcluflg;
+      Sceof (Lastsc)  := False;
+   end Scinstal;
 
-    SCNAME(LASTSC) := STR; 
+   -- sclookup - lookup the number associated with a start condition
 
-    ADDSYM(SCNAME(LASTSC), NUL, LASTSC, SCTBL, START_COND_HASH_SIZE, RESULT); 
-    if RESULT then 
-      MISC.AFLEXERROR("start condition " & STR & " declared twice"); 
-    end if; 
+   function Sclookup (Str : in Vstring) return Integer is
+   begin
+      return Findsym (Str, Sctbl, Start_Cond_Hash_Size).Int_Val;
+   end Sclookup;
 
-    SCSET(LASTSC) := NFA.MKSTATE(SYM_EPSILON); 
-    SCBOL(LASTSC) := NFA.MKSTATE(SYM_EPSILON); 
-    SCXCLU(LASTSC) := XCLUFLG; 
-    SCEOF(LASTSC) := FALSE; 
-  end SCINSTAL; 
-
-
-  -- sclookup - lookup the number associated with a start condition
-
-  function SCLOOKUP(STR : in VSTRING) return INTEGER is 
-  begin
-    return FINDSYM(STR, SCTBL, START_COND_HASH_SIZE).INT_VAL; 
-  end SCLOOKUP; 
-
-end SYM; 
+end Sym;

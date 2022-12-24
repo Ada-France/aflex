@@ -20,9 +20,8 @@
 -- AUTHOR: John Self (UCI)
 -- DESCRIPTION used to store lines in the template files
 -- NOTES if lines in a template exceed 128 characters we are in trouble
--- $Header: /co/ua/self/arcadia/aflex/ada/src/RCS/file_strings.a,v 1.3 90/01/12 15:20:02 self Exp Locker: self $ 
+-- $Header: /co/ua/self/arcadia/aflex/ada/src/RCS/file_strings.a,v 1.3 90/01/12 15:20:02 self Exp Locker: self $
 
-with VSTRINGS; 
-pragma Elaborate_All(VSTRINGS);
-package FILE_STRING is 
-  new VSTRINGS(128); 
+with Vstrings;
+pragma Elaborate_All (Vstrings);
+package File_String is new Vstrings (128);

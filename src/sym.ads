@@ -20,33 +20,30 @@
 -- AUTHOR: John Self (UCI)
 -- DESCRIPTION implements only a simple symbol table using open hashing
 -- NOTES could be faster, but it isn't used much
--- $Header: /co/ua/self/arcadia/aflex/ada/src/RCS/symS.a,v 1.4 90/01/12 15:20:42 self Exp Locker: self $ 
+-- $Header: /co/ua/self/arcadia/aflex/ada/src/RCS/symS.a,v 1.4 90/01/12 15:20:42 self Exp Locker: self $
 
-with TSTRING; 
-with MISC_DEFS; 
-package SYM is 
+with Tstring;
+with Misc_Defs;
+package Sym is
 
-  use TSTRING; 
-  use MISC_DEFS; 
+   use Tstring;
+   use Misc_Defs;
 
-  procedure ADDSYM(SYM, STR_DEF : in VSTRING; 
-                   INT_DEF      : in INTEGER; 
-                   TABLE        : in out HASH_TABLE; 
-                   TABLE_SIZE   : in INTEGER; 
-                   RESULT       : out BOOLEAN); 
-  -- result indicates success
-  procedure CCLINSTAL(CCLTXT : in VSTRING; 
-                      CCLNUM : in INTEGER); 
-  function CCLLOOKUP(CCLTXT : in VSTRING) return INTEGER; 
-  function FINDSYM(SYMBOL     : in VSTRING; 
-                   TABLE      : in HASH_TABLE; 
-                   TABLE_SIZE : in INTEGER) return HASH_LINK; 
+   procedure Addsym
+     (Sym, Str_Def : in     Vstring; Int_Def : in Integer;
+      Table        : in out Hash_Table; Table_Size : in Integer;
+      Result       :    out Boolean);
+   -- result indicates success
+   procedure Cclinstal (Ccltxt : in Vstring; Cclnum : in Integer);
+   function Ccllookup (Ccltxt : in Vstring) return Integer;
+   function Findsym
+     (Symbol : in Vstring; Table : in Hash_Table; Table_Size : in Integer)
+      return Hash_Link;
 
-  function HASHFUNCT(STR       : in VSTRING; 
-                     HASH_SIZE : in INTEGER) return INTEGER; 
-  procedure NDINSTAL(ND, DEF : in VSTRING); 
-  function NDLOOKUP(ND : in VSTRING) return VSTRING; 
-  procedure SCINSTAL(STR     : in VSTRING; 
-                     XCLUFLG : in BOOLEAN); 
-  function SCLOOKUP(STR : in VSTRING) return INTEGER; 
-end SYM; 
+   function Hashfunct
+     (Str : in Vstring; Hash_Size : in Integer) return Integer;
+   procedure Ndinstal (Nd, Def : in Vstring);
+   function Ndlookup (Nd : in Vstring) return Vstring;
+   procedure Scinstal (Str : in Vstring; Xcluflg : in Boolean);
+   function Sclookup (Str : in Vstring) return Integer;
+end Sym;

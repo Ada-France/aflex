@@ -2,8 +2,8 @@
 --
 -- AUTHOR: John Self (UCI)
 -- DESCRIPTION main subprogram of aflex, calls the major routines in order
--- $Header: /co/ua/self/arcadia/aflex/ada/src/RCS/aflex.a,v 1.11 90/10/15 20:00:40 self Exp Locker: self $ 
---*************************************************************************** 
+-- $Header: /co/ua/self/arcadia/aflex/ada/src/RCS/aflex.a,v 1.11 90/10/15 20:00:40 self Exp Locker: self $
+--***************************************************************************
 --                              aflex
 --                          version 1.4a
 --***************************************************************************
@@ -63,44 +63,46 @@
 --
 --***************************************************************************
 
-with MAIN_BODY, DFA, GEN, MISC_DEFS, Text_IO, MISC; 
-with TEMPLATE_MANAGER; use MISC_DEFS, Text_IO;
- 
-function AFLEX return INTEGER is 
-  --	copyright : constant string :=
-  --    "@(#) Copyright (c) 1990 Regents of the University of California.";
-  --	copyright2 : constant string :=
-  --    "All rights reserved.";
+with Main_Body, Dfa, Gen, Misc_Defs, Text_Io, Misc;
+with Template_Manager;
+use Misc_Defs, Text_Io;
+
+function Aflex return Integer is
+--    copyright : constant string :=
+--    "@(#) Copyright (c) 1990 Regents of the University of California.";
+--    copyright2 : constant string :=
+--    "All rights reserved.";
 begin
-  MAIN_BODY.AFLEXINIT; 
-  MAIN_BODY.READIN; 
+   Main_Body.Aflexinit;
+   Main_Body.Readin;
 
-  if SYNTAXERROR then 
-    MAIN_BODY.AFLEXEND(1); 
-  end if; 
+   if Syntaxerror then
+      Main_Body.Aflexend (1);
+   end if;
 
-  if PERFORMANCE_REPORT then 
-    if INTERACTIVE then 
-      Text_IO.PUT_LINE(STANDARD_ERROR, 
-	"-I (interactive) entails a minor performance penalty"); 
-    end if; 
-  end if; 
+   if Performance_Report then
+      if Interactive then
+         Text_Io.Put_Line
+           (Standard_Error,
+            "-I (interactive) entails a minor performance penalty");
+      end if;
+   end if;
 
-  if VARIABLE_TRAILING_CONTEXT_RULES then 
-    MISC.AFLEXERROR("can't handle variable trailing context rules"); 
-  end if; 
+   if Variable_Trailing_Context_Rules then
+      Misc.Aflexerror ("can't handle variable trailing context rules");
+   end if;
 
-  -- convert the ndfa to a dfa
-  DFA.NTOD; 
+   -- convert the ndfa to a dfa
+   Dfa.Ntod;
 
-  -- generate the Ada state transition tables from the DFA
-  GEN.MAKE_TABLES; 
+   -- generate the Ada state transition tables from the DFA
+   Gen.Make_Tables;
 
-  TEMPLATE_MANAGER.GENERATE_IO_FILE; 
-  TEMPLATE_MANAGER.GENERATE_DFA_FILE; 
-  MAIN_BODY.AFLEXEND(0); 
-  return 0; 
+   Template_Manager.Generate_Io_File;
+   Template_Manager.Generate_Dfa_File;
+   Main_Body.Aflexend (0);
+   return 0;
 exception
-  when MAIN_BODY.AFLEX_TERMINATE => 
-    return MAIN_BODY.TERMINATION_STATUS; 
-end AFLEX; 
+   when Main_Body.Aflex_Terminate =>
+      return Main_Body.Termination_Status;
+end Aflex;

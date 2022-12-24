@@ -1,14 +1,14 @@
-package body VSTRINGS is
+package body Vstrings is
 
-  -- local declarations
+   -- local declarations
 
-  FILL_CHAR : constant CHARACTER := ASCII.NUL;
+   Fill_Char : constant Character := Ascii.Nul;
 
 --  procedure FORMAT(THE_STRING : in out VSTRING; OLDLEN : in STRINDEX := LAST) is
 --    -- fill the string with FILL_CHAR to null out old values
 
 --    begin -- FORMAT (Local Procedure)
---      THE_STRING.VALUE(THE_STRING.LEN + 1 .. OLDLEN) := 
+--      THE_STRING.VALUE(THE_STRING.LEN + 1 .. OLDLEN) :=
 --                                        (others => FILL_CHAR);
 --    end FORMAT;
 
@@ -19,473 +19,499 @@ package body VSTRINGS is
 -- The following procedure is far from optimal but it doesn't break
 -- NOTE: gcc-2.6.2 and gnat-2.00 do it wrong too!
 
-  procedure FORMAT(THE_STRING : in out VSTRING; OLDLEN : in STRINDEX := LAST) 
-  is
-    -- fill the string with FILL_CHAR to null out old values
+   procedure Format (The_String : in out Vstring; Oldlen : in Strindex := Last)
+   is
+   -- fill the string with FILL_CHAR to null out old values
 
-    begin -- FORMAT (Local Procedure)
-      for I in the_string.len+1..oldlen loop
-        THE_STRING.VALUE(I) := FILL_CHAR;
+   begin -- FORMAT (Local Procedure)
+      for I in The_String.Len + 1 .. Oldlen loop
+         The_String.Value (I) := Fill_Char;
       end loop;
-    end FORMAT;
-
-
-  -- bodies of visible operations
-
-  function LEN(FROM : VSTRING) return STRINDEX is
-    begin
-      return FROM.LEN;
-    end LEN;
-
-
-  --  function MAX(FROM : VSTRING) return STRINDEX is
-  --    begin
-  --      return LAST;
-  --    end MAX;
-
-
-  function STR(FROM : VSTRING) return STRING is
-    begin
-      return FROM.VALUE(FIRST .. FROM.LEN);
-    end STR;
-
-
-  function CHAR(FROM : VSTRING; POSITION : STRINDEX := FIRST)
-                 return CHARACTER is
-    begin
-      if POSITION not in FIRST .. FROM.LEN
-        then raise CONSTRAINT_ERROR;
-       end if;
-      return FROM.VALUE(POSITION);
-    end CHAR;
-
-
-  function "<" (LEFT: VSTRING; RIGHT: VSTRING) return BOOLEAN is
-    begin -- "<"
-      return LEFT.VALUE < RIGHT.VALUE;
-    end "<";
-
-
-  function ">" (LEFT: VSTRING; RIGHT: VSTRING) return BOOLEAN is
-    begin -- ">"
-      return LEFT.VALUE > RIGHT.VALUE;
-    end ">";
-
-
-  function "<=" (LEFT: VSTRING; RIGHT: VSTRING) return BOOLEAN is
-    begin -- "<="
-      return LEFT.VALUE <= RIGHT.VALUE;
-    end "<=";
-
-
-  function ">=" (LEFT: VSTRING; RIGHT: VSTRING) return BOOLEAN is
-    begin -- ">="
-      return LEFT.VALUE >= RIGHT.VALUE;
-    end ">=";
-
-
-  procedure PUT(FILE : in FILE_TYPE; ITEM : in VSTRING) is
-    begin -- PUT
-      PUT(FILE, ITEM.VALUE(FIRST .. ITEM.LEN));
-    end PUT;
-
-  procedure Put(ITEM : in VSTRING) is
-    begin -- PUT
-      PUT(ITEM.VALUE(FIRST .. ITEM.LEN));
-    end PUT;
-
-
-  procedure PUT_LINE(FILE : in FILE_TYPE; ITEM : in VSTRING) is
-    begin -- PUT_LINE
-      PUT_LINE(FILE, ITEM.VALUE(FIRST .. ITEM.LEN));
-    end PUT_LINE;
-
-  procedure PUT_LINE(ITEM : in VSTRING) is
-    begin -- PUT_LINE
-      PUT_LINE(ITEM.VALUE(FIRST .. ITEM.LEN));
-    end PUT_LINE;
-
-
-  procedure GET(FILE : in FILE_TYPE; ITEM : out VSTRING;
-                LENGTH : in STRINDEX := LAST) is
-    begin -- GET
-      if LENGTH not in FIRST .. LAST
-        then raise CONSTRAINT_ERROR;
-       end if;
-
-      ITEM := NUL;
-      for INDEX in FIRST .. LENGTH loop
-        GET(FILE, ITEM.VALUE(INDEX));
-        ITEM.LEN := INDEX;
-       end loop;
-    end GET;
-
-  procedure GET(ITEM : out VSTRING; LENGTH : in STRINDEX := LAST) is
-    begin -- GET
-      if LENGTH not in FIRST .. LAST
-        then raise CONSTRAINT_ERROR;
-       end if;
-
-      ITEM := NUL;
-      for INDEX in FIRST .. LENGTH loop
-        GET(ITEM.VALUE(INDEX));
-        ITEM.LEN := INDEX;
-       end loop;
-    end GET;
-
-
-  procedure GET_LINE(FILE : in FILE_TYPE; ITEM : in out VSTRING) is
-
-    OLDLEN : constant STRINDEX := ITEM.LEN;
-
-    begin -- GET_LINE
-      GET_LINE(FILE, ITEM.VALUE, ITEM.LEN);
-      FORMAT(ITEM, OLDLEN);
-    end GET_LINE;
-       
-  procedure GET_LINE(ITEM : in out VSTRING) is
-
-    OLDLEN : constant STRINDEX := ITEM.LEN;
-
-    begin -- GET_LINE
-      GET_LINE(ITEM.VALUE, ITEM.LEN);
-      FORMAT(ITEM, OLDLEN);
-    end GET_LINE;
-
-
-  function SLICE(FROM : VSTRING; FRONT, BACK : STRINDEX) return VSTRING is
-
-    begin -- SLICE
-      if ((FRONT not in FIRST .. FROM.LEN) or else 
-         (BACK not in FIRST .. FROM.LEN)) and then FRONT <= BACK
-        then raise CONSTRAINT_ERROR;
-       end if;
-
-      return Vstr(FROM.VALUE(FRONT .. BACK));
-    end SLICE;
-
-
-  function SUBSTR(FROM : VSTRING; START, LENGTH : STRINDEX) return VSTRING is
-
-    begin -- SUBSTR
-      if (START not in FIRST .. FROM.LEN) or else
-         ((START + LENGTH - 1 not in FIRST .. FROM.LEN)
-          and then (LENGTH > 0))
-        then raise CONSTRAINT_ERROR;
-       end if;
-
-      return Vstr(FROM.VALUE(START .. START + LENGTH -1));
-    end SUBSTR;
-
-
-  function DELETE(FROM : VSTRING; FRONT, BACK : STRINDEX) return VSTRING is
-
-    TEMP : VSTRING := FROM;
-
-    begin -- DELETE
-      if ((FRONT not in FIRST .. FROM.LEN) or else
-         (BACK not in FIRST .. FROM.LEN)) and then FRONT <= BACK
-        then raise CONSTRAINT_ERROR;
-       end if;
-
-      if FRONT > BACK then return FROM; end if;
-      TEMP.LEN := FROM.LEN - (BACK - FRONT) - 1;
-
-      TEMP.VALUE(FRONT .. TEMP.LEN) := FROM.VALUE(BACK + 1 .. FROM.LEN);
-      FORMAT(TEMP, FROM.LEN);
-      return TEMP;
-    end DELETE;
-
-
-  function INSERT(TARGET: VSTRING; ITEM: VSTRING;
-                  POSITION : STRINDEX := FIRST) return VSTRING is
-
-    TEMP : VSTRING;
-
-    begin -- INSERT
-      if POSITION not in FIRST .. TARGET.LEN
-        then raise CONSTRAINT_ERROR;
-       end if;
-
-      if TARGET.LEN + ITEM.LEN > LAST
-        then raise CONSTRAINT_ERROR;
-        else TEMP.LEN := TARGET.LEN + ITEM.LEN;
-       end if;
-
-      TEMP.VALUE(FIRST .. POSITION - 1) := TARGET.VALUE(FIRST .. POSITION - 1);
-      TEMP.VALUE(POSITION .. (POSITION + ITEM.LEN - 1)) :=
-        ITEM.VALUE(FIRST .. ITEM.LEN);
-      TEMP.VALUE((POSITION + ITEM.LEN) .. TEMP.LEN) :=
-        TARGET.VALUE(POSITION .. TARGET.LEN);
-
-      return TEMP;
-    end INSERT;
-
-  function INSERT(TARGET: VSTRING; ITEM: STRING;
-                  POSITION : STRINDEX := FIRST) return VSTRING is
-    begin -- INSERT
-      return INSERT(TARGET, VSTR(ITEM), POSITION);
-    end INSERT;
-  
-  function INSERT(TARGET: VSTRING; ITEM: CHARACTER;
-                  POSITION : STRINDEX := FIRST) return VSTRING is
-    begin -- INSERT
-      return INSERT(TARGET, VSTR(ITEM), POSITION);
-    end INSERT;
-
-
-  function APPEND(TARGET: VSTRING; ITEM: VSTRING; POSITION : STRINDEX)
-                  return VSTRING is
-
-    TEMP : VSTRING;
-    POS : constant STRINDEX := POSITION;
-
-    begin -- APPEND
-      if POSITION not in FIRST .. TARGET.LEN
-        then raise CONSTRAINT_ERROR;
-       end if;
-
-      if TARGET.LEN + ITEM.LEN > LAST
-        then raise CONSTRAINT_ERROR;
-        else TEMP.LEN := TARGET.LEN + ITEM.LEN;
-       end if;
-
-      TEMP.VALUE(FIRST .. POS) := TARGET.VALUE(FIRST .. POS);
-      TEMP.VALUE(POS + 1 .. (POS + ITEM.LEN)) := ITEM.VALUE(FIRST .. ITEM.LEN);
-      TEMP.VALUE((POS + ITEM.LEN + 1) .. TEMP.LEN) :=
-        TARGET.VALUE(POS + 1 .. TARGET.LEN);
-
-      return TEMP;
-    end APPEND;
-
-  function APPEND(TARGET: VSTRING; ITEM: STRING; POSITION : STRINDEX)
-                  return VSTRING is
-    begin
-      return APPEND(TARGET, VSTR(ITEM), POSITION);
-    end APPEND;
-
-  function APPEND(TARGET: VSTRING; ITEM: CHARACTER; POSITION : STRINDEX)
-                  return VSTRING is
-    begin
-      return APPEND(TARGET, VSTR(ITEM), POSITION);
-    end APPEND;
-
-
-  function APPEND(TARGET: VSTRING; ITEM: VSTRING) return VSTRING is
-    begin
-      return APPEND(TARGET, ITEM, TARGET.LEN);
-    end APPEND;
-
-  function APPEND(TARGET: VSTRING; ITEM: STRING) return VSTRING is
-    begin
-      return APPEND(TARGET, VSTR(ITEM), TARGET.LEN);
-    end APPEND;
-
-  function APPEND(TARGET: VSTRING; ITEM: CHARACTER) return VSTRING is
-    begin
-      return APPEND(TARGET, VSTR(ITEM), TARGET.LEN);
-    end APPEND;
-
-
-  function REPLACE(TARGET: VSTRING; ITEM: VSTRING;
-                   POSITION : STRINDEX := FIRST) return VSTRING is
-    TEMP : VSTRING;
-
-    begin -- REPLACE
-      if POSITION not in FIRST .. TARGET.LEN
-        then raise CONSTRAINT_ERROR;
-       end if;
-
-      if POSITION + ITEM.LEN - 1 <= TARGET.LEN
-        then TEMP.LEN := TARGET.LEN;
-        elsif POSITION + ITEM.LEN - 1 > LAST
-          then raise CONSTRAINT_ERROR;
-          else TEMP.LEN := POSITION + ITEM.LEN - 1;
-       end if;
-
-      TEMP.VALUE(FIRST .. POSITION - 1) := TARGET.VALUE(FIRST .. POSITION - 1);
-      TEMP.VALUE(POSITION .. (POSITION + ITEM.LEN - 1)) := 
-        ITEM.VALUE(FIRST .. ITEM.LEN);
-      TEMP.VALUE((POSITION + ITEM.LEN) .. TEMP.LEN) :=
-        TARGET.VALUE((POSITION + ITEM.LEN) .. TARGET.LEN);
-
-      return TEMP;
-    end REPLACE;
-
-  function REPLACE(TARGET: VSTRING; ITEM: STRING;
-                   POSITION : STRINDEX := FIRST) return VSTRING is
-    begin
-      return REPLACE(TARGET, VSTR(ITEM), POSITION);
-    end REPLACE;
-
-  function REPLACE(TARGET: VSTRING; ITEM: CHARACTER;
-                   POSITION : STRINDEX := FIRST) return VSTRING is
-    begin
-      return REPLACE(TARGET, VSTR(ITEM), POSITION);
-    end REPLACE;
-
-
-  function "&"(LEFT:VSTRING; RIGHT : VSTRING) return VSTRING is
-    TEMP : VSTRING;
-
-    begin -- "&"
-      if LEFT.LEN + RIGHT.LEN > LAST
-        then raise CONSTRAINT_ERROR;
-        else TEMP.LEN := LEFT.LEN + RIGHT.LEN;
-       end if;
-
-      TEMP.VALUE(FIRST .. TEMP.LEN) := LEFT.VALUE(FIRST .. LEFT.LEN) &
-        RIGHT.VALUE(FIRST .. RIGHT.LEN);
-      return TEMP;
-    end "&";
-
-  function "&"(LEFT:VSTRING; RIGHT : STRING) return VSTRING is
-    begin
-      return LEFT & VSTR(RIGHT);
-    end "&";
-
-  function "&"(LEFT:VSTRING; RIGHT : CHARACTER) return VSTRING is
-    begin
-      return LEFT & VSTR(RIGHT);
-    end "&";
-
-  function "&"(LEFT : STRING; RIGHT : VSTRING) return VSTRING is
-    begin
-      return VSTR(LEFT) & RIGHT;
-    end "&";
-
-  function "&"(LEFT : CHARACTER; RIGHT : VSTRING) return VSTRING is
-    begin
-      return VSTR(LEFT) & RIGHT;
-    end "&";
-
-
-  Function INDEX(WHOLE : VSTRING; PART : VSTRING; OCCURRENCE : NATURAL := 1)
-                 return STRINDEX is
-
-    NOT_FOUND : constant NATURAL := 0;
-    INDEX : NATURAL := FIRST;
-    COUNT : NATURAL := 0;
-
-    begin -- INDEX
-      if PART = NUL then return NOT_FOUND; -- by definition
-        end if;
-
-      while INDEX + PART.LEN - 1 <= WHOLE.LEN and then COUNT < OCCURRENCE loop
-        if WHOLE.VALUE(INDEX .. PART.LEN + INDEX - 1) =
-           PART.VALUE(1 .. PART.LEN)
-          then COUNT := COUNT + 1;
+   end Format;
+
+   -- bodies of visible operations
+
+   function Len (From : Vstring) return Strindex is
+   begin
+      return From.Len;
+   end Len;
+
+   --  function MAX(FROM : VSTRING) return STRINDEX is
+   --    begin
+   --      return LAST;
+   --    end MAX;
+
+   function Str (From : Vstring) return String is
+   begin
+      return From.Value (First .. From.Len);
+   end Str;
+
+   function Char
+     (From : Vstring; Position : Strindex := First) return Character
+   is
+   begin
+      if Position not in First .. From.Len then
+         raise Constraint_Error;
+      end if;
+      return From.Value (Position);
+   end Char;
+
+   function "<" (Left : Vstring; Right : Vstring) return Boolean is
+   begin -- "<"
+      return Left.Value < Right.Value;
+   end "<";
+
+   function ">" (Left : Vstring; Right : Vstring) return Boolean is
+   begin -- ">"
+      return Left.Value > Right.Value;
+   end ">";
+
+   function "<=" (Left : Vstring; Right : Vstring) return Boolean is
+   begin -- "<="
+      return Left.Value <= Right.Value;
+   end "<=";
+
+   function ">=" (Left : Vstring; Right : Vstring) return Boolean is
+   begin -- ">="
+      return Left.Value >= Right.Value;
+   end ">=";
+
+   procedure Put (File : in File_Type; Item : in Vstring) is
+   begin -- PUT
+      Put (File, Item.Value (First .. Item.Len));
+   end Put;
+
+   procedure Put (Item : in Vstring) is
+   begin -- PUT
+      Put (Item.Value (First .. Item.Len));
+   end Put;
+
+   procedure Put_Line (File : in File_Type; Item : in Vstring) is
+   begin -- PUT_LINE
+      Put_Line (File, Item.Value (First .. Item.Len));
+   end Put_Line;
+
+   procedure Put_Line (Item : in Vstring) is
+   begin -- PUT_LINE
+      Put_Line (Item.Value (First .. Item.Len));
+   end Put_Line;
+
+   procedure Get
+     (File : in File_Type; Item : out Vstring; Length : in Strindex := Last)
+   is
+   begin -- GET
+      if Length not in First .. Last then
+         raise Constraint_Error;
+      end if;
+
+      Item := Nul;
+      for Index in First .. Length loop
+         Get (File, Item.Value (Index));
+         Item.Len := Index;
+      end loop;
+   end Get;
+
+   procedure Get (Item : out Vstring; Length : in Strindex := Last) is
+   begin -- GET
+      if Length not in First .. Last then
+         raise Constraint_Error;
+      end if;
+
+      Item := Nul;
+      for Index in First .. Length loop
+         Get (Item.Value (Index));
+         Item.Len := Index;
+      end loop;
+   end Get;
+
+   procedure Get_Line (File : in File_Type; Item : in out Vstring) is
+
+      Oldlen : constant Strindex := Item.Len;
+
+   begin -- GET_LINE
+      Get_Line (File, Item.Value, Item.Len);
+      Format (Item, Oldlen);
+   end Get_Line;
+
+   procedure Get_Line (Item : in out Vstring) is
+
+      Oldlen : constant Strindex := Item.Len;
+
+   begin -- GET_LINE
+      Get_Line (Item.Value, Item.Len);
+      Format (Item, Oldlen);
+   end Get_Line;
+
+   function Slice (From : Vstring; Front, Back : Strindex) return Vstring is
+
+   begin -- SLICE
+      if
+        ((Front not in First .. From.Len)
+         or else (Back not in First .. From.Len))
+        and then Front <= Back
+      then
+         raise Constraint_Error;
+      end if;
+
+      return Vstr (From.Value (Front .. Back));
+   end Slice;
+
+   function Substr (From : Vstring; Start, Length : Strindex) return Vstring is
+
+   begin -- SUBSTR
+      if (Start not in First .. From.Len)
+        or else
+        ((Start + Length - 1 not in First .. From.Len) and then (Length > 0))
+      then
+         raise Constraint_Error;
+      end if;
+
+      return Vstr (From.Value (Start .. Start + Length - 1));
+   end Substr;
+
+   function Delete (From : Vstring; Front, Back : Strindex) return Vstring is
+
+      Temp : Vstring := From;
+
+   begin -- DELETE
+      if
+        ((Front not in First .. From.Len)
+         or else (Back not in First .. From.Len))
+        and then Front <= Back
+      then
+         raise Constraint_Error;
+      end if;
+
+      if Front > Back then
+         return From;
+      end if;
+      Temp.Len := From.Len - (Back - Front) - 1;
+
+      Temp.Value (Front .. Temp.Len) := From.Value (Back + 1 .. From.Len);
+      Format (Temp, From.Len);
+      return Temp;
+   end Delete;
+
+   function Insert
+     (Target : Vstring; Item : Vstring; Position : Strindex := First)
+      return Vstring
+   is
+
+      Temp : Vstring;
+
+   begin -- INSERT
+      if Position not in First .. Target.Len then
+         raise Constraint_Error;
+      end if;
+
+      if Target.Len + Item.Len > Last then
+         raise Constraint_Error;
+      else
+         Temp.Len := Target.Len + Item.Len;
+      end if;
+
+      Temp.Value (First .. Position - 1) :=
+        Target.Value (First .. Position - 1);
+      Temp.Value (Position .. (Position + Item.Len - 1)) :=
+        Item.Value (First .. Item.Len);
+      Temp.Value ((Position + Item.Len) .. Temp.Len) :=
+        Target.Value (Position .. Target.Len);
+
+      return Temp;
+   end Insert;
+
+   function Insert
+     (Target : Vstring; Item : String; Position : Strindex := First)
+      return Vstring
+   is
+   begin -- INSERT
+      return Insert (Target, Vstr (Item), Position);
+   end Insert;
+
+   function Insert
+     (Target : Vstring; Item : Character; Position : Strindex := First)
+      return Vstring
+   is
+   begin -- INSERT
+      return Insert (Target, Vstr (Item), Position);
+   end Insert;
+
+   function Append
+     (Target : Vstring; Item : Vstring; Position : Strindex) return Vstring
+   is
+
+      Temp : Vstring;
+      Pos  : constant Strindex := Position;
+
+   begin -- APPEND
+      if Position not in First .. Target.Len then
+         raise Constraint_Error;
+      end if;
+
+      if Target.Len + Item.Len > Last then
+         raise Constraint_Error;
+      else
+         Temp.Len := Target.Len + Item.Len;
+      end if;
+
+      Temp.Value (First .. Pos)                := Target.Value (First .. Pos);
+      Temp.Value (Pos + 1 .. (Pos + Item.Len)) :=
+        Item.Value (First .. Item.Len);
+      Temp.Value ((Pos + Item.Len + 1) .. Temp.Len) :=
+        Target.Value (Pos + 1 .. Target.Len);
+
+      return Temp;
+   end Append;
+
+   function Append
+     (Target : Vstring; Item : String; Position : Strindex) return Vstring
+   is
+   begin
+      return Append (Target, Vstr (Item), Position);
+   end Append;
+
+   function Append
+     (Target : Vstring; Item : Character; Position : Strindex) return Vstring
+   is
+   begin
+      return Append (Target, Vstr (Item), Position);
+   end Append;
+
+   function Append (Target : Vstring; Item : Vstring) return Vstring is
+   begin
+      return Append (Target, Item, Target.Len);
+   end Append;
+
+   function Append (Target : Vstring; Item : String) return Vstring is
+   begin
+      return Append (Target, Vstr (Item), Target.Len);
+   end Append;
+
+   function Append (Target : Vstring; Item : Character) return Vstring is
+   begin
+      return Append (Target, Vstr (Item), Target.Len);
+   end Append;
+
+   function Replace
+     (Target : Vstring; Item : Vstring; Position : Strindex := First)
+      return Vstring
+   is
+      Temp : Vstring;
+
+   begin -- REPLACE
+      if Position not in First .. Target.Len then
+         raise Constraint_Error;
+      end if;
+
+      if Position + Item.Len - 1 <= Target.Len then
+         Temp.Len := Target.Len;
+      elsif Position + Item.Len - 1 > Last then
+         raise Constraint_Error;
+      else
+         Temp.Len := Position + Item.Len - 1;
+      end if;
+
+      Temp.Value (First .. Position - 1) :=
+        Target.Value (First .. Position - 1);
+      Temp.Value (Position .. (Position + Item.Len - 1)) :=
+        Item.Value (First .. Item.Len);
+      Temp.Value ((Position + Item.Len) .. Temp.Len) :=
+        Target.Value ((Position + Item.Len) .. Target.Len);
+
+      return Temp;
+   end Replace;
+
+   function Replace
+     (Target : Vstring; Item : String; Position : Strindex := First)
+      return Vstring
+   is
+   begin
+      return Replace (Target, Vstr (Item), Position);
+   end Replace;
+
+   function Replace
+     (Target : Vstring; Item : Character; Position : Strindex := First)
+      return Vstring
+   is
+   begin
+      return Replace (Target, Vstr (Item), Position);
+   end Replace;
+
+   function "&" (Left : Vstring; Right : Vstring) return Vstring is
+      Temp : Vstring;
+
+   begin -- "&"
+      if Left.Len + Right.Len > Last then
+         raise Constraint_Error;
+      else
+         Temp.Len := Left.Len + Right.Len;
+      end if;
+
+      Temp.Value (First .. Temp.Len) :=
+        Left.Value (First .. Left.Len) & Right.Value (First .. Right.Len);
+      return Temp;
+   end "&";
+
+   function "&" (Left : Vstring; Right : String) return Vstring is
+   begin
+      return Left & Vstr (Right);
+   end "&";
+
+   function "&" (Left : Vstring; Right : Character) return Vstring is
+   begin
+      return Left & Vstr (Right);
+   end "&";
+
+   function "&" (Left : String; Right : Vstring) return Vstring is
+   begin
+      return Vstr (Left) & Right;
+   end "&";
+
+   function "&" (Left : Character; Right : Vstring) return Vstring is
+   begin
+      return Vstr (Left) & Right;
+   end "&";
+
+   function Index
+     (Whole : Vstring; Part : Vstring; Occurrence : Natural := 1)
+      return Strindex
+   is
+
+      Not_Found : constant Natural := 0;
+      Index     : Natural          := First;
+      Count     : Natural          := 0;
+
+   begin -- INDEX
+      if Part = Nul then
+         return Not_Found; -- by definition
+      end if;
+
+      while Index + Part.Len - 1 <= Whole.Len and then Count < Occurrence loop
+         if Whole.Value (Index .. Part.Len + Index - 1) =
+           Part.Value (1 .. Part.Len)
+         then
+            Count := Count + 1;
          end if;
-        INDEX := INDEX + 1;
-       end loop;
+         Index := Index + 1;
+      end loop;
 
-      if COUNT = OCCURRENCE
-        then return INDEX - 1;
-        else return NOT_FOUND;
-       end if;
-    end INDEX;
+      if Count = Occurrence then
+         return Index - 1;
+      else
+         return Not_Found;
+      end if;
+   end Index;
 
-  Function INDEX(WHOLE : VSTRING; PART : STRING; OCCURRENCE : NATURAL := 1)
-                 return STRINDEX is
+   function Index
+     (Whole : Vstring; Part : String; Occurrence : Natural := 1)
+      return Strindex
+   is
 
-    begin
-      return Index(WHOLE, VSTR(PART), OCCURRENCE);
-    end INDEX;
+   begin
+      return Index (Whole, Vstr (Part), Occurrence);
+   end Index;
 
+   function Index
+     (Whole : Vstring; Part : Character; Occurrence : Natural := 1)
+      return Strindex
+   is
 
-  Function INDEX(WHOLE : VSTRING; PART : CHARACTER; OCCURRENCE : NATURAL := 1)
-                 return STRINDEX is
+   begin
+      return Index (Whole, Vstr (Part), Occurrence);
+   end Index;
 
-    begin
-      return Index(WHOLE, VSTR(PART), OCCURRENCE);
-    end INDEX;
+   function Rindex
+     (Whole : Vstring; Part : Vstring; Occurrence : Natural := 1)
+      return Strindex
+   is
 
+      Not_Found : constant Natural := 0;
+      Index     : Integer          := Whole.Len - (Part.Len - 1);
+      Count     : Natural          := 0;
 
-  function RINDEX(WHOLE: VSTRING; PART:VSTRING; OCCURRENCE:NATURAL := 1) 
-                 return STRINDEX is
+   begin -- RINDEX
+      if Part = Nul then
+         return Not_Found; -- by definition
+      end if;
 
-    NOT_FOUND : constant NATURAL := 0;
-    INDEX : INTEGER := WHOLE.LEN - (PART.LEN -1);
-    COUNT : NATURAL := 0;
-
-    begin -- RINDEX
-      if PART = NUL then return NOT_FOUND; -- by definition
-        end if;
-
-      while INDEX >= FIRST and then COUNT < OCCURRENCE loop
-        if WHOLE.VALUE(INDEX .. PART.LEN + INDEX - 1) =
-           PART.VALUE(1 .. PART.LEN)
-          then COUNT := COUNT + 1;
+      while Index >= First and then Count < Occurrence loop
+         if Whole.Value (Index .. Part.Len + Index - 1) =
+           Part.Value (1 .. Part.Len)
+         then
+            Count := Count + 1;
          end if;
-        INDEX := INDEX - 1;
-       end loop;
+         Index := Index - 1;
+      end loop;
 
-      if COUNT = OCCURRENCE
-        then
-          if COUNT > 0
-            then return INDEX + 1;
-            else return NOT_FOUND;
-           end if;
-        else return NOT_FOUND;
-       end if;
-    end RINDEX;
+      if Count = Occurrence then
+         if Count > 0 then
+            return Index + 1;
+         else
+            return Not_Found;
+         end if;
+      else
+         return Not_Found;
+      end if;
+   end Rindex;
 
-  Function RINDEX(WHOLE : VSTRING; PART : STRING; OCCURRENCE : NATURAL := 1)
-                 return STRINDEX is
-    begin
-      return RINDEX(WHOLE, VSTR(PART), OCCURRENCE);
-    end RINDEX;
+   function Rindex
+     (Whole : Vstring; Part : String; Occurrence : Natural := 1)
+      return Strindex
+   is
+   begin
+      return Rindex (Whole, Vstr (Part), Occurrence);
+   end Rindex;
 
+   function Rindex
+     (Whole : Vstring; Part : Character; Occurrence : Natural := 1)
+      return Strindex
+   is
+   begin
+      return Rindex (Whole, Vstr (Part), Occurrence);
+   end Rindex;
 
-  Function RINDEX(WHOLE : VSTRING; PART : CHARACTER; OCCURRENCE : NATURAL := 1)
-                 return STRINDEX is
-    begin
-      return RINDEX(WHOLE, VSTR(PART), OCCURRENCE);
-    end RINDEX;
+   function Vstr (From : Character) return Vstring is
 
+      Temp : Vstring;
 
-  function VSTR(FROM : CHARACTER) return VSTRING is
-    
-    TEMP : VSTRING;
+   begin -- VSTR
+      if Last < 1 then
+         raise Constraint_Error;
+      else
+         Temp.Len := 1;
+      end if;
 
-    begin -- VSTR
-      if LAST < 1
-        then raise CONSTRAINT_ERROR;
-        else TEMP.LEN := 1;
-       end if;
+      Temp.Value (First) := From;
+      return Temp;
+   end Vstr;
 
-      TEMP.VALUE(FIRST) := FROM;
-      return TEMP;
-    end VSTR;
+   function Vstr (From : String) return Vstring is
 
+      Temp : Vstring;
 
-  function VSTR(FROM : STRING) return VSTRING is
+   begin -- VSTR
+      if From'Length > Last then
+         raise Constraint_Error;
+      else
+         Temp.Len := From'Length;
+      end if;
 
-    TEMP : VSTRING;
+      Temp.Value (First .. From'Length) := From;
+      return Temp;
+   end Vstr;
 
-    begin -- VSTR
-      if FROM'LENGTH > LAST
-        then raise CONSTRAINT_ERROR;
-        else TEMP.LEN := FROM'LENGTH;
-       end if;
+   function "+" (From : String) return Vstring is
+   begin
+      return Vstr (From);
+   end "+";
 
-      TEMP.VALUE(FIRST .. FROM'LENGTH) := FROM;
-      return TEMP;
-    end VSTR;
+   function "+" (From : Character) return Vstring is
+   begin
+      return Vstr (From);
+   end "+";
 
-  Function "+" (FROM : STRING) return VSTRING is
-    begin
-      return VSTR(FROM);
-    end "+";
-
-  Function "+" (FROM : CHARACTER) return VSTRING is
-    begin
-     return VSTR(FROM);
-    end "+";
-
-
-  function CONVERT(X : FROM) return TO is
-    begin
-      return VSTR(STR(X));
-    end CONVERT;   
-end VSTRINGS;
+   function Convert (X : From) return To is
+   begin
+      return Vstr (Str (X));
+   end Convert;
+end Vstrings;

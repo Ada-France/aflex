@@ -21,17 +21,14 @@
 -- DESCRIPTION finds equivalence classes so DFA will be smaller
 -- $Header: /co/ua/self/arcadia/aflex/ada/src/RCS/ecsS.a,v 1.4 90/01/12 15:19:57 self Exp Locker: self $
 
-with MISC_DEFS; use MISC_DEFS;
-package ECS is
-  procedure CCL2ECL;
-  procedure CRE8ECS(FWD      : in     C_SIZE_ARRAY;
-                    BCK      : in out C_SIZE_ARRAY;
-                    NUM      : in     INTEGER;
-                    RESULT   : out    INTEGER);
-  procedure MKECCL(CCLS     : in CHAR_ARRAY;
-                   LENCCL   : in INTEGER;
-                   FWD, BCK : in out UNBOUNDED_INT_ARRAY;
-                   LLSIZ    : in INTEGER);
-  procedure MKECHAR(TCH      : in INTEGER;
-                    FWD, BCK : in out C_SIZE_ARRAY);
-end ECS;
+with Misc_Defs; use Misc_Defs;
+package Ecs is
+   procedure Ccl2ecl;
+   procedure Cre8ecs
+     (Fwd    : in C_Size_Array; Bck : in out C_Size_Array; Num : in Integer;
+      Result :    out Integer);
+   procedure Mkeccl
+     (Ccls     : in     Char_Array; Lenccl : in Integer;
+      Fwd, Bck : in out Unbounded_Int_Array; Llsiz : in Integer);
+   procedure Mkechar (Tch : in Integer; Fwd, Bck : in out C_Size_Array);
+end Ecs;

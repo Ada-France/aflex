@@ -20,14 +20,14 @@
 -- AUTHOR: John Self (UCI)
 -- DESCRIPTION driver routines for aflex.  Calls drivers for all
 -- high level routines from other packages.
--- $Header: /co/ua/self/arcadia/aflex/ada/src/RCS/mainS.a,v 1.5 90/01/12 15:20:14 self Exp Locker: self $ 
+-- $Header: /co/ua/self/arcadia/aflex/ada/src/RCS/mainS.a,v 1.5 90/01/12 15:20:14 self Exp Locker: self $
 
 -- aflex - tool to generate fast lexical analyzers
-package MAIN_BODY is 
-  procedure AFLEXEND(STATUS : in INTEGER); 
-  procedure AFLEXINIT; 
-  procedure READIN; 
-  procedure SET_UP_INITIAL_ALLOCATIONS; 
-  AFLEX_TERMINATE    : exception; 
-  TERMINATION_STATUS : INTEGER; 
-end MAIN_BODY; 
+package Main_Body is
+   procedure Aflexend (Status : in Integer);
+   procedure Aflexinit;
+   procedure Readin;
+   procedure Set_Up_Initial_Allocations;
+   Aflex_Terminate : exception;
+   Termination_Status : Integer;
+end Main_Body;

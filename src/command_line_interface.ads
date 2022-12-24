@@ -20,13 +20,13 @@
 -- AUTHOR: John Self (UCI)
 -- DESCRIPTION command line interface body for use with the VERDIX VADS system.
 -- NOTES this file is system dependent
--- $Header: /co/ua/self/arcadia/aflex/ada/src/RCS/command_lineS.a,v 1.3 90/01/12 15:19:46 self Exp Locker: self $ 
+-- $Header: /co/ua/self/arcadia/aflex/ada/src/RCS/command_lineS.a,v 1.3 90/01/12 15:19:46 self Exp Locker: self $
 
-with TSTRING; use TSTRING; 
-package COMMAND_LINE_INTERFACE is 
-  MAX_NUMBER_ARGS : INTEGER := 32; 
-  type COMMAND_VECTOR is array(0 .. MAX_NUMBER_ARGS) of VSTRING; 
-  procedure INITIALIZE_COMMAND_LINE; 
-  ARGV : COMMAND_VECTOR; 
-  ARGC : INTEGER; 
-end COMMAND_LINE_INTERFACE; 
+with Tstring; use Tstring;
+package Command_Line_Interface is
+   Max_Number_Args : Integer := 32;
+   type Command_Vector is array (0 .. Max_Number_Args) of Vstring;
+   procedure Initialize_Command_Line;
+   Argv : Command_Vector;
+   Argc : Integer;
+end Command_Line_Interface;

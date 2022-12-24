@@ -1,4 +1,4 @@
-package Parse_Goto is
+private package Parse_Goto is
 
 
    type Rule        is new Natural;

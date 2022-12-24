@@ -19,14 +19,14 @@
 -- TITLE  scanner parser interface
 -- AUTHOR: John Self (UCI)
 -- DESCRIPTION causes parser to call augmented version of YYLex.
--- $Header: /co/ua/self/arcadia/aflex/ada/src/RCS/aflex_scanner.a,v 1.3 90/01/12 15:19:33 self Exp Locker: self $ 
+-- $Header: /co/ua/self/arcadia/aflex/ada/src/RCS/aflex_scanner.a,v 1.3 90/01/12 15:19:33 self Exp Locker: self $
 
-with SCANNER;
+with Scanner;
 
-package body AFLEX_SCANNER is 
-  function YYLEX return TOKEN is 
-  begin
-    return SCANNER.GET_TOKEN; 
-  end YYLEX; 
+package body Aflex_Scanner is
+   function Yylex return Token is
+   begin
+      return Scanner.Get_Token;
+   end Yylex;
 
-end AFLEX_SCANNER; 
+end Aflex_Scanner;

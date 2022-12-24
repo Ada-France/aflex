@@ -20,26 +20,26 @@
 -- AUTHOR: John Self (UCI)
 -- DESCRIPTION
 -- NOTES does actual generation (writing) of output aflex scanners
--- $Header: /co/ua/self/arcadia/aflex/ada/src/RCS/genS.a,v 1.4 90/01/12 15:20:07 self Exp Locker: self $ 
+-- $Header: /co/ua/self/arcadia/aflex/ada/src/RCS/genS.a,v 1.4 90/01/12 15:20:07 self Exp Locker: self $
 
-package GEN is 
-  procedure DO_INDENT; 
-  procedure GEN_BACKTRACKING; 
-  procedure GEN_BT_ACTION; 
-  procedure GEN_FIND_ACTION; 
-  procedure GEN_NEXT_COMPRESSED_STATE; 
-  procedure GEN_NEXT_MATCH; 
-  procedure GEN_NEXT_STATE; 
-  procedure GEN_START_STATE; 
-  procedure GENECS; 
-  procedure GENFTBL; 
-  procedure INDENT_PUTS(STR : in STRING); 
-  procedure GENTABS; 
-  procedure INDENT_DOWN; 
-  pragma INLINE(INDENT_DOWN);
-  procedure INDENT_UP; 
-  pragma INLINE(INDENT_UP);
-  procedure SET_INDENT(INDENT_VAL : in INTEGER); 
-  procedure MAKE_TABLES; 
-  procedure DO_SECT3_OUT; 
-end GEN; 
+package Gen is
+   procedure Do_Indent;
+   procedure Gen_Backtracking;
+   procedure Gen_Bt_Action;
+   procedure Gen_Find_Action;
+   procedure Gen_Next_Compressed_State;
+   procedure Gen_Next_Match;
+   procedure Gen_Next_State;
+   procedure Gen_Start_State;
+   procedure Genecs;
+   procedure Genftbl;
+   procedure Indent_Puts (Str : in String);
+   procedure Gentabs;
+   procedure Indent_Down;
+   pragma Inline (Indent_Down);
+   procedure Indent_Up;
+   pragma Inline (Indent_Up);
+   procedure Set_Indent (Indent_Val : in Integer);
+   procedure Make_Tables;
+   procedure Do_Sect3_Out;
+end Gen;

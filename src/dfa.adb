@@ -21,916 +21,915 @@
 -- DESCRIPTION converts non-deterministic finite automatons to finite ones.
 -- $Header: /dc/uc/self/tmp/gnat_aflex/RCS/dfa.adb,v 1.1 1995/07/04 20:18:39 self Exp self $
 
-with DFA, INT_IO, MISC, TBLCMP, CCL;
-with ECS, NFA, TSTRING, GEN, SKELETON_MANAGER;
+with Dfa, Int_Io, Misc, Tblcmp, Ccl;
+with Ecs, Nfa, Tstring, Gen, Skeleton_Manager;
 
-package body DFA is
-  use TSTRING;
-  -- check_for_backtracking - check a DFA state for backtracking
-  --
-  -- ds is the number of the state to check and state[) is its out-transitions,
-  -- indexed by equivalence class, and state_rules[) is the set of rules
-  -- associated with this state
+package body Dfa is
+   use Tstring;
+   -- check_for_backtracking - check a DFA state for backtracking
+   --
+-- ds is the number of the state to check and state[) is its out-transitions,
+-- indexed by equivalence class, and state_rules[) is the set of rules
+-- associated with this state
 
-  DID_STK_INIT : BOOLEAN := FALSE;
-  STK          : INT_PTR;
+   Did_Stk_Init : Boolean := False;
+   Stk          : Int_Ptr;
 
-  procedure CHECK_FOR_BACKTRACKING(DS    : in INTEGER;
-                                   STATE : in UNBOUNDED_INT_ARRAY) is
-  begin
-    if DFAACC(DS).DFAACC_STATE = 0 then
+   procedure Check_For_Backtracking
+     (Ds : in Integer; State : in Unbounded_Int_Array)
+   is
+   begin
+      if Dfaacc (Ds).Dfaacc_State = 0 then
 
-      -- state is non-accepting
-      NUM_BACKTRACKING := NUM_BACKTRACKING + 1;
+         -- state is non-accepting
+         Num_Backtracking := Num_Backtracking + 1;
 
-      if BACKTRACK_REPORT then
-        TEXT_IO.PUT(BACKTRACK_FILE, "State #");
-        INT_IO.PUT(BACKTRACK_FILE, DS, 1);
-        TEXT_IO.PUT(BACKTRACK_FILE, "is non-accepting -");
-        TEXT_IO.NEW_LINE(BACKTRACK_FILE);
+         if Backtrack_Report then
+            Text_Io.Put (Backtrack_File, "State #");
+            Int_Io.Put (Backtrack_File, Ds, 1);
+            Text_Io.Put (Backtrack_File, "is non-accepting -");
+            Text_Io.New_Line (Backtrack_File);
 
-        -- identify the state
-        DUMP_ASSOCIATED_RULES(BACKTRACK_FILE, DS);
+            -- identify the state
+            Dump_Associated_Rules (Backtrack_File, Ds);
 
-        -- now identify it further using the out- and jam-transitions
-        DUMP_TRANSITIONS(BACKTRACK_FILE, STATE);
-        TEXT_IO.NEW_LINE(BACKTRACK_FILE);
+            -- now identify it further using the out- and jam-transitions
+            Dump_Transitions (Backtrack_File, State);
+            Text_Io.New_Line (Backtrack_File);
+         end if;
       end if;
-    end if;
-  end CHECK_FOR_BACKTRACKING;
+   end Check_For_Backtracking;
 
+   -- check_trailing_context - check to see if NFA state set constitutes
+   --                          "dangerous" trailing context
+   --
+   -- NOTES
+   --    Trailing context is "dangerous" if both the head and the trailing
+   --  part are of variable size \and/ there's a DFA state which contains
+   --  both an accepting state for the head part of the rule and NFA states
+   --  which occur after the beginning of the trailing context.
+   --  When such a rule is matched, it's impossible to tell if having been
+   --  in the DFA state indicates the beginning of the trailing context
+   --  or further-along scanning of the pattern.  In these cases, a warning
+   --  message is issued.
+   --
+   --    nfa_states[1 .. num_states) is the list of NFA states in the DFA.
+   --    accset[1 .. nacc) is the list of accepting numbers for the DFA state.
 
-  -- check_trailing_context - check to see if NFA state set constitutes
-  --                          "dangerous" trailing context
-  --
-  -- NOTES
-  --    Trailing context is "dangerous" if both the head and the trailing
-  --  part are of variable size \and/ there's a DFA state which contains
-  --  both an accepting state for the head part of the rule and NFA states
-  --  which occur after the beginning of the trailing context.
-  --  When such a rule is matched, it's impossible to tell if having been
-  --  in the DFA state indicates the beginning of the trailing context
-  --  or further-along scanning of the pattern.  In these cases, a warning
-  --  message is issued.
-  --
-  --    nfa_states[1 .. num_states) is the list of NFA states in the DFA.
-  --    accset[1 .. nacc) is the list of accepting numbers for the DFA state.
+   procedure Check_Trailing_Context
+     (Nfa_States : in Int_Ptr; Num_States : in Integer; Accset : in Int_Ptr;
+      Nacc       : in Integer)
+   is
+      Ns, Ar   : Integer;
+      Type_Var : State_Enum;
 
-  procedure CHECK_TRAILING_CONTEXT(NFA_STATES : in INT_PTR;
-                                   NUM_STATES : in INTEGER;
-                                   ACCSET     : in INT_PTR;
-                                   NACC       : in INTEGER) is
-    NS, AR              : INTEGER;
-    TYPE_VAR : STATE_ENUM;
+      use Misc;
+   begin
+      for I in 1 .. Num_States loop
+         Ns       := Nfa_States (I);
+         Type_Var := State_Type (Ns);
+         Ar       := Assoc_Rule (Ns);
 
-    use MISC;
-  begin
-    for I in 1 .. NUM_STATES loop
-      NS := NFA_STATES(I);
-      TYPE_VAR := STATE_TYPE(NS);
-      AR := ASSOC_RULE(NS);
+         if Type_Var = State_Normal or Rule_Type (Ar) /= Rule_Variable then
+            null;
 
-      if TYPE_VAR = STATE_NORMAL or RULE_TYPE(AR) /= RULE_VARIABLE then
-        null;
+            -- do nothing
+         else
+            if Type_Var = State_Trailing_Context then
 
-      -- do nothing
-      else
-        if TYPE_VAR = STATE_TRAILING_CONTEXT then
-
-          -- potential trouble.  Scan set of accepting numbers for
-          -- the one marking the end of the "head".  We assume that
-          -- this looping will be fairly cheap since it's rare that
-          -- an accepting number set is large.
-          for J in 1 .. NACC loop
-            if CHECK_YY_TRAILING_HEAD_MASK(ACCSET(J)) /= 0 then
-              TEXT_IO.PUT(STANDARD_ERROR,
-                "aflex: Dangerous trailing context in rule at line ");
-              INT_IO.PUT(STANDARD_ERROR, RULE_LINENUM(AR), 1);
-              TEXT_IO.NEW_LINE(STANDARD_ERROR);
-              return;
+               -- potential trouble.  Scan set of accepting numbers for
+               -- the one marking the end of the "head".  We assume that
+               -- this looping will be fairly cheap since it's rare that
+               -- an accepting number set is large.
+               for J in 1 .. Nacc loop
+                  if Check_Yy_Trailing_Head_Mask (Accset (J)) /= 0 then
+                     Text_Io.Put
+                       (Standard_Error,
+                        "aflex: Dangerous trailing context in rule at line ");
+                     Int_Io.Put (Standard_Error, Rule_Linenum (Ar), 1);
+                     Text_Io.New_Line (Standard_Error);
+                     return;
+                  end if;
+               end loop;
             end if;
-          end loop;
-        end if;
-      end if;
-    end loop;
-  end CHECK_TRAILING_CONTEXT;
-
-
-  -- dump_associated_rules - list the rules associated with a DFA state
-  --
-  -- goes through the set of NFA states associated with the DFA and
-  -- extracts the first MAX_ASSOC_RULES unique rules, sorts them,
-  -- and writes a report to the given file
-
-  procedure DUMP_ASSOCIATED_RULES(F  : in FILE_TYPE;
-                                  DS : in INTEGER) is
-    J                    : INTEGER;
-    NUM_ASSOCIATED_RULES : INTEGER := 0;
-    RULE_SET             : INT_PTR;
-    SIZE, RULE_NUM       : INTEGER;
-  begin
-    RULE_SET := new UNBOUNDED_INT_ARRAY(0 .. MAX_ASSOC_RULES + 1);
-    SIZE := DFASIZ(DS);
-
-    for I in 1 .. SIZE loop
-      RULE_NUM := RULE_LINENUM(ASSOC_RULE(DSS(DS)(I)));
-
-      J := 1;
-      while J <= NUM_ASSOCIATED_RULES loop
-        if RULE_NUM = RULE_SET(J) then
-          exit;
-        end if;
-        J := J + 1;
+         end if;
       end loop;
-      if J > NUM_ASSOCIATED_RULES then
+   end Check_Trailing_Context;
 
-        --new rule
-        if NUM_ASSOCIATED_RULES < MAX_ASSOC_RULES then
-          NUM_ASSOCIATED_RULES := NUM_ASSOCIATED_RULES + 1;
-          RULE_SET(NUM_ASSOCIATED_RULES) := RULE_NUM;
-        end if;
-      end if;
-    end loop;
+   -- dump_associated_rules - list the rules associated with a DFA state
+   --
+   -- goes through the set of NFA states associated with the DFA and
+   -- extracts the first MAX_ASSOC_RULES unique rules, sorts them,
+   -- and writes a report to the given file
 
-    MISC.BUBBLE(RULE_SET, NUM_ASSOCIATED_RULES);
+   procedure Dump_Associated_Rules (F : in File_Type; Ds : in Integer) is
+      J                    : Integer;
+      Num_Associated_Rules : Integer := 0;
+      Rule_Set             : Int_Ptr;
+      Size, Rule_Num       : Integer;
+   begin
+      Rule_Set := new Unbounded_Int_Array (0 .. Max_Assoc_Rules + 1);
+      Size     := Dfasiz (Ds);
 
-    TEXT_IO.PUT(F, " associated rules:");
+      for I in 1 .. Size loop
+         Rule_Num := Rule_Linenum (Assoc_Rule (Dss (Ds) (I)));
 
-    for I in 1 .. NUM_ASSOCIATED_RULES loop
-      if I mod 8 = 1 then
-        TEXT_IO.NEW_LINE(F);
-      end if;
+         J := 1;
+         while J <= Num_Associated_Rules loop
+            if Rule_Num = Rule_Set (J) then
+               exit;
+            end if;
+            J := J + 1;
+         end loop;
+         if J > Num_Associated_Rules then
 
-      TEXT_IO.PUT(F, ASCII.HT);
-      INT_IO.PUT(F, RULE_SET(I), 1);
-    end loop;
+            --new rule
+            if Num_Associated_Rules < Max_Assoc_Rules then
+               Num_Associated_Rules            := Num_Associated_Rules + 1;
+               Rule_Set (Num_Associated_Rules) := Rule_Num;
+            end if;
+         end if;
+      end loop;
 
-    TEXT_IO.NEW_LINE(F);
-  exception
-    when STORAGE_ERROR =>
-      MISC.AFLEXFATAL("dynamic memory failure in dump_associated_rules()");
-  end DUMP_ASSOCIATED_RULES;
+      Misc.Bubble (Rule_Set, Num_Associated_Rules);
 
+      Text_Io.Put (F, " associated rules:");
 
-  -- dump_transitions - list the transitions associated with a DFA state
-  --
-  -- goes through the set of out-transitions and lists them in human-readable
-  -- form (i.e., not as equivalence classes); also lists jam transitions
-  -- (i.e., all those which are not out-transitions, plus EOF).  The dump
-  -- is done to the given file.
+      for I in 1 .. Num_Associated_Rules loop
+         if I mod 8 = 1 then
+            Text_Io.New_Line (F);
+         end if;
 
-  procedure DUMP_TRANSITIONS(F     : in FILE_TYPE;
-                             STATE : in UNBOUNDED_INT_ARRAY) is
-    EC           : INTEGER;
-    OUT_CHAR_SET : C_SIZE_BOOL_ARRAY;
-  begin
-    for I in 1 .. CSIZE loop
-      EC := ECGROUP(I);
+         Text_Io.Put (F, Ascii.Ht);
+         Int_Io.Put (F, Rule_Set (I), 1);
+      end loop;
 
-      if EC < 0 then
-        EC :=  -EC;
-      end if;
+      Text_Io.New_Line (F);
+   exception
+      when Storage_Error =>
+         Misc.Aflexfatal ("dynamic memory failure in dump_associated_rules()");
+   end Dump_Associated_Rules;
 
-      OUT_CHAR_SET(I) := STATE(EC) /= 0;
-    end loop;
+   -- dump_transitions - list the transitions associated with a DFA state
+   --
+   -- goes through the set of out-transitions and lists them in human-readable
+   -- form (i.e., not as equivalence classes); also lists jam transitions
+   -- (i.e., all those which are not out-transitions, plus EOF).  The dump
+   -- is done to the given file.
 
-    TEXT_IO.PUT(F, " out-transitions: ");
+   procedure Dump_Transitions
+     (F : in File_Type; State : in Unbounded_Int_Array)
+   is
+      Ec           : Integer;
+      Out_Char_Set : C_Size_Bool_Array;
+   begin
+      for I in 1 .. Csize loop
+         Ec := Ecgroup (I);
 
-    CCL.LIST_CHARACTER_SET(F, OUT_CHAR_SET);
+         if Ec < 0 then
+            Ec := -Ec;
+         end if;
 
-    -- now invert the members of the set to get the jam transitions
-    for I in 1 .. CSIZE loop
-      OUT_CHAR_SET(I) := not OUT_CHAR_SET(I);
-    end loop;
+         Out_Char_Set (I) := State (Ec) /= 0;
+      end loop;
 
-    TEXT_IO.NEW_LINE(F);
-    TEXT_IO.PUT(F, "jam-transitions: EOF ");
+      Text_Io.Put (F, " out-transitions: ");
 
-    CCL.LIST_CHARACTER_SET(F, OUT_CHAR_SET);
+      Ccl.List_Character_Set (F, Out_Char_Set);
 
-    TEXT_IO.NEW_LINE(F);
-  end DUMP_TRANSITIONS;
+      -- now invert the members of the set to get the jam transitions
+      for I in 1 .. Csize loop
+         Out_Char_Set (I) := not Out_Char_Set (I);
+      end loop;
 
+      Text_Io.New_Line (F);
+      Text_Io.Put (F, "jam-transitions: EOF ");
 
-  -- epsclosure - construct the epsilon closure of a set of ndfa states
-  --
-  -- NOTES
-  --    the epsilon closure is the set of all states reachable by an arbitrary
-  --  number of epsilon transitions which themselves do not have epsilon
-  --  transitions going out, unioned with the set of states which have non-null
-  --  accepting numbers.  t is an array of size numstates of nfa state numbers.
+      Ccl.List_Character_Set (F, Out_Char_Set);
+
+      Text_Io.New_Line (F);
+   end Dump_Transitions;
+
+   -- epsclosure - construct the epsilon closure of a set of ndfa states
+   --
+   -- NOTES
+   --    the epsilon closure is the set of all states reachable by an arbitrary
+--  number of epsilon transitions which themselves do not have epsilon
+--  transitions going out, unioned with the set of states which have non-null
+--  accepting numbers.  t is an array of size numstates of nfa state numbers.
 --  Upon return, t holds the epsilon closure and numstates is updated.  accset
-  --  holds a list of the accepting numbers, and the size of accset is given
-  --  by nacc.  t may be subjected to reallocation if it is not large enough
-  --  to hold the epsilon closure.
-  --
-  --    hashval is the hash value for the dfa corresponding to the state set
+   --  holds a list of the accepting numbers, and the size of accset is given
+   --  by nacc.  t may be subjected to reallocation if it is not large enough
+   --  to hold the epsilon closure.
+   --
+   --    hashval is the hash value for the dfa corresponding to the state set
 
-  procedure EPSCLOSURE(T                  : in out INT_PTR;
-                       NS_ADDR            : in out INTEGER;
-                       ACCSET             : in     INT_PTR;
-                       NACC_ADDR, HV_ADDR : out INTEGER) is
-    NS, TSP                                      : INTEGER;
-    NUMSTATES, NACC, HASHVAL, TRANSSYM, NFACCNUM : INTEGER;
-    STKEND                                       : INTEGER;
-    STKPOS                                       : INTEGER;
-    procedure MARK_STATE(STATE : in INTEGER) is
-    pragma INLINE(MARK_STATE);
-    begin
-      TRANS1(STATE) := TRANS1(STATE) - MARKER_DIFFERENCE;
-    end MARK_STATE;
+   procedure Epsclosure
+     (T : in out Int_Ptr; Ns_Addr : in out Integer; Accset : in Int_Ptr;
+      Nacc_Addr, Hv_Addr :    out Integer)
+   is
+      Ns, Tsp                                      : Integer;
+      Numstates, Nacc, Hashval, Transsym, Nfaccnum : Integer;
+      Stkend                                       : Integer;
+      Stkpos                                       : Integer;
+      procedure Mark_State (State : in Integer) is
+         pragma Inline (Mark_State);
+      begin
+         Trans1 (State) := Trans1 (State) - Marker_Difference;
+      end Mark_State;
 
-    function IS_MARKED(STATE : in INTEGER) return BOOLEAN is
-    pragma INLINE(IS_MARKED);
-    begin
-      return TRANS1(STATE) < 0;
-    end IS_MARKED;
+      function Is_Marked (State : in Integer) return Boolean is
+         pragma Inline (Is_Marked);
+      begin
+         return Trans1 (State) < 0;
+      end Is_Marked;
 
-    procedure UNMARK_STATE(STATE : in INTEGER) is
-    pragma INLINE(UNMARK_STATE);
-    begin
-      TRANS1(STATE) := TRANS1(STATE) + MARKER_DIFFERENCE;
-    end UNMARK_STATE;
+      procedure Unmark_State (State : in Integer) is
+         pragma Inline (Unmark_State);
+      begin
+         Trans1 (State) := Trans1 (State) + Marker_Difference;
+      end Unmark_State;
 
+      procedure Check_Accept (State : in Integer) is
+         pragma Inline (Check_Accept);
+      begin
+         Nfaccnum := Accptnum (State);
+         if Nfaccnum /= Nil then
+            Nacc          := Nacc + 1;
+            Accset (Nacc) := Nfaccnum;
+         end if;
+      end Check_Accept;
 
-    procedure CHECK_ACCEPT(STATE : in INTEGER) is
-    pragma INLINE(CHECK_ACCEPT);
-    begin
-      NFACCNUM := ACCPTNUM(STATE);
-      if NFACCNUM /= NIL then
-        NACC := NACC + 1;
-        ACCSET(NACC) := NFACCNUM;
-      end if;
-    end CHECK_ACCEPT;
+      procedure Do_Reallocation is
+         pragma Inline (Do_Reallocation);
+      begin
+         Current_Max_Dfa_Size := Current_Max_Dfa_Size + Max_Dfa_Size_Increment;
+         Num_Reallocs         := Num_Reallocs + 1;
+         Reallocate_Integer_Array (T, Current_Max_Dfa_Size);
+         Reallocate_Integer_Array (Stk, Current_Max_Dfa_Size);
+      end Do_Reallocation;
 
-    procedure DO_REALLOCATION is
-    pragma INLINE(DO_REALLOCATION);
-    begin
-      CURRENT_MAX_DFA_SIZE := CURRENT_MAX_DFA_SIZE + MAX_DFA_SIZE_INCREMENT;
-      NUM_REALLOCS := NUM_REALLOCS + 1;
-      REALLOCATE_INTEGER_ARRAY(T, CURRENT_MAX_DFA_SIZE);
-      REALLOCATE_INTEGER_ARRAY(STK, CURRENT_MAX_DFA_SIZE);
-    end DO_REALLOCATION;
+      procedure Put_On_Stack (State : in Integer) is
+         pragma Inline (Put_On_Stack);
+      begin
+         Stkend := Stkend + 1;
+         if Stkend >= Current_Max_Dfa_Size then
+            Do_Reallocation;
+         end if;
+         Stk (Stkend) := State;
+         Mark_State (State);
+      end Put_On_Stack;
 
+      procedure Add_State (State : in Integer) is
+         pragma Inline (Add_State);
+      begin
+         Numstates := Numstates + 1;
+         if Numstates >= Current_Max_Dfa_Size then
+            Do_Reallocation;
+         end if;
+         T (Numstates) := State;
+         Hashval       := Hashval + State;
+      end Add_State;
 
-    procedure PUT_ON_STACK(STATE : in INTEGER) is
-    pragma INLINE(PUT_ON_STACK);
-    begin
-      STKEND := STKEND + 1;
-      if STKEND >= CURRENT_MAX_DFA_SIZE then
-        DO_REALLOCATION;
-      end if;
-      STK(STKEND) := STATE;
-      MARK_STATE(STATE);
-    end PUT_ON_STACK;
+      procedure Stack_State (State : in Integer) is
+         pragma Inline (Stack_State);
+      begin
+         Put_On_Stack (State);
+         Check_Accept (State);
+         if Nfaccnum /= Nil or Transchar (State) /= Sym_Epsilon then
+            Add_State (State);
+         end if;
+      end Stack_State;
 
-    procedure ADD_STATE(STATE : in INTEGER) is
-    pragma INLINE(ADD_STATE);
-    begin
-      NUMSTATES := NUMSTATES + 1;
-      if NUMSTATES >= CURRENT_MAX_DFA_SIZE then
-        DO_REALLOCATION;
-      end if;
-      T(NUMSTATES) := STATE;
-      HASHVAL := HASHVAL + STATE;
-    end ADD_STATE;
-
-    procedure STACK_STATE(STATE : in INTEGER) is
-    pragma INLINE(STACK_STATE);
-    begin
-      PUT_ON_STACK(STATE);
-      CHECK_ACCEPT(STATE);
-      if NFACCNUM /= NIL or TRANSCHAR(STATE) /= SYM_EPSILON then
-        ADD_STATE(STATE);
-      end if;
-    end STACK_STATE;
-
-  begin
-    NUMSTATES := NS_ADDR;
-    if not DID_STK_INIT then
-      STK := ALLOCATE_INTEGER_ARRAY(CURRENT_MAX_DFA_SIZE);
-      DID_STK_INIT := TRUE;
-    end if;
-
-    NACC := 0;
-    STKEND := 0;
-    HASHVAL := 0;
-
-    for NSTATE in 1 .. NUMSTATES loop
-      NS := T(NSTATE);
-
-      -- the state could be marked if we've already pushed it onto
-      -- the stack
-      if not IS_MARKED(NS) then
-        PUT_ON_STACK(NS);
-        null;
+   begin
+      Numstates := Ns_Addr;
+      if not Did_Stk_Init then
+         Stk          := Allocate_Integer_Array (Current_Max_Dfa_Size);
+         Did_Stk_Init := True;
       end if;
 
-      CHECK_ACCEPT(NS);
-      HASHVAL := HASHVAL + NS;
-    end loop;
+      Nacc    := 0;
+      Stkend  := 0;
+      Hashval := 0;
 
+      for Nstate in 1 .. Numstates loop
+         Ns := T (Nstate);
 
-    STKPOS := 1;
-    while STKPOS <= STKEND loop
-      NS := STK(STKPOS);
-      TRANSSYM := TRANSCHAR(NS);
+         -- the state could be marked if we've already pushed it onto
+         -- the stack
+         if not Is_Marked (Ns) then
+            Put_On_Stack (Ns);
+            null;
+         end if;
 
-      if TRANSSYM = SYM_EPSILON then
-        TSP := TRANS1(NS) + MARKER_DIFFERENCE;
-
-        if TSP /= NO_TRANSITION then
-          if not IS_MARKED(TSP) then
-            STACK_STATE(TSP);
-          end if;
-
-          TSP := TRANS2(NS);
-
-          if TSP /= NO_TRANSITION then
-            if not IS_MARKED(TSP) then
-              STACK_STATE(TSP);
-            end if;
-          end if;
-        end if;
-      end if;
-      STKPOS := STKPOS + 1;
-    end loop;
-
-    -- clear out "visit" markers
-    for CHK_STKPOS in 1 .. STKEND loop
-      if IS_MARKED(STK(CHK_STKPOS)) then
-        UNMARK_STATE(STK(CHK_STKPOS));
-      else
-        MISC.AFLEXFATAL("consistency check failed in epsclosure()");
-      end if;
-    end loop;
-
-    NS_ADDR := NUMSTATES;
-    HV_ADDR := HASHVAL;
-    NACC_ADDR := NACC;
-
-  end EPSCLOSURE;
-
-
-  -- increase_max_dfas - increase the maximum number of DFAs
-
-  procedure INCREASE_MAX_DFAS is
-  begin
-    CURRENT_MAX_DFAS := CURRENT_MAX_DFAS + MAX_DFAS_INCREMENT;
-
-    NUM_REALLOCS := NUM_REALLOCS + 1;
-
-    REALLOCATE_INTEGER_ARRAY(BASE, CURRENT_MAX_DFAS);
-    REALLOCATE_INTEGER_ARRAY(DEF, CURRENT_MAX_DFAS);
-    REALLOCATE_INTEGER_ARRAY(DFASIZ, CURRENT_MAX_DFAS);
-    REALLOCATE_INTEGER_ARRAY(ACCSIZ, CURRENT_MAX_DFAS);
-    REALLOCATE_INTEGER_ARRAY(DHASH, CURRENT_MAX_DFAS);
-    REALLOCATE_INT_PTR_ARRAY(DSS, CURRENT_MAX_DFAS);
-    REALLOCATE_DFAACC_UNION(DFAACC, CURRENT_MAX_DFAS);
-  end INCREASE_MAX_DFAS;
-
-
-  -- ntod - convert an ndfa to a dfa
-  --
-  --  creates the dfa corresponding to the ndfa we've constructed.  the
-  --  dfa starts out in state #1.
-
-  procedure NTOD is
-
-    ACCSET                                             : INT_PTR;
-    DS, NACC, NEWDS                                    : INTEGER;
-    DUPLIST, TARGFREQ, TARGSTATE, STATE                : C_SIZE_ARRAY;
-    SYMLIST                                            : C_SIZE_BOOL_ARRAY;
-    HASHVAL, NUMSTATES, DSIZE                          : INTEGER;
-    NSET, DSET                                         : INT_PTR;
-    TARGPTR, TOTALTRANS, I, J, COMSTATE, COMFREQ, TARG : INTEGER;
-    NUM_START_STATES, TODO_HEAD, TODO_NEXT             : INTEGER;
-    SNSRESULT                                          : BOOLEAN;
-    FULL_TABLE_TEMP_FILE                               : FILE_TYPE;
-    BUF                                                : VSTRING;
-    NUM_NXT_STATES                                     : INTEGER;
-
-    -- this is so find_table_space(...) will know where to start looking in
-    -- chk/nxt for unused records for space to put in the state
-  begin
-    ACCSET := ALLOCATE_INTEGER_ARRAY(NUM_RULES + 1);
-    NSET := ALLOCATE_INTEGER_ARRAY(CURRENT_MAX_DFA_SIZE);
-
-    -- the "todo" queue is represented by the head, which is the DFA
-    -- state currently being processed, and the "next", which is the
-    -- next DFA state number available (not in use).  We depend on the
-    -- fact that snstods() returns DFA's \in increasing order/, and thus
-    -- need only know the bounds of the dfas to be processed.
-    TODO_HEAD := 0;
-    TODO_NEXT := 0;
-
-    for CNT in 0 .. CSIZE loop
-      DUPLIST(CNT) := NIL;
-      SYMLIST(CNT) := FALSE;
-    end loop;
-
-    for CNT in 0 .. NUM_RULES loop
-      ACCSET(CNT) := NIL;
-    end loop;
-
-    if TRACE then
-      NFA.DUMPNFA(SCSET(1));
-      TEXT_IO.NEW_LINE(STANDARD_ERROR);
-      TEXT_IO.NEW_LINE(STANDARD_ERROR);
-      TEXT_IO.PUT(STANDARD_ERROR, "DFA Dump:");
-      TEXT_IO.NEW_LINE(STANDARD_ERROR);
-      TEXT_IO.NEW_LINE(STANDARD_ERROR);
-    end if;
-
-    TBLCMP.INITTBL;
-
-    if FULLTBL then
-      GEN.DO_SECT3_OUT;
-
-      -- output user code up to ##
-      SKELETON_MANAGER.SKELOUT;
-
-      -- declare it "short" because it's a real long-shot that that
-      -- won't be large enough
-      begin -- make a temporary file to write yy_nxt array into
-        CREATE(FULL_TABLE_TEMP_FILE, OUT_FILE);
-      exception
-        when USE_ERROR | NAME_ERROR =>
-          MISC.AFLEXFATAL("can't create temporary file");
-      end;
-
-      NUM_NXT_STATES := 1;
-      TEXT_IO.PUT(FULL_TABLE_TEMP_FILE, "( ");
-      -- generate 0 entries for state #0
-      for CNT in 0 .. NUMECS loop
-        MISC.MK2DATA(FULL_TABLE_TEMP_FILE, 0);
+         Check_Accept (Ns);
+         Hashval := Hashval + Ns;
       end loop;
 
-      TEXT_IO.PUT(FULL_TABLE_TEMP_FILE, " )");
-      -- force extra blank line next dataflush()
-      DATALINE := NUMDATALINES;
-    end if;
+      Stkpos := 1;
+      while Stkpos <= Stkend loop
+         Ns       := Stk (Stkpos);
+         Transsym := Transchar (Ns);
 
-    -- create the first states
+         if Transsym = Sym_Epsilon then
+            Tsp := Trans1 (Ns) + Marker_Difference;
 
-    NUM_START_STATES := LASTSC*2;
+            if Tsp /= No_Transition then
+               if not Is_Marked (Tsp) then
+                  Stack_State (Tsp);
+               end if;
 
-    for CNT in 1 .. NUM_START_STATES loop
-      NUMSTATES := 1;
+               Tsp := Trans2 (Ns);
 
-      -- for each start condition, make one state for the case when
-      -- we're at the beginning of the line (the '%' operator) and
-      -- one for the case when we're not
-
-      if CNT mod 2 = 1 then
-        NSET(NUMSTATES) := SCSET((CNT/2) + 1);
-      else
-        NSET(NUMSTATES) := NFA.MKBRANCH(SCBOL(CNT/2), SCSET(CNT/2));
-      end if;
-
-      DFA.EPSCLOSURE(NSET, NUMSTATES, ACCSET, NACC, HASHVAL);
-
-      SNSTODS(NSET, NUMSTATES, ACCSET, NACC, HASHVAL, DS, SNSRESULT);
-      if SNSRESULT then
-        NUMAS := NUMAS + NACC;
-        TOTNST := TOTNST + NUMSTATES;
-        TODO_NEXT := TODO_NEXT + 1;
-
-        if (VARIABLE_TRAILING_CONTEXT_RULES and (NACC > 0)) then
-          CHECK_TRAILING_CONTEXT(NSET, NUMSTATES, ACCSET, NACC);
-        end if;
-      end if;
-    end loop;
-
-    SNSTODS(NSET, 0, ACCSET, 0, 0, END_OF_BUFFER_STATE, SNSRESULT);
-    if not SNSRESULT then
-      MISC.AFLEXFATAL("could not create unique end-of-buffer state");
-    end if;
-    NUMAS := NUMAS + 1;
-    NUM_START_STATES := NUM_START_STATES + 1;
-    TODO_NEXT := TODO_NEXT + 1;
-
-    while TODO_HEAD < TODO_NEXT loop
-      NUM_NXT_STATES := NUM_NXT_STATES + 1;
-      TARGPTR := 0;
-      TOTALTRANS := 0;
-
-      for STATE_CNT in 1 .. NUMECS loop
-        STATE(STATE_CNT) := 0;
+               if Tsp /= No_Transition then
+                  if not Is_Marked (Tsp) then
+                     Stack_State (Tsp);
+                  end if;
+               end if;
+            end if;
+         end if;
+         Stkpos := Stkpos + 1;
       end loop;
 
-      TODO_HEAD := TODO_HEAD + 1;
-      DS := TODO_HEAD;
+      -- clear out "visit" markers
+      for Chk_Stkpos in 1 .. Stkend loop
+         if Is_Marked (Stk (Chk_Stkpos)) then
+            Unmark_State (Stk (Chk_Stkpos));
+         else
+            Misc.Aflexfatal ("consistency check failed in epsclosure()");
+         end if;
+      end loop;
 
-      DSET := DSS(DS);
-      DSIZE := DFASIZ(DS);
+      Ns_Addr   := Numstates;
+      Hv_Addr   := Hashval;
+      Nacc_Addr := Nacc;
 
-      if TRACE then
-        TEXT_IO.PUT(STANDARD_ERROR, "state # ");
-        INT_IO.PUT(STANDARD_ERROR, DS, 1);
-        TEXT_IO.PUT_LINE(STANDARD_ERROR, ":");
+   end Epsclosure;
+
+   -- increase_max_dfas - increase the maximum number of DFAs
+
+   procedure Increase_Max_Dfas is
+   begin
+      Current_Max_Dfas := Current_Max_Dfas + Max_Dfas_Increment;
+
+      Num_Reallocs := Num_Reallocs + 1;
+
+      Reallocate_Integer_Array (Base, Current_Max_Dfas);
+      Reallocate_Integer_Array (Def, Current_Max_Dfas);
+      Reallocate_Integer_Array (Dfasiz, Current_Max_Dfas);
+      Reallocate_Integer_Array (Accsiz, Current_Max_Dfas);
+      Reallocate_Integer_Array (Dhash, Current_Max_Dfas);
+      Reallocate_Int_Ptr_Array (Dss, Current_Max_Dfas);
+      Reallocate_Dfaacc_Union (Dfaacc, Current_Max_Dfas);
+   end Increase_Max_Dfas;
+
+   -- ntod - convert an ndfa to a dfa
+   --
+   --  creates the dfa corresponding to the ndfa we've constructed.  the
+   --  dfa starts out in state #1.
+
+   procedure Ntod is
+
+      Accset                                             : Int_Ptr;
+      Ds, Nacc, Newds                                    : Integer;
+      Duplist, Targfreq, Targstate, State                : C_Size_Array;
+      Symlist                                            : C_Size_Bool_Array;
+      Hashval, Numstates, Dsize                          : Integer;
+      Nset, Dset                                         : Int_Ptr;
+      Targptr, Totaltrans, I, J, Comstate, Comfreq, Targ : Integer;
+      Num_Start_States, Todo_Head, Todo_Next             : Integer;
+      Snsresult                                          : Boolean;
+      Full_Table_Temp_File                               : File_Type;
+      Buf                                                : Vstring;
+      Num_Nxt_States                                     : Integer;
+
+      -- this is so find_table_space(...) will know where to start looking in
+      -- chk/nxt for unused records for space to put in the state
+   begin
+      Accset := Allocate_Integer_Array (Num_Rules + 1);
+      Nset   := Allocate_Integer_Array (Current_Max_Dfa_Size);
+
+      -- the "todo" queue is represented by the head, which is the DFA
+      -- state currently being processed, and the "next", which is the
+      -- next DFA state number available (not in use).  We depend on the
+      -- fact that snstods() returns DFA's \in increasing order/, and thus
+      -- need only know the bounds of the dfas to be processed.
+      Todo_Head := 0;
+      Todo_Next := 0;
+
+      for Cnt in 0 .. Csize loop
+         Duplist (Cnt) := Nil;
+         Symlist (Cnt) := False;
+      end loop;
+
+      for Cnt in 0 .. Num_Rules loop
+         Accset (Cnt) := Nil;
+      end loop;
+
+      if Trace then
+         Nfa.Dumpnfa (Scset (1));
+         Text_Io.New_Line (Standard_Error);
+         Text_Io.New_Line (Standard_Error);
+         Text_Io.Put (Standard_Error, "DFA Dump:");
+         Text_Io.New_Line (Standard_Error);
+         Text_Io.New_Line (Standard_Error);
       end if;
 
-      SYMPARTITION(DSET, DSIZE, SYMLIST, DUPLIST);
+      Tblcmp.Inittbl;
 
-      for SYM in 1 .. NUMECS loop
-        if SYMLIST(SYM) then
-          SYMLIST(SYM) := FALSE;
+      if Fulltbl then
+         Gen.Do_Sect3_Out;
 
-          if (DUPLIST(SYM) = NIL) then
-          -- symbol has unique out-transitions
-            NUMSTATES := SYMFOLLOWSET(DSET, DSIZE, SYM, NSET);
-            DFA.EPSCLOSURE(NSET, NUMSTATES, ACCSET, NACC, HASHVAL);
+         -- output user code up to ##
+         Skeleton_Manager.Skelout;
 
-            SNSTODS(NSET, NUMSTATES, ACCSET, NACC, HASHVAL, NEWDS, SNSRESULT);
-            if SNSRESULT then
-              TOTNST := TOTNST + NUMSTATES;
-              TODO_NEXT := TODO_NEXT + 1;
-              NUMAS := NUMAS + NACC;
+         -- declare it "short" because it's a real long-shot that that
+         -- won't be large enough
+         begin -- make a temporary file to write yy_nxt array into
+            Create (Full_Table_Temp_File, Out_File);
+         exception
+            when Use_Error | Name_Error =>
+               Misc.Aflexfatal ("can't create temporary file");
+         end;
 
-              if (VARIABLE_TRAILING_CONTEXT_RULES and (NACC > 0)) then
-                CHECK_TRAILING_CONTEXT(NSET, NUMSTATES, ACCSET, NACC);
-              end if;
+         Num_Nxt_States := 1;
+         Text_Io.Put (Full_Table_Temp_File, "( ");
+         -- generate 0 entries for state #0
+         for Cnt in 0 .. Numecs loop
+            Misc.Mk2data (Full_Table_Temp_File, 0);
+         end loop;
+
+         Text_Io.Put (Full_Table_Temp_File, " )");
+         -- force extra blank line next dataflush()
+         Dataline := Numdatalines;
+      end if;
+
+      -- create the first states
+
+      Num_Start_States := Lastsc * 2;
+
+      for Cnt in 1 .. Num_Start_States loop
+         Numstates := 1;
+
+         -- for each start condition, make one state for the case when
+         -- we're at the beginning of the line (the '%' operator) and
+         -- one for the case when we're not
+
+         if Cnt mod 2 = 1 then
+            Nset (Numstates) := Scset ((Cnt / 2) + 1);
+         else
+            Nset (Numstates) :=
+              Nfa.Mkbranch (Scbol (Cnt / 2), Scset (Cnt / 2));
+         end if;
+
+         Dfa.Epsclosure (Nset, Numstates, Accset, Nacc, Hashval);
+
+         Snstods (Nset, Numstates, Accset, Nacc, Hashval, Ds, Snsresult);
+         if Snsresult then
+            Numas     := Numas + Nacc;
+            Totnst    := Totnst + Numstates;
+            Todo_Next := Todo_Next + 1;
+
+            if (Variable_Trailing_Context_Rules and (Nacc > 0)) then
+               Check_Trailing_Context (Nset, Numstates, Accset, Nacc);
             end if;
+         end if;
+      end loop;
 
-            STATE(SYM) := NEWDS;
+      Snstods (Nset, 0, Accset, 0, 0, End_Of_Buffer_State, Snsresult);
+      if not Snsresult then
+         Misc.Aflexfatal ("could not create unique end-of-buffer state");
+      end if;
+      Numas            := Numas + 1;
+      Num_Start_States := Num_Start_States + 1;
+      Todo_Next        := Todo_Next + 1;
 
-            if TRACE then
-              TEXT_IO.PUT(STANDARD_ERROR, ASCII.HT);
-              INT_IO.PUT(STANDARD_ERROR, SYM, 1);
-              TEXT_IO.PUT(STANDARD_ERROR, ASCII.HT);
-              INT_IO.PUT(STANDARD_ERROR, NEWDS, 1);
-              TEXT_IO.NEW_LINE(STANDARD_ERROR);
+      while Todo_Head < Todo_Next loop
+         Num_Nxt_States := Num_Nxt_States + 1;
+         Targptr        := 0;
+         Totaltrans     := 0;
+
+         for State_Cnt in 1 .. Numecs loop
+            State (State_Cnt) := 0;
+         end loop;
+
+         Todo_Head := Todo_Head + 1;
+         Ds        := Todo_Head;
+
+         Dset  := Dss (Ds);
+         Dsize := Dfasiz (Ds);
+
+         if Trace then
+            Text_Io.Put (Standard_Error, "state # ");
+            Int_Io.Put (Standard_Error, Ds, 1);
+            Text_Io.Put_Line (Standard_Error, ":");
+         end if;
+
+         Sympartition (Dset, Dsize, Symlist, Duplist);
+
+         for Sym in 1 .. Numecs loop
+            if Symlist (Sym) then
+               Symlist (Sym) := False;
+
+               if (Duplist (Sym) = Nil) then
+                  -- symbol has unique out-transitions
+                  Numstates := Symfollowset (Dset, Dsize, Sym, Nset);
+                  Dfa.Epsclosure (Nset, Numstates, Accset, Nacc, Hashval);
+
+                  Snstods
+                    (Nset, Numstates, Accset, Nacc, Hashval, Newds, Snsresult);
+                  if Snsresult then
+                     Totnst    := Totnst + Numstates;
+                     Todo_Next := Todo_Next + 1;
+                     Numas     := Numas + Nacc;
+
+                     if (Variable_Trailing_Context_Rules and (Nacc > 0)) then
+                        Check_Trailing_Context (Nset, Numstates, Accset, Nacc);
+                     end if;
+                  end if;
+
+                  State (Sym) := Newds;
+
+                  if Trace then
+                     Text_Io.Put (Standard_Error, Ascii.Ht);
+                     Int_Io.Put (Standard_Error, Sym, 1);
+                     Text_Io.Put (Standard_Error, Ascii.Ht);
+                     Int_Io.Put (Standard_Error, Newds, 1);
+                     Text_Io.New_Line (Standard_Error);
+                  end if;
+
+                  Targptr             := Targptr + 1;
+                  Targfreq (Targptr)  := 1;
+                  Targstate (Targptr) := Newds;
+                  Numuniq             := Numuniq + 1;
+               else
+                  -- sym's equivalence class has the same transitions
+                  -- as duplist(sym)'s equivalence class
+
+                  Targ        := State (Duplist (Sym));
+                  State (Sym) := Targ;
+                  if Trace then
+                     Text_Io.Put (Standard_Error, Ascii.Ht);
+                     Int_Io.Put (Standard_Error, Sym, 1);
+                     Text_Io.Put (Standard_Error, Ascii.Ht);
+                     Int_Io.Put (Standard_Error, Targ, 1);
+                     Text_Io.New_Line (Standard_Error);
+                  end if;
+
+                  -- update frequency count for destination state
+
+                  I := 1;
+
+                  while Targstate (I) /= Targ loop
+                     I := I + 1;
+                  end loop;
+
+                  Targfreq (I) := Targfreq (I) + 1;
+                  Numdup       := Numdup + 1;
+               end if;
+
+               Totaltrans    := Totaltrans + 1;
+               Duplist (Sym) := Nil;
             end if;
+         end loop;
 
-            TARGPTR := TARGPTR + 1;
-            TARGFREQ(TARGPTR) := 1;
-            TARGSTATE(TARGPTR) := NEWDS;
-            NUMUNIQ := NUMUNIQ + 1;
-          else
-          -- sym's equivalence class has the same transitions
-          -- as duplist(sym)'s equivalence class
+         Numsnpairs := Numsnpairs + Totaltrans;
 
-            TARG := STATE(DUPLIST(SYM));
-            STATE(SYM) := TARG;
-            if TRACE then
-              TEXT_IO.PUT(STANDARD_ERROR, ASCII.HT);
-              INT_IO.PUT(STANDARD_ERROR, SYM, 1);
-              TEXT_IO.PUT(STANDARD_ERROR, ASCII.HT);
-              INT_IO.PUT(STANDARD_ERROR, TARG, 1);
-              TEXT_IO.NEW_LINE(STANDARD_ERROR);
-            end if;
-
-            -- update frequency count for destination state
-
-            I := 1;
-
-            while TARGSTATE(I) /= TARG loop
-              I := I + 1;
+         if Caseins and not Useecs then
+            I := Character'Pos ('A');
+            J := Character'Pos ('a');
+            while I < Character'Pos ('Z') loop
+               State (I) := State (J);
+               I         := I + 1;
+               J         := J + 1;
             end loop;
+         end if;
 
-            TARGFREQ(I) := TARGFREQ(I) + 1;
-            NUMDUP := NUMDUP + 1;
-          end if;
+         if Ds > Num_Start_States then
+            Check_For_Backtracking (Ds, State);
+         end if;
 
-          TOTALTRANS := TOTALTRANS + 1;
-          DUPLIST(SYM) := NIL;
-        end if;
-      end loop;
-
-      NUMSNPAIRS := NUMSNPAIRS + TOTALTRANS;
-
-      if CASEINS and not USEECS then
-        I := CHARACTER'POS('A');
-        J := CHARACTER'POS('a');
-        while I < CHARACTER'POS('Z') loop
-          STATE(I) := STATE(J);
-          I := I + 1;
-          J := J + 1;
-        end loop;
-      end if;
-
-      if DS > NUM_START_STATES then
-        CHECK_FOR_BACKTRACKING(DS, STATE);
-      end if;
-
-      if FULLTBL then
-      -- supply array's 0-element
-        TEXT_IO.PUT(FULL_TABLE_TEMP_FILE, ",");
-        MISC.DATAFLUSH(FULL_TABLE_TEMP_FILE);
-        TEXT_IO.PUT(FULL_TABLE_TEMP_FILE, "( ");
-        if DS = END_OF_BUFFER_STATE then
-          MISC.MK2DATA(FULL_TABLE_TEMP_FILE,  -END_OF_BUFFER_STATE);
-        else
-          MISC.MK2DATA(FULL_TABLE_TEMP_FILE, END_OF_BUFFER_STATE);
-        end if;
-
-        for CNT in 1 .. NUMECS loop
-        -- jams are marked by negative of state number
-          if STATE(CNT) /= 0 then
-            MISC.MK2DATA(FULL_TABLE_TEMP_FILE, STATE(CNT));
-          else
-            MISC.MK2DATA(FULL_TABLE_TEMP_FILE,  -DS);
-          end if;
-        end loop;
-
-        TEXT_IO.PUT(FULL_TABLE_TEMP_FILE, " )");
-        -- force extra blank line next dataflush()
-        DATALINE := NUMDATALINES;
-      else
-        if DS = END_OF_BUFFER_STATE then
-        -- special case this state to make sure it does what it's
-        -- supposed to, i.e., jam on end-of-buffer
-          TBLCMP.STACK1(DS, 0, 0, JAMSTATE_CONST);
-        else  -- normal, compressed state
-        -- determine which destination state is the most common, and
-        -- how many transitions to it there are
-          COMFREQ := 0;
-          COMSTATE := 0;
-
-          for CNT in 1 .. TARGPTR loop
-            if TARGFREQ(CNT) > COMFREQ then
-              COMFREQ := TARGFREQ(CNT);
-              COMSTATE := TARGSTATE(CNT);
-            end if;
-          end loop;
-
-          TBLCMP.BLDTBL(STATE, DS, TOTALTRANS, COMSTATE, COMFREQ);
-        end if;
-      end if;
-    end loop;
-
-    if FULLTBL then
-      TEXT_IO.PUT("yy_nxt : constant array(0..");
-      INT_IO.PUT(NUM_NXT_STATES - 1, 1);
-      TEXT_IO.PUT_LINE(" , ASCII.NUL..ASCII.DEL) of short :=");
-      TEXT_IO.PUT_LINE("   (");
-
-      RESET(FULL_TABLE_TEMP_FILE, IN_FILE);
-      while (not END_OF_FILE(FULL_TABLE_TEMP_FILE)) loop
-        TSTRING.GET_LINE(FULL_TABLE_TEMP_FILE, BUF);
-        TSTRING.PUT_LINE(BUF);
-      end loop;
-      DELETE(FULL_TABLE_TEMP_FILE);
-
-      MISC.DATAEND;
-    else
-      TBLCMP.CMPTMPS;  -- create compressed template entries
-
-      -- create tables for all the states with only one out-transition
-      while ONESP > 0 loop
-        TBLCMP.MK1TBL(ONESTATE(ONESP), ONESYM(ONESP), ONENEXT(ONESP), ONEDEF(
-          ONESP));
-        ONESP := ONESP - 1;
-      end loop;
-
-      TBLCMP.MKDEFTBL;
-    end if;
-  end NTOD;
-
-  -- snstods - converts a set of ndfa states into a dfa state
-  --
-  -- on return, the dfa state number is in newds.
-  procedure SNSTODS(SNS           : in INT_PTR;
-                    NUMSTATES     : in INTEGER;
-                    ACCSET        : in INT_PTR;
-                    NACC, HASHVAL : in INTEGER;
-                    NEWDS_ADDR    : out INTEGER;
-                    RESULT        : out BOOLEAN) is
-    DIDSORT : BOOLEAN := FALSE;
-    J       : INTEGER;
-    NEWDS   : INTEGER;
-    OLDSNS  : INT_PTR;
-  begin
-    for I in 1 .. LASTDFA loop
-      if HASHVAL = DHASH(I) then
-        if NUMSTATES = DFASIZ(I) then
-          OLDSNS := DSS(I);
-
-          if not DIDSORT then
-          -- we sort the states in sns so we can compare it to
-          -- oldsns quickly.  we use bubble because there probably
-          -- aren't very many states
-
-            MISC.BUBBLE(SNS, NUMSTATES);
-            DIDSORT := TRUE;
-          end if;
-
-          J := 1;
-          while J <= NUMSTATES loop
-            if SNS(J) /= OLDSNS(J) then
-              exit;
-            end if;
-            J := J + 1;
-          end loop;
-
-          if J > NUMSTATES then
-            DFAEQL := DFAEQL + 1;
-            NEWDS_ADDR := I;
-            RESULT := FALSE;
-            return;
-          end if;
-
-          HSHCOL := HSHCOL + 1;
-        else
-          HSHSAVE := HSHSAVE + 1;
-        end if;
-      end if;
-    end loop;
-    -- make a new dfa
-
-    LASTDFA := LASTDFA + 1;
-    if LASTDFA >= CURRENT_MAX_DFAS then
-      INCREASE_MAX_DFAS;
-    end if;
-
-    NEWDS := LASTDFA;
-
-    DSS(NEWDS) := new UNBOUNDED_INT_ARRAY(0 .. NUMSTATES + 1);
-
-    -- if we haven't already sorted the states in sns, we do so now, so that
-    -- future comparisons with it can be made quickly
-
-    if not DIDSORT then
-      MISC.BUBBLE(SNS, NUMSTATES);
-    end if;
-
-    for I in 1 .. NUMSTATES loop
-      DSS(NEWDS)(I) := SNS(I);
-    end loop;
-
-    DFASIZ(NEWDS) := NUMSTATES;
-    DHASH(NEWDS) := HASHVAL;
-
-    if NACC = 0 then
-      DFAACC(NEWDS).DFAACC_STATE := 0;
-      ACCSIZ(NEWDS) := 0;
-    else
-    -- find lowest numbered rule so the disambiguating rule will work
-      J := NUM_RULES + 1;
-
-      for I in 1 .. NACC loop
-        if ACCSET(I) < J then
-          J := ACCSET(I);
-        end if;
-      end loop;
-
-      DFAACC(NEWDS).DFAACC_STATE := J;
-    end if;
-
-    NEWDS_ADDR := NEWDS;
-    RESULT := TRUE;
-    return;
-
-  exception
-    when STORAGE_ERROR =>
-      MISC.AFLEXFATAL("dynamic memory failure in snstods()");
-  end SNSTODS;
-
-  -- symfollowset - follow the symbol transitions one step
-  function SYMFOLLOWSET(DS              : in INT_PTR;
-                        DSIZE, TRANSSYM : in INTEGER;
-                        NSET            : in INT_PTR) return INTEGER is
-    NS, TSP, SYM, LENCCL, CH, NUMSTATES, CCLLIST : INTEGER;
-  begin
-    NUMSTATES := 0;
-
-    for I in 1 .. DSIZE loop
-    -- for each nfa state ns in the state set of ds
-      NS := DS(I);
-      SYM := TRANSCHAR(NS);
-      TSP := TRANS1(NS);
-
-      if SYM < 0 then
-      -- it's a character class
-        SYM :=  -SYM;
-        CCLLIST := CCLMAP(SYM);
-        LENCCL := CCLLEN(SYM);
-
-        if CCLNG(SYM) /= 0 then
-          for J in 0 .. LENCCL - 1 loop
-          -- loop through negated character class
-            CH := CHARACTER'POS(CCLTBL(CCLLIST + J));
-
-            if CH > TRANSSYM then
-              exit;  -- transsym isn't in negated ccl
+         if Fulltbl then
+            -- supply array's 0-element
+            Text_Io.Put (Full_Table_Temp_File, ",");
+            Misc.Dataflush (Full_Table_Temp_File);
+            Text_Io.Put (Full_Table_Temp_File, "( ");
+            if Ds = End_Of_Buffer_State then
+               Misc.Mk2data (Full_Table_Temp_File, -End_Of_Buffer_State);
             else
-              if CH = TRANSSYM then
-                goto BOTTOM;  -- next 2
-              end if;
+               Misc.Mk2data (Full_Table_Temp_File, End_Of_Buffer_State);
             end if;
-          end loop;
 
-          -- didn't find transsym in ccl
-          NUMSTATES := NUMSTATES + 1;
-          NSET(NUMSTATES) := TSP;
-        else
-          for J in 0 .. LENCCL - 1 loop
-            CH := CHARACTER'POS(CCLTBL(CCLLIST + J));
+            for Cnt in 1 .. Numecs loop
+               -- jams are marked by negative of state number
+               if State (Cnt) /= 0 then
+                  Misc.Mk2data (Full_Table_Temp_File, State (Cnt));
+               else
+                  Misc.Mk2data (Full_Table_Temp_File, -Ds);
+               end if;
+            end loop;
 
-            if CH > TRANSSYM then
-              exit;
-            else
-              if CH = TRANSSYM then
-                NUMSTATES := NUMSTATES + 1;
-                NSET(NUMSTATES) := TSP;
-                exit;
-              end if;
+            Text_Io.Put (Full_Table_Temp_File, " )");
+            -- force extra blank line next dataflush()
+            Dataline := Numdatalines;
+         else
+            if Ds = End_Of_Buffer_State then
+               -- special case this state to make sure it does what it's
+               -- supposed to, i.e., jam on end-of-buffer
+               Tblcmp.Stack1 (Ds, 0, 0, Jamstate_Const);
+            else  -- normal, compressed state
+               -- determine which destination state is the most common, and
+               -- how many transitions to it there are
+               Comfreq  := 0;
+               Comstate := 0;
+
+               for Cnt in 1 .. Targptr loop
+                  if Targfreq (Cnt) > Comfreq then
+                     Comfreq  := Targfreq (Cnt);
+                     Comstate := Targstate (Cnt);
+                  end if;
+               end loop;
+
+               Tblcmp.Bldtbl (State, Ds, Totaltrans, Comstate, Comfreq);
             end if;
-          end loop;
-        end if;
+         end if;
+      end loop;
+
+      if Fulltbl then
+         Text_Io.Put ("yy_nxt : constant array(0..");
+         Int_Io.Put (Num_Nxt_States - 1, 1);
+         Text_Io.Put_Line (" , ASCII.NUL..ASCII.DEL) of short :=");
+         Text_Io.Put_Line ("   (");
+
+         Reset (Full_Table_Temp_File, In_File);
+         while (not End_Of_File (Full_Table_Temp_File)) loop
+            Tstring.Get_Line (Full_Table_Temp_File, Buf);
+            Tstring.Put_Line (Buf);
+         end loop;
+         Delete (Full_Table_Temp_File);
+
+         Misc.Dataend;
       else
-        if SYM >= CHARACTER'POS('A') and SYM <= CHARACTER'POS('Z') and
-          CASEINS then
-          MISC.AFLEXFATAL("consistency check failed in symfollowset");
-        else
-          if SYM = SYM_EPSILON then
-            null;  -- do nothing
-          else
-            if ECGROUP(SYM) = TRANSSYM then
-              NUMSTATES := NUMSTATES + 1;
-              NSET(NUMSTATES) := TSP;
+         Tblcmp.Cmptmps;  -- create compressed template entries
+
+         -- create tables for all the states with only one out-transition
+         while Onesp > 0 loop
+            Tblcmp.Mk1tbl
+              (Onestate (Onesp), Onesym (Onesp), Onenext (Onesp),
+               Onedef (Onesp));
+            Onesp := Onesp - 1;
+         end loop;
+
+         Tblcmp.Mkdeftbl;
+      end if;
+   end Ntod;
+
+   -- snstods - converts a set of ndfa states into a dfa state
+   --
+   -- on return, the dfa state number is in newds.
+   procedure Snstods
+     (Sns           : in Int_Ptr; Numstates : in Integer; Accset : in Int_Ptr;
+      Nacc, Hashval : in     Integer; Newds_Addr : out Integer;
+      Result        :    out Boolean)
+   is
+      Didsort : Boolean := False;
+      J       : Integer;
+      Newds   : Integer;
+      Oldsns  : Int_Ptr;
+   begin
+      for I in 1 .. Lastdfa loop
+         if Hashval = Dhash (I) then
+            if Numstates = Dfasiz (I) then
+               Oldsns := Dss (I);
+
+               if not Didsort then
+                  -- we sort the states in sns so we can compare it to
+                  -- oldsns quickly.  we use bubble because there probably
+                  -- aren't very many states
+
+                  Misc.Bubble (Sns, Numstates);
+                  Didsort := True;
+               end if;
+
+               J := 1;
+               while J <= Numstates loop
+                  if Sns (J) /= Oldsns (J) then
+                     exit;
+                  end if;
+                  J := J + 1;
+               end loop;
+
+               if J > Numstates then
+                  Dfaeql     := Dfaeql + 1;
+                  Newds_Addr := I;
+                  Result     := False;
+                  return;
+               end if;
+
+               Hshcol := Hshcol + 1;
+            else
+               Hshsave := Hshsave + 1;
             end if;
-          end if;
-        end if;
+         end if;
+      end loop;
+      -- make a new dfa
+
+      Lastdfa := Lastdfa + 1;
+      if Lastdfa >= Current_Max_Dfas then
+         Increase_Max_Dfas;
       end if;
 
-      <<BOTTOM>> null;
-    end loop;
-    return NUMSTATES;
-  end SYMFOLLOWSET;
+      Newds := Lastdfa;
 
-  -- sympartition - partition characters with same out-transitions
-  procedure SYMPARTITION(DS        : in INT_PTR;
-                         NUMSTATES : in INTEGER;
-                         SYMLIST   : in out C_SIZE_BOOL_ARRAY;
-                         DUPLIST   : in out C_SIZE_ARRAY) is
-    TCH, J, NS, LENCCL, CCLP, ICH : INTEGER;
-    DUPFWD                        : C_SIZE_ARRAY;
+      Dss (Newds) := new Unbounded_Int_Array (0 .. Numstates + 1);
 
-  -- partitioning is done by creating equivalence classes for those
-  -- characters which have out-transitions from the given state.  Thus
-  -- we are really creating equivalence classes of equivalence classes.
-  begin
-    for I in 1 .. NUMECS loop
-    -- initialize equivalence class list
-      DUPLIST(I) := I - 1;
-      DUPFWD(I) := I + 1;
-    end loop;
+      -- if we haven't already sorted the states in sns, we do so now, so that
+      -- future comparisons with it can be made quickly
 
-    DUPLIST(1) := NIL;
-    DUPFWD(NUMECS) := NIL;
-    DUPFWD(0) := 0;
-
-    for I in 1 .. NUMSTATES loop
-      NS := DS(I);
-      TCH := TRANSCHAR(NS);
-
-      if TCH /= SYM_EPSILON then
-        if TCH <  -LASTCCL or TCH > CSIZE then
-          MISC.AFLEXFATAL("bad transition character detected in sympartition()")
-            ;
-        end if;
-
-        if TCH > 0 then
-        -- character transition
-          ECS.MKECHAR(ECGROUP(TCH), DUPFWD, DUPLIST);
-          SYMLIST(ECGROUP(TCH)) := TRUE;
-        else
-        -- character class
-          TCH :=  -TCH;
-
-          LENCCL := CCLLEN(TCH);
-          CCLP := CCLMAP(TCH);
-          ECS.MKECCL(CCLTBL(CCLP .. CCLP + LENCCL), LENCCL, DUPFWD, DUPLIST,
-            NUMECS);
-
-          if CCLNG(TCH) /= 0 then
-            J := 0;
-
-            for K in 0 .. LENCCL - 1 loop
-              ICH := CHARACTER'POS(CCLTBL(CCLP + K));
-
-              J := J + 1;
-              while J < ICH loop
-                SYMLIST(J) := TRUE;
-                J := J + 1;
-              end loop;
-            end loop;
-
-            J := J + 1;
-            while J <= NUMECS loop
-              SYMLIST(J) := TRUE;
-              J := J + 1;
-            end loop;
-          else
-            for K in 0 .. LENCCL - 1 loop
-              ICH := CHARACTER'POS(CCLTBL(CCLP + K));
-              SYMLIST(ICH) := TRUE;
-            end loop;
-          end if;
-        end if;
+      if not Didsort then
+         Misc.Bubble (Sns, Numstates);
       end if;
-    end loop;
-  end SYMPARTITION;
-end DFA;
+
+      for I in 1 .. Numstates loop
+         Dss (Newds) (I) := Sns (I);
+      end loop;
+
+      Dfasiz (Newds) := Numstates;
+      Dhash (Newds)  := Hashval;
+
+      if Nacc = 0 then
+         Dfaacc (Newds).Dfaacc_State := 0;
+         Accsiz (Newds)              := 0;
+      else
+         -- find lowest numbered rule so the disambiguating rule will work
+         J := Num_Rules + 1;
+
+         for I in 1 .. Nacc loop
+            if Accset (I) < J then
+               J := Accset (I);
+            end if;
+         end loop;
+
+         Dfaacc (Newds).Dfaacc_State := J;
+      end if;
+
+      Newds_Addr := Newds;
+      Result     := True;
+      return;
+
+   exception
+      when Storage_Error =>
+         Misc.Aflexfatal ("dynamic memory failure in snstods()");
+   end Snstods;
+
+   -- symfollowset - follow the symbol transitions one step
+   function Symfollowset
+     (Ds : in Int_Ptr; Dsize, Transsym : in Integer; Nset : in Int_Ptr)
+      return Integer
+   is
+      Ns, Tsp, Sym, Lenccl, Ch, Numstates, Ccllist : Integer;
+   begin
+      Numstates := 0;
+
+      for I in 1 .. Dsize loop
+         -- for each nfa state ns in the state set of ds
+         Ns  := Ds (I);
+         Sym := Transchar (Ns);
+         Tsp := Trans1 (Ns);
+
+         if Sym < 0 then
+            -- it's a character class
+            Sym     := -Sym;
+            Ccllist := Cclmap (Sym);
+            Lenccl  := Ccllen (Sym);
+
+            if Cclng (Sym) /= 0 then
+               for J in 0 .. Lenccl - 1 loop
+                  -- loop through negated character class
+                  Ch := Character'Pos (Ccltbl (Ccllist + J));
+
+                  if Ch > Transsym then
+                     exit;  -- transsym isn't in negated ccl
+                  else
+                     if Ch = Transsym then
+                        goto Bottom;  -- next 2
+                     end if;
+                  end if;
+               end loop;
+
+               -- didn't find transsym in ccl
+               Numstates        := Numstates + 1;
+               Nset (Numstates) := Tsp;
+            else
+               for J in 0 .. Lenccl - 1 loop
+                  Ch := Character'Pos (Ccltbl (Ccllist + J));
+
+                  if Ch > Transsym then
+                     exit;
+                  else
+                     if Ch = Transsym then
+                        Numstates        := Numstates + 1;
+                        Nset (Numstates) := Tsp;
+                        exit;
+                     end if;
+                  end if;
+               end loop;
+            end if;
+         else
+            if Sym >= Character'Pos ('A') and Sym <= Character'Pos ('Z') and
+              Caseins
+            then
+               Misc.Aflexfatal ("consistency check failed in symfollowset");
+            else
+               if Sym = Sym_Epsilon then
+                  null;  -- do nothing
+               else
+                  if Ecgroup (Sym) = Transsym then
+                     Numstates        := Numstates + 1;
+                     Nset (Numstates) := Tsp;
+                  end if;
+               end if;
+            end if;
+         end if;
+
+         <<Bottom>>
+         null;
+      end loop;
+      return Numstates;
+   end Symfollowset;
+
+   -- sympartition - partition characters with same out-transitions
+   procedure Sympartition
+     (Ds      : in     Int_Ptr; Numstates : in Integer;
+      Symlist : in out C_Size_Bool_Array; Duplist : in out C_Size_Array)
+   is
+      Tch, J, Ns, Lenccl, Cclp, Ich : Integer;
+      Dupfwd                        : C_Size_Array;
+
+      -- partitioning is done by creating equivalence classes for those
+      -- characters which have out-transitions from the given state.  Thus
+      -- we are really creating equivalence classes of equivalence classes.
+   begin
+      for I in 1 .. Numecs loop
+         -- initialize equivalence class list
+         Duplist (I) := I - 1;
+         Dupfwd (I)  := I + 1;
+      end loop;
+
+      Duplist (1)     := Nil;
+      Dupfwd (Numecs) := Nil;
+      Dupfwd (0)      := 0;
+
+      for I in 1 .. Numstates loop
+         Ns  := Ds (I);
+         Tch := Transchar (Ns);
+
+         if Tch /= Sym_Epsilon then
+            if Tch < -Lastccl or Tch > Csize then
+               Misc.Aflexfatal
+                 ("bad transition character detected in sympartition()");
+            end if;
+
+            if Tch > 0 then
+               -- character transition
+               Ecs.Mkechar (Ecgroup (Tch), Dupfwd, Duplist);
+               Symlist (Ecgroup (Tch)) := True;
+            else
+               -- character class
+               Tch := -Tch;
+
+               Lenccl := Ccllen (Tch);
+               Cclp   := Cclmap (Tch);
+               Ecs.Mkeccl
+                 (Ccltbl (Cclp .. Cclp + Lenccl), Lenccl, Dupfwd, Duplist,
+                  Numecs);
+
+               if Cclng (Tch) /= 0 then
+                  J := 0;
+
+                  for K in 0 .. Lenccl - 1 loop
+                     Ich := Character'Pos (Ccltbl (Cclp + K));
+
+                     J := J + 1;
+                     while J < Ich loop
+                        Symlist (J) := True;
+                        J           := J + 1;
+                     end loop;
+                  end loop;
+
+                  J := J + 1;
+                  while J <= Numecs loop
+                     Symlist (J) := True;
+                     J           := J + 1;
+                  end loop;
+               else
+                  for K in 0 .. Lenccl - 1 loop
+                     Ich           := Character'Pos (Ccltbl (Cclp + K));
+                     Symlist (Ich) := True;
+                  end loop;
+               end if;
+            end if;
+         end if;
+      end loop;
+   end Sympartition;
+end Dfa;

@@ -24,11 +24,11 @@
 --       This version is for the VADS 5.5 Ada development system.
 -- $Header: /co/ua/self/arcadia/aflex/ada/src/RCS/file_managerS.a,v 1.4 90/01/12 15:20:00 self Exp Locker: self $
 
-with TEXT_IO; use TEXT_IO;
-package EXTERNAL_FILE_MANAGER is
-  procedure GET_IO_FILE(F : in out FILE_TYPE; Spec : in Boolean);
-  procedure GET_DFA_FILE(F : in out FILE_TYPE; Spec : in Boolean);
-  procedure GET_SCANNER_FILE(F : in out FILE_TYPE; Spec : in Boolean);
-  procedure GET_BACKTRACK_FILE(F : in out FILE_TYPE);
-  procedure INITIALIZE_FILES;
-end EXTERNAL_FILE_MANAGER;
+with Text_Io; use Text_Io;
+package External_File_Manager is
+   procedure Get_Io_File (F : in out File_Type; Spec : in Boolean);
+   procedure Get_Dfa_File (F : in out File_Type; Spec : in Boolean);
+   procedure Get_Scanner_File (F : in out File_Type; Spec : in Boolean);
+   procedure Get_Backtrack_File (F : in out File_Type);
+   procedure Initialize_Files;
+end External_File_Manager;

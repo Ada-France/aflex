@@ -19,123 +19,122 @@
 -- TITLE character classes routines
 -- AUTHOR: John Self (UCI)
 -- DESCRIPTION routines for character classes like [abc]
--- $Header: /dc/uc/self/arcadia/aflex/ada/src/RCS/cclB.a,v 1.7 1993/04/27 23:17:15 self Exp $ 
+-- $Header: /dc/uc/self/arcadia/aflex/ada/src/RCS/cclB.a,v 1.7 1993/04/27 23:17:15 self Exp $
 
-with MISC, TSTRING; 
-package body CCL is 
+with Misc, Tstring;
+package body Ccl is
 
 -- ccladd - add a single character to a ccl
-  procedure CCLADD(CCLP : in INTEGER; 
-                   CH   : in CHARACTER) is 
-    IND, LEN, NEWPOS : INTEGER; 
-  begin
-    LEN := CCLLEN(CCLP); 
-    IND := CCLMAP(CCLP); 
+   procedure Ccladd (Cclp : in Integer; Ch : in Character) is
+      Ind, Len, Newpos : Integer;
+   begin
+      Len := Ccllen (Cclp);
+      Ind := Cclmap (Cclp);
 
-    -- check to see if the character is already in the ccl
-    for I in 0 .. LEN - 1 loop
-      if (CCLTBL(IND + I) = CH) then 
-        return; 
-      end if; 
-    end loop; 
+      -- check to see if the character is already in the ccl
+      for I in 0 .. Len - 1 loop
+         if (Ccltbl (Ind + I) = Ch) then
+            return;
+         end if;
+      end loop;
 
-    NEWPOS := IND + LEN; 
+      Newpos := Ind + Len;
 
-    if (NEWPOS >= CURRENT_MAX_CCL_TBL_SIZE) then 
-      CURRENT_MAX_CCL_TBL_SIZE := CURRENT_MAX_CCL_TBL_SIZE + 
-        MAX_CCL_TBL_SIZE_INCREMENT; 
+      if (Newpos >= Current_Max_Ccl_Tbl_Size) then
+         Current_Max_Ccl_Tbl_Size :=
+           Current_Max_Ccl_Tbl_Size + Max_Ccl_Tbl_Size_Increment;
 
-      NUM_REALLOCS := NUM_REALLOCS + 1; 
+         Num_Reallocs := Num_Reallocs + 1;
 
-      REALLOCATE_CHARACTER_ARRAY(CCLTBL, CURRENT_MAX_CCL_TBL_SIZE); 
-    end if; 
+         Reallocate_Character_Array (Ccltbl, Current_Max_Ccl_Tbl_Size);
+      end if;
 
-    CCLLEN(CCLP) := LEN + 1; 
-    CCLTBL(NEWPOS) := CH; 
+      Ccllen (Cclp)   := Len + 1;
+      Ccltbl (Newpos) := Ch;
 
-  end CCLADD; 
+   end Ccladd;
 
-  -- cclinit - make an empty ccl
+   -- cclinit - make an empty ccl
 
-  function CCLINIT return INTEGER is 
-  begin
-    LASTCCL := LASTCCL + 1; 
-    if (LASTCCL >= CURRENT_MAXCCLS) then 
-      CURRENT_MAXCCLS := CURRENT_MAXCCLS + MAX_CCLS_INCREMENT; 
+   function Cclinit return Integer is
+   begin
+      Lastccl := Lastccl + 1;
+      if (Lastccl >= Current_Maxccls) then
+         Current_Maxccls := Current_Maxccls + Max_Ccls_Increment;
 
-      NUM_REALLOCS := NUM_REALLOCS + 1; 
+         Num_Reallocs := Num_Reallocs + 1;
 
-      REALLOCATE_INTEGER_ARRAY(CCLMAP, CURRENT_MAXCCLS); 
-      REALLOCATE_INTEGER_ARRAY(CCLLEN, CURRENT_MAXCCLS); 
-      REALLOCATE_INTEGER_ARRAY(CCLNG, CURRENT_MAXCCLS); 
-    end if; 
+         Reallocate_Integer_Array (Cclmap, Current_Maxccls);
+         Reallocate_Integer_Array (Ccllen, Current_Maxccls);
+         Reallocate_Integer_Array (Cclng, Current_Maxccls);
+      end if;
 
-    if (LASTCCL = 1) then 
+      if (Lastccl = 1) then
 
-      -- we're making the first ccl
-      CCLMAP(LASTCCL) := 0; 
+         -- we're making the first ccl
+         Cclmap (Lastccl) := 0;
 
-    else 
+      else
 
-      -- the new pointer is just past the end of the last ccl.  Since
-      -- the cclmap points to the \first/ character of a ccl, adding the
-      -- length of the ccl to the cclmap pointer will produce a cursor
-      -- to the first free space
-      CCLMAP(LASTCCL) := CCLMAP(LASTCCL - 1) + CCLLEN(LASTCCL - 1); 
-    end if; 
+         -- the new pointer is just past the end of the last ccl.  Since
+         -- the cclmap points to the \first/ character of a ccl, adding the
+         -- length of the ccl to the cclmap pointer will produce a cursor
+         -- to the first free space
+         Cclmap (Lastccl) := Cclmap (Lastccl - 1) + Ccllen (Lastccl - 1);
+      end if;
 
-    CCLLEN(LASTCCL) := 0; 
-    CCLNG(LASTCCL) := 0; 
+      Ccllen (Lastccl) := 0;
+      Cclng (Lastccl)  := 0;
 
-    -- ccl's start out life un-negated
-    return LASTCCL; 
-  end CCLINIT; 
+      -- ccl's start out life un-negated
+      return Lastccl;
+   end Cclinit;
 
-  -- cclnegate - negate a ccl
+   -- cclnegate - negate a ccl
 
-  procedure CCLNEGATE(CCLP : in INTEGER) is 
-  begin
-    CCLNG(CCLP) := 1; 
-  end CCLNEGATE; 
+   procedure Cclnegate (Cclp : in Integer) is
+   begin
+      Cclng (Cclp) := 1;
+   end Cclnegate;
 
-  -- list_character_set - list the members of a set of characters in CCL form
-  --
-  -- writes to the given file a character-class representation of those
-  -- characters present in the given set.  A character is present if it
-  -- has a non-zero value in the set array.
+   -- list_character_set - list the members of a set of characters in CCL form
+   --
+   -- writes to the given file a character-class representation of those
+   -- characters present in the given set.  A character is present if it
+   -- has a non-zero value in the set array.
 
-  procedure LIST_CHARACTER_SET(F    : in FILE_TYPE; 
-                               CSET : in C_SIZE_BOOL_ARRAY) is 
-    I, START_CHAR : INTEGER; 
-  begin
-    TEXT_IO.PUT(F, '['); 
+   procedure List_Character_Set (F : in File_Type; Cset : in C_Size_Bool_Array)
+   is
+      I, Start_Char : Integer;
+   begin
+      Text_Io.Put (F, '[');
 
-    I := 1; 
-    while (I <= CSIZE) loop
-      if (CSET(I)) then 
-        START_CHAR := I; 
+      I := 1;
+      while (I <= Csize) loop
+         if (Cset (I)) then
+            Start_Char := I;
 
-        TEXT_IO.PUT(F, ' '); 
+            Text_Io.Put (F, ' ');
 
-        TSTRING.PUT(F, MISC.READABLE_FORM(CHARACTER'VAL(I))); 
+            Tstring.Put (F, Misc.Readable_Form (Character'Val (I)));
 
-        I := I + 1; 
-        while ((I <= CSIZE) and then (CSET(I))) loop
-          I := I + 1; 
-        end loop; 
+            I := I + 1;
+            while ((I <= Csize) and then (Cset (I))) loop
+               I := I + 1;
+            end loop;
 
-        if (I - 1 > START_CHAR) then 
+            if (I - 1 > Start_Char) then
 
-          -- this was a run
-          TEXT_IO.PUT(F, "-"); 
-          TSTRING.PUT(F, MISC.READABLE_FORM(CHARACTER'VAL(I - 1))); 
-        end if; 
+               -- this was a run
+               Text_Io.Put (F, "-");
+               Tstring.Put (F, Misc.Readable_Form (Character'Val (I - 1)));
+            end if;
 
-        TEXT_IO.PUT(F, ' '); 
-      end if; 
-      I := I + 1; 
-    end loop; 
+            Text_Io.Put (F, ' ');
+         end if;
+         I := I + 1;
+      end loop;
 
-    TEXT_IO.PUT(F, ']'); 
-  end LIST_CHARACTER_SET; 
-end CCL; 
+      Text_Io.Put (F, ']');
+   end List_Character_Set;
+end Ccl;

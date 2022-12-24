@@ -1,14 +1,14 @@
 -- .......................................................................... --
 --
 -- DISTRIBUTION AND COPYRIGHT:
---                                                           
+--
 -- This software is released to the Public Domain (note:
 --   software released to the Public Domain is not subject
 --   to copyright protection).
 -- Restrictions on use or distribution:  NONE
---                                                           
+--
 -- DISCLAIMER:
---                                                           
+--
 -- This software and its documentation are provided "AS IS" and
 -- without any expressed or implied warranties whatsoever.
 -- No warranties as to performance, merchantability, or fitness
@@ -45,9 +45,8 @@
 -- TITLE variable length strings
 -- AUTHOR: John Self (UCI)
 -- DESCRIPTION these strings are used for many functions
--- $Header: /co/ua/self/arcadia/aflex/ada/src/RCS/tstrings.a,v 1.4 90/01/12 15:20:51 self Exp Locker: self $ 
+-- $Header: /co/ua/self/arcadia/aflex/ada/src/RCS/tstrings.a,v 1.4 90/01/12 15:20:51 self Exp Locker: self $
 
-with VSTRINGS;
-pragma Elaborate_All(VSTRINGS);
-package TSTRING is 
-  new VSTRINGS(1024);  -- This is MAXLINE in misc_defs
+with Vstrings;
+pragma Elaborate_All (Vstrings);
+package Tstring is new Vstrings (1_024);  -- This is MAXLINE in misc_defs
