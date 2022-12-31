@@ -26,6 +26,7 @@
 -- + Add support for Ada95 parent/child units
 -- + Less GNAT warnings
 
+with Ada.Characters.Handling;
 with Misc, Main_Body, Int_Io, Calendar;
 
 package body Misc is
@@ -34,6 +35,7 @@ package body Misc is
    Unitname_Defined : Boolean := False;
    Unitname_Value   : Vstring;
    Lex_Filename     : Vstring;
+   YYDecl_Name      : Vstring;
 
    procedure Action_Out is
       Buf : Vstring;
@@ -347,6 +349,43 @@ package body Misc is
          Misc_Defs.Yylineno := True;
       end if;
    end Set_Option;
+
+   procedure Set_YYDecl (Str : in Vstring) is
+   begin
+      YYDecl_Name := Str;
+   end Set_YYDecl;
+
+   function Get_YYLex_Declaration return String is
+   begin
+      return "   " & Str (YYDecl_Name) & " is";
+   end Get_YYLex_Declaration;
+
+   function Get_YYLex_Name return String is
+      use Ada.Characters.Handling;
+
+      Decl : constant String := Str (YYDecl_Name);
+      Pos1 : Natural := Decl'First;
+      Pos2 : Natural;
+   begin
+      while Pos1 <= Decl'Last and then Is_Space (Decl (Pos1)) loop
+         Pos1 := Pos1 + 1;
+      end loop;
+      if Pos1 + 7 >= Decl'Last or else Decl (Pos1 .. Pos1 + 7) /= "function" then
+         return "";
+      end if;
+      Pos1 := Pos1 + 8;
+      if not Is_Space (Decl (Pos1)) then
+         return "";
+      end if;
+      while Pos1 <= Decl'Last and then Is_Space (Decl (Pos1)) loop
+         Pos1 := Pos1 + 1;
+      end loop;
+      Pos2 := Pos1;
+      while Pos2 <= Decl'Last and then Is_Letter (Decl (Pos2)) loop
+         Pos2 := Pos2 + 1;
+      end loop;
+      return Decl (Pos1 .. Pos2 - 1);
+   end Get_YYLex_Name;
 
    -- basename - find the basename of a file
    function Package_Name return String is

@@ -22,7 +22,7 @@
 -- NOTES allows use of internal or external skeleton
 -- $Header: /dc/uc/self/arcadia/aflex/ada/src/RCS/skeleton_managerB.a,v 1.19 1992/12/29 22:46:15 self Exp self $
 
-with Misc_Defs, Text_Io, File_String;
+with Misc, Misc_Defs, Text_Io, File_String;
 package body Skeleton_Manager is
    use File_String; -- to save having to type FILE_STRING 177 times
    Use_External_Skeleton : Boolean := False;
@@ -340,6 +340,7 @@ package body Skeleton_Manager is
       -- END OF UMASS CODES.
       Echo_Codes  : Boolean := False;
       Ignore_Line : Boolean := False;
+      YYLex_Name  : constant String := Misc.Get_YYLex_Name;
    begin
       while not End_Of_Skeleton loop
          Get_File_Line (Buf);
@@ -382,7 +383,15 @@ package body Skeleton_Manager is
             end if;
 
             if not Ignore_Line then
-               File_String.Put_Line (Buf);
+               if YYLex_Name'Length = 0 then
+                  File_String.Put_Line (Buf);
+               elsif File_String.Str (Buf) = "   function YYLex return Token is" then
+                  File_String.Put_Line (File_String.Vstr (Misc.Get_YYLex_Declaration));
+               elsif File_String.Str (Buf) = "   end YYLex;" then
+                  File_String.Put_Line (File_String.Vstr ("   end " & YYLex_Name & ";"));
+               else
+                  File_String.Put_Line (Buf);
+               end if;
             end if;
             Ignore_Line := False;
          end if;

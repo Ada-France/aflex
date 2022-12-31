@@ -26,6 +26,8 @@
 --       generate scanner using the command 'aflex -is ascan.l'
 --  $Header: C:/CVSROOT/afay/aflex/src/ascan.l,v 1.3 2004/10/23 22:06:12 Grands Exp $ 
 --
+--  2022/12/31 Stephane Carrez
+--  + Add "%yydecl" to control the declaration of YYLex function
 --  2017/01/08 Stephane Carrez
 --  + Add "%option" to support flex controlling options
 --  2004/10/16 Thierry Bernier
@@ -35,7 +37,7 @@
 %x SECT2 SECT2PROLOG SECT3 PICKUPDEF SC CARETISBOL NUM QUOTE
 %x FIRSTCCL CCL ACTION RECOVER BRACEERROR
 %x ACTION_STRING
-
+%x YYDECL_STRING
 
 WS      [ \t\f]+
 OPTWS       [ \t\f]*
@@ -63,6 +65,7 @@ ESCSEQ      \\([^\n]|[0-9]{1,3})
 ^"%x"           { return XSCDECL; }
 ^"%u"(nit)?     { return USCDECL; }
 ^"%o"(ption)?   { return OPTDECL; }
+^"%y"(ydecl)?{WS}+  { ENTER(YYDECL_STRING); return YYDECL; }
 
 {WS}            { return WHITESPACE; }
 
@@ -101,7 +104,11 @@ ESCSEQ      \\([^\n]|[0-9]{1,3})
             }
 {OPTWS}\n       { linenum := linenum + 1; return Newline; }
 .           { misc.synerr( "illegal character" );ENTER(RECOVER);}
-
+<YYDECL_STRING>.* {
+               nmstr := vstr(yytext(1..YYLength));
+               ENTER(0);
+               return NAME;
+            }
 <PICKUPDEF>{WS}     { null;
               -- separates name and definition;
             }

@@ -22,11 +22,13 @@
 -- NOTES
 -- $Header: C:/CVSROOT/afay/aflex/src/parse.y,v 1.3 2004/10/23 22:06:13 Grands Exp $ 
 --
+--  2022/12/31 Stephane Carrez
+--  + Add "%yydecl" to control the declaration of YYLex function
 -- 2004/10/16 Thierry Bernier
 -- + Add "%unit" for Ada-95 parent/child units support
 
 %token CHAR NUMBER SECTEND SCDECL XSCDECL WHITESPACE NAME PREVCCL EOF_OP
-%token USCDECL OPTDECL UNAME
+%token USCDECL OPTDECL YYDECL UNAME
 %token NEWLINE
 
 -- %with TEXT_IO
@@ -86,6 +88,13 @@ sect1		:  sect1 startconddecl WHITESPACE namelist1 NEWLINE
 		|  sect1 OPTDECL WHITESPACE unit_name NEWLINE
 			{
 			misc.set_option (nmstr);
+			}
+		|  sect1 YYDECL NAME NEWLINE
+			{
+                        misc.set_yydecl (nmstr);
+                        if misc.Get_YYLex_Name'Length = 0 then
+                           misc.synerr("%yydecl directive must be a function declaration");
+                        end if;
 			}
 		|
 		|  error NEWLINE
