@@ -59,7 +59,9 @@ This version brings a number of improvements:
   gnatmake example.ada
 ```
 
-# Articles
+# Articles and Documentation
+
+* Man page: [aflex (1)](https://github.com/Ada-France/aflex/blob/master/doc/aflex.md)
 
 * [Aflex 1.5 and Ayacc 1.3.0](https://blog.vacs.fr/vacs/blogs/post.html?post=2021/12/18/Aflex-1.5-and-Ayacc-1.3.0)
   explains how to use Aflex and Ayacc together, 
