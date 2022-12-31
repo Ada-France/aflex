@@ -155,136 +155,139 @@ aflex maintenance or development.
 *aflex* is fully compatible with
 *lex* with the following exceptions:
 
-    Source file format:
-    The input specification file for 
-*aflex*     must use the following format.
-    		definitions section
-       		%%
-       		rules section
-       		%%
-       		user defined section
-       		##
-       		user defined section
-    
+* Source file format:
+The input specification file for 
+*aflex* must use the following format.
+```
+definitions section
+%%
+rules section
+%%
+user defined section
+##
+user defined section
+```
 
-    lex's
-*%r*     (Ratfor scanners) and
-*%t*     (translation table) options
-    are not supported.
+* lex's
+*%r* (Ratfor scanners) and
+*%t* (translation table) options
+are not supported.
 
-    The do-nothing
-    .ul
-    -n
-    flag is not supported.
+* The do-nothing
+*-n* flag is not supported.
 
-    When definitions are expanded, aflex encloses them in parentheses.
-    With lex, the following
-    
-        NAME    [A-Z][A-Z0-9]*
-        %%
-        foo{NAME}?      Ada.Text_IO.Put_Line ("Found it");
-        %%
-    
-    will not match the string "foo" because when the macro
-    is expanded the rule is equivalent to "foo[A-Z][A-Z0-9]*?"
-    and the precedence is such that the '?' is associated with
-    "[A-Z0-9]*".  With aflex, the rule will be expanded to
-    "foo([A-z][A-Z0-9]*)?" and so the string "foo" will match.
-    Note that because of this, the
-*^, $, <s>,*     and
-*/*     operators cannot be used in a definition.
+* When definitions are expanded, aflex encloses them in parentheses.
+With lex, the following
+```
 
-    Input can be controlled by redefining the
-*YY_INPUT*     function.
-    YY_INPUT's calling sequence is "YY_INPUT(buf,result,max_size)".  Its
-    action is to place up to max_size characters in the character buffer "buf"
-    and return in the integer variable "result" either the
-    number of characters read or the constant YY_NULL
-    to indicate EOF.  The default YY_INPUT reads from
-    Standard_Input.
-    You also can add in things like counting keeping track of the
-    input line number this way; but don't expect your scanner to
-    go very fast.
+    NAME    [A-Z][A-Z0-9]*
+    %%
+    foo{NAME}?      Ada.Text_IO.Put_Line ("Found it");
+    %%
 
-    Yytext is a function returning a
-*String.* 
-    aflex reads only one input file, while lex's input is made
-    up of the concatenation of its input files.
+```
+will not match the string "foo" because when the macro
+is expanded the rule is equivalent to "foo[A-Z][A-Z0-9]*?"
+and the precedence is such that the '?' is associated with
+"[A-Z0-9]*".  With aflex, the rule will be expanded to
+"foo([A-z][A-Z0-9]*)?" and so the string "foo" will match.
+Note that because of this, the
+*^, $, <s>,* and
+*/* operators cannot be used in a definition.
 
-    The
-*%unit*     directive is an optional statement to define the name of the generated Ada package.
+* Input can be controlled by redefining the
+*YY_INPUT* function.
+YY_INPUT's calling sequence is "YY_INPUT(buf,result,max_size)".  Its
+action is to place up to max_size characters in the character buffer "buf"
+and return in the integer variable "result" either the
+number of characters read or the constant YY_NULL
+to indicate EOF.  The default YY_INPUT reads from
+Standard_Input.
+You also can add in things like counting keeping track of the
+input line number this way; but don't expect your scanner to
+go very fast.
 
-    The following lex constructs are not supported
-    .in 5
-    - REJECT
-    - %T 	-- character set tables
-    - %x	-- changes to internal array sizes (see below)
-    .in 0
+* Yytext is a function returning a
+*String*. 
+* aflex reads only one input file, while lex's input is made
+up of the concatenation of its input files.
+
+* The
+*%unit* directive is an optional statement to define the name of the generated Ada package.
+
+* The following lex constructs are not supported
+```
+- REJECT
+- %T 	-- character set tables
+- %x	-- changes to internal array sizes (see below)
+```
 
 ## ENHANCEMENTS
 
 
-*Exclusive start-conditions*     can be declared by using
-*%x*     instead of
-*%s.*     These start-conditions have the property that when they are active,
-*no other rules are active.*     Thus a set of rules governed by the same exclusive start condition
-    describe a scanner which is independent of any of the other rules in
-    the aflex input.  This feature makes it easy to specify "mini-scanners"
-    which scan portions of the input that are syntactically different
-    from the rest (e.g., comments).
-*End-of-file rules.*     The special rule "<<EOF>>" indicates
-    actions which are to be taken when an end-of-file is
-    encountered and yywrap() returns non-zero (i.e., indicates
-    no further files to process).  The action can either
-**Ada.Text_IO.Set_Input**()     to a new file to process, in which case the
-    action should finish with
-*YY_NEW_FILE*     (this is a branch, so subsequent code in the action won't
-    be executed), or it should finish with a
-*return*     statement.  <<EOF>> rules may not be used with other
-    patterns; they may only be qualified with a list of start
-    conditions.  If an unqualified <<EOF>> rule is given, it
-    applies only to the INITIAL start condition, and
-*not*     to
-*%s*     start conditions.
-    These rules are useful for catching things like unclosed comments.
-    An example:
-    
-        %x quote
-        %%
-        ...
-        <quote><<EOF>>   {
-    	     error( "unterminated quote" );
-    	     }
-        <<EOF>>          {
-    	     set_input( next_file );
-    	     YY_NEW_FILE;
-    	     }
-    
+* *Exclusive start-conditions* can be declared by using
+*%x* instead of
+*%s.* These start-conditions have the property that when they are active,
+*no other rules are active.* Thus a set of rules governed by the same exclusive start condition
+describe a scanner which is independent of any of the other rules in
+the aflex input.  This feature makes it easy to specify "mini-scanners"
+which scan portions of the input that are syntactically different
+from the rest (e.g., comments).
+*End-of-file rules.* The special rule "<<EOF>>" indicates
+actions which are to be taken when an end-of-file is
+encountered and yywrap() returns non-zero (i.e., indicates
+no further files to process).  The action can either
+**Ada.Text_IO.Set_Input**() to a new file to process, in which case the
+action should finish with
+*YY_NEW_FILE* (this is a branch, so subsequent code in the action won't
+be executed), or it should finish with a
+*return* statement.  <<EOF>> rules may not be used with other
+patterns; they may only be qualified with a list of start
+conditions.  If an unqualified <<EOF>> rule is given, it
+applies only to the INITIAL start condition, and
+*not* to
+*%s* start conditions.
+These rules are useful for catching things like unclosed comments.
+An example:
+```
 
-    aflex dynamically resizes its internal tables, so directives like "%a 3000"
-    are not needed when specifying large scanners.
+    %x quote
+    %%
+    ...
+    <quote><<EOF>>   {
+	     error( "unterminated quote" );
+	     }
+    <<EOF>>          {
+	     set_input( next_file );
+	     YY_NEW_FILE;
+	     }
 
-    aflex generates
-*--#line*     comments mapping lines in the output to
-    their origin in the input file.
+```
 
-    All actions must be enclosed by curly braces.
+* aflex dynamically resizes its internal tables, so directives like "%a 3000"
+are not needed when specifying large scanners.
 
-    Comments may be put in the first section of the input by preceding
-    them with '#'.
+* aflex generates
+*--#line* comments mapping lines in the output to
+their origin in the input file.
 
-    Ada style comments are supported instead of C style comments.
+* All actions must be enclosed by curly braces.
 
-    All template files are internalized.
+* Comments may be put in the first section of the input by preceding
+them with '#'.
 
-    The input source file must end with a ".l" extension.
+* Ada style comments are supported instead of C style comments.
 
-    The Ada package name used for the generated DFA and IO files can be customized by
-    using the
-*%unit*     statement at begining of the lex file.  By default, aflex will use the
-    scanner file name to build the package name.  The package name will be the
-    scanner file name with the possible '-' changed into '.'.  The
-*%unit*     allows to override this and specify the Ada package name to use.
+* All template files are internalized.
+
+* The input source file must end with a ".l" extension.
+
+* The Ada package name used for the generated DFA and IO files can be customized by
+using the
+*%unit* statement at begining of the lex file.  By default, aflex will use the
+scanner file name to build the package name.  The package name will be the
+scanner file name with the possible '-' changed into '.'.  The
+*%unit* allows to override this and specify the Ada package name to use.
 
 ## FILES
 
@@ -332,9 +335,6 @@ John Self.  Based on the tool flex written and designed by
 Vern Paxson.  It reimplements the functionality of the tool alex
 designed by Thieu Q. Nguyen.
 
-Send requests for aflex information to alex-info@ics.uci.edu
-Send bug reports for aflex to alex-bugs@ics.uci.edu
-
 ## DIAGNOSTICS
 
 
@@ -371,9 +371,11 @@ errors.
 
 Pushing back definitions enclosed in ()'s can result in nasty,
 difficult-to-understand problems like:
+```
 
 	{DIG}  [0-9] -- a digit
 
+```
 In which the pushed-back text is "([0-9] -- a digit)".
 
 Due to both buffering of input and read-ahead, you cannot intermix
