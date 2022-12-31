@@ -9,13 +9,14 @@ package Parse_Tokens is
          Sectend, Scdecl, Xscdecl,
          Whitespace, Name, Prevccl,
          Eof_Op, Uscdecl, Optdecl,
-         Uname, Newline, '^',
-         '<', '>', ',',
-         '$', '|', '/',
-         '*', '+', '?',
-         '{', '}', '.',
-         '"', '(', ')',
-         '[', ']', '-');
+         Yydecl, Uname, Newline,
+         '^', '<', '>',
+         ',', '$', '|',
+         '/', '*', '+',
+         '?', '{', '}',
+         '.', '"', '(',
+         ')', '[', ']',
+         '-');
 
    Syntax_Error : exception;
 
