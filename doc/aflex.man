@@ -183,44 +183,47 @@ aflex maintenance or development.
 is fully compatible with
 .I lex
 with the following exceptions:
-.IP -
+.\"
+.IP \(bu 4
 Source file format:
 .sp
 The input specification file for 
 .I aflex
 must use the following format.
-.sp 2
-		definitions section
-   		%%
-   		rules section
-   		%%
-   		user defined section
-   		##
-   		user defined section
-
-.IP -
+.RS 5
+definitions section
+%%
+rules section
+%%
+user defined section
+##
+user defined section
+.RE
+.\"
+.IP \(bu 4
 lex's
 .B %r
 (Ratfor scanners) and
 .B %t
 (translation table) options
 are not supported.
-.IP -
+.\"
+.IP \(bu 4
 The do-nothing
-.ul
--n
+.I -n
 flag is not supported.
-.IP -
+.\"
+.IP \(bu 4
 When definitions are expanded, aflex encloses them in parentheses.
 With lex, the following
-.nf
+.RS 5
 
     NAME    [A-Z][A-Z0-9]*
     %%
     foo{NAME}?      Ada.Text_IO.Put_Line ("Found it");
     %%
 
-.fi
+.RE
 will not match the string "foo" because when the macro
 is expanded the rule is equivalent to "foo[A-Z][A-Z0-9]*?"
 and the precedence is such that the '?' is associated with
@@ -231,7 +234,8 @@ Note that because of this, the
 and
 .B /
 operators cannot be used in a definition.
-.IP -
+.\"
+.IP \(bu 4
 Input can be controlled by redefining the
 .B YY_INPUT
 function.
@@ -245,28 +249,33 @@ Standard_Input.
 You also can add in things like counting keeping track of the
 input line number this way; but don't expect your scanner to
 go very fast.
-.IP -
+.\"
+.IP \(bu 4
 Yytext is a function returning a
-.B String.
-.IP -
+.BR String .
+.\"
+.IP \(bu 4
 aflex reads only one input file, while lex's input is made
 up of the concatenation of its input files.
-.IP -
+.\"
+.IP \(bu 4
 The
 .B %unit
 directive is an optional statement to define the name of the generated Ada package.
-.IP -
+.\"
+.IP \(bu 4
 The following lex constructs are not supported
-.in 5
+.RS 5
 - REJECT
 .sp
 - %T 	-- character set tables
 .sp
 - %x	-- changes to internal array sizes (see below)
 .sp
-.in 0
+.RE
 .SH ENHANCEMENTS
-.IP -
+.\"
+.IP \(bu 4
 .I Exclusive start-conditions
 can be declared by using
 .B %x
@@ -301,7 +310,7 @@ to
 start conditions.
 These rules are useful for catching things like unclosed comments.
 An example:
-.nf
+.RS 5
 
     %x quote
     %%
@@ -314,27 +323,35 @@ An example:
 	     YY_NEW_FILE;
 	     }
 
-.fi
-.IP -
+.RE
+.\"
+.IP \(bu 4
 aflex dynamically resizes its internal tables, so directives like "%a 3000"
 are not needed when specifying large scanners.
-.IP -
+.\"
+.IP \(bu 4
 aflex generates
 .B --#line
 comments mapping lines in the output to
 their origin in the input file.
-.IP -
+.\"
+.IP \(bu 4
 All actions must be enclosed by curly braces.
-.IP -
+.\"
+.IP \(bu 4
 Comments may be put in the first section of the input by preceding
 them with '#'.
-.IP -
+.\"
+.IP \(bu 4
 Ada style comments are supported instead of C style comments.
-.IP -
+.\"
+.IP \(bu 4
 All template files are internalized.
-.IP -
+.\"
+.IP \(bu 4
 The input source file must end with a ".l" extension.
-.IP -
+.\"
+.IP \(bu 4
 The Ada package name used for the generated DFA and IO files can be customized by
 using the
 .B %unit
@@ -390,11 +407,6 @@ University of California, Irvine, 1986
 John Self.  Based on the tool flex written and designed by
 Vern Paxson.  It reimplements the functionality of the tool alex
 designed by Thieu Q. Nguyen.
-.LP
-.nf
-Send requests for aflex information to alex-info@ics.uci.edu
-Send bug reports for aflex to alex-bugs@ics.uci.edu
-.fi
 .SH DIAGNOSTICS
 .LP
 .I aflex scanner jammed -
@@ -432,11 +444,11 @@ errors.
 .LP
 Pushing back definitions enclosed in ()'s can result in nasty,
 difficult-to-understand problems like:
-.nf
+.RS 5
 
 	{DIG}  [0-9] -- a digit
 
-.fi
+.RE
 In which the pushed-back text is "([0-9] -- a digit)".
 .LP
 Due to both buffering of input and read-ahead, you cannot intermix
