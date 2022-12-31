@@ -24,6 +24,8 @@ This version brings a number of improvements:
 ## Version 1.6 - Under development
 
 - New option -P to generate a private Ada package for DFA and IO
+- New directory `%yydecl` to allow passing parameters to `YYLex`
+  or change the default function name
 - Reformat code using `gnatpp`
 
 ## Version 1.5.2021 - Dec 2021
