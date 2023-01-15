@@ -67,6 +67,9 @@ package ${NAME}_IO is
    procedure Output_New_Line;
    function Output_Column return Text_IO.Count;
 %end
+%if error
+  function Input_Line return Text_IO.Count;
+%end
 %if yywrap
    function yyWrap return Boolean;
 %end

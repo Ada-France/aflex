@@ -347,8 +347,15 @@ package body ${NAME}_IO is
       end if;
    end Output_Column;
 %end
+%if error
 
+   function Input_Line return Text_IO.Count is
+   begin
+      return Text_IO.Count (Line_Number_Of_Saved_Tok_Line2);
+   end Input_Line;
+%end
 %if yywrap
+
    --  default yywrap function - always treat EOF as an EOF
    function yyWrap return Boolean is
    begin
