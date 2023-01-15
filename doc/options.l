@@ -24,6 +24,7 @@ UPPER    [A-Z]
 
 %%
 with Ada.Command_Line;
+with Ada.Characters.Handling;
 procedure Options is
 
    type Token is (End_of_Input, Error);
@@ -32,14 +33,8 @@ procedure Options is
    Lower_Case : Natural := 0;   --  frequency of lower case words
    Upper_Case : Natural := 0;   --  frequency of upper case words
 
-   function To_Upper_Case (Word : String) return String is
-      Temp : String (1 .. Word'Length);
-   begin
-      for i in 1 .. Word'Length loop
-         Temp (i) := Character'Val (Character'Pos (Word (i)) - 32);
-      end loop;
-      return Temp;
-   end To_Upper_Case;
+   function To_Upper_Case (Word : String) return String
+     renames Ada.Characters.Handling.To_Upper;
 
    --  function YYlex will go here!!
 ##
