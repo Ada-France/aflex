@@ -340,6 +340,12 @@ package Misc_Defs is
    --  Generate support for yylineno
    Yylineno : Boolean;
 
+   --  When true, don't emit the Unput and YYunput methods in _IO package.
+   No_Unput : Boolean;
+
+   --  When true, don't emit the Output methods in _IO package.
+   No_Output : Boolean;
+
    Syntaxerror : Boolean;
 
    -- variables used in the aflex input routines:

@@ -81,3 +81,14 @@ options: doc/options.l bin/aflex
 	bin/aflex -s doc/options.l
 	mv options.ada options.adb
 	gnatmake options
+
+# Used for Aflex development only: rebuild the embedded templates from `templates/*.ad[bs]` files.
+generate:
+	@ERRORS=`sed -f templates/check.sed templates/*.ads templates/*.adb` ; \
+	if test "T$$ERRORS" = "T"; then \
+	   are -o src --rule=are-package.xml --var-access --content-only . ; \
+	else \
+	   echo "Invalid %if <option>, %else or %end option in template:"; \
+	   echo $$ERRORS; \
+           exit 1 ; \
+	fi

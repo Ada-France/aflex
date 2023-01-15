@@ -347,6 +347,10 @@ package body Misc is
          Misc_Defs.Fulltbl := True;
       elsif Option = "yylineno" then
          Misc_Defs.Yylineno := True;
+      elsif Option = "nounput" then
+         Misc_Defs.No_Unput := True;
+      elsif Option = "nooutput" then
+         Misc_Defs.No_Output := True;
       end if;
    end Set_Option;
 
