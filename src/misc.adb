@@ -349,8 +349,18 @@ package body Misc is
          Misc_Defs.Yylineno := True;
       elsif Option = "nounput" then
          Misc_Defs.No_Unput := True;
+      elsif Option = "unput" then
+         Misc_Defs.No_Unput := False;
       elsif Option = "nooutput" then
          Misc_Defs.No_Output := True;
+      elsif Option = "output" then
+         Misc_Defs.No_Output := False;
+      elsif Option = "noyywrap" then
+         Misc_Defs.No_YYWrap := True;
+      elsif Option = "yywrap" then
+         Misc_Defs.No_YYWrap := False;
+      else
+         Aflexerror ("option '" & Option & "' is not recognized");
       end if;
    end Set_Option;
 
