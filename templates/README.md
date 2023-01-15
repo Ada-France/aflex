@@ -24,7 +24,7 @@ a single space and the keyword followed by the end of line.
 The following conditions are supported:
 
 | Condition        | Description                                                |
-| ================ | ========================================================== |
+|------------------|------------------------------------------------------------|
 | %if private      | Generate Ada `private` package (Aflex -P option is passed) |
 | %if output       | Support `Output` in `_IO` package (can be disabled by using the `%option nooutput`) |
 | %if interactive  | Scanner in interactive mode (Aflex -I option is passed) |
@@ -46,7 +46,7 @@ A very basic variable replacement is implemented for the template.
 The following string patterns are replaced:
 
 | Pattern   | Description                                         |
-| ========= | =================================================== |
+|-----------|-----------------------------------------------------|
 | ${NAME}   | The name of the Ada lexer package that is generated |
 
 ## Build
