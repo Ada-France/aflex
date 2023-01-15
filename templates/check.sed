@@ -11,5 +11,6 @@
 /^%if debug$/d
 /^%if yylineno$/d
 /^%if unput$/d
+/^%if yywrap$/d
 /^%else$/d
 /^%end$/d

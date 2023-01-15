@@ -51,6 +51,7 @@ package body Template_Manager is
                             S_IF_PRIVATE,
                             S_IF_INTERACTIVE,
                             S_IF_YYLINENO,
+                            S_IF_YYWRAP,
                             S_IF_UNPUT);
       Current    : Section_Type := S_COMMON;
       Is_Visible : Boolean := True;
@@ -76,6 +77,8 @@ package body Template_Manager is
                Current := S_IF_PRIVATE;
             elsif Line.all = "%if interactive" then
                Current := S_IF_INTERACTIVE;
+            elsif Line.all = "%if yywrap" then
+               Current := S_IF_YYWRAP;
             elsif Line.all = "%end" then
                Current := S_COMMON;
                Invert := False;
@@ -94,6 +97,7 @@ package body Template_Manager is
               or else (Current = S_IF_PRIVATE and then Private_Package)
               or else (Current = S_IF_UNPUT and then not No_Unput)
               or else (Current = S_IF_OUTPUT and then not No_Output)
+              or else (Current = S_IF_YYWRAP and then not No_YYWrap)
               or else (Current = S_IF_ERROR and then Ayacc_Extension_Flag);
             if Invert then
                Is_Visible := not Is_Visible;

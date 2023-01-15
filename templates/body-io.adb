@@ -284,6 +284,7 @@ package body ${NAME}_IO is
             --  that above
 
          when EOB_ACT_END_OF_FILE =>
+%if yywrap
             if yyWrap then
                yy_c_buf_p := yytext_ptr;
                return ASCII.NUL;
@@ -299,6 +300,10 @@ package body ${NAME}_IO is
             yy_hold_char := yy_ch_buf (yy_c_buf_p);
 
             return Input;
+%else
+            yy_c_buf_p := yytext_ptr;
+            return ASCII.NUL;
+%end
          when EOB_ACT_RESTART_SCAN =>
             yy_c_buf_p := yytext_ptr;
 
@@ -343,11 +348,13 @@ package body ${NAME}_IO is
    end Output_Column;
 %end
 
+%if yywrap
    --  default yywrap function - always treat EOF as an EOF
    function yyWrap return Boolean is
    begin
       return True;
    end yyWrap;
+%end
 
    procedure Open_Input (fname : in String) is
    begin

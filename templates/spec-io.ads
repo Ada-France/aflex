@@ -67,7 +67,9 @@ package ${NAME}_IO is
    procedure Output_New_Line;
    function Output_Column return Text_IO.Count;
 %end
+%if yywrap
    function yyWrap return Boolean;
+%end
    procedure Open_Input (fname : in String);
    procedure Close_Input;
 %if output

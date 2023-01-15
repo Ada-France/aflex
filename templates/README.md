@@ -32,6 +32,7 @@ The following conditions are supported:
 | %if debug        | Scanner in debug mode (Aflex -d option) |
 | %if yylineno     | Support `yylineno` generation (enabled by using the `%option yylineno`) |
 | %if unput        | Support `Unput` in `_IO` package (can be disabled by using the `%option nounput`) |
+| %if yywrap       | Support `yyWrap` in `_IO` package (can be disabled by using the `%option noyywrap`) |
 
 Note:
 - the template expander raises the `Program_Error` exception when a `%` pattern is not recognized.
