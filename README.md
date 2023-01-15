@@ -24,8 +24,13 @@ This version brings a number of improvements:
 
 ## Version 1.6 - Under development
 
+- Support the flex options `%option output`, `%option nooutput`, `%option yywrap`,
+  `%option noyywrap`, `%option unput`, `%option nounput` to better control the
+  generated `_IO` package.
+- Aflex templates provide more control for tuning the code generation and
+  they are embedded with [Advanced Resource Embedder](https://gitlab.com/stcarrez/resource-embedder)
 - New option -P to generate a private Ada package for DFA and IO
-- New directory `%yydecl` to allow passing parameters to `YYLex`
+- New directive `%yydecl` to allow passing parameters to `YYLex`
   or change the default function name
 - Reformat code using `gnatpp`
 
