@@ -293,7 +293,7 @@ package body parser is
             case yy.rule_id is
                pragma Style_Checks (Off);
 
-when 1 => -- #line 50
+when 1 => -- #line 52
  -- add default rule
 
             pat := ccl.cclinit;
@@ -317,7 +317,7 @@ when 1 => -- #line 50
             end if;
 
 
-when 2 => -- #line 75
+when 2 => -- #line 77
 
             -- initialize for processing rules
 
@@ -325,17 +325,22 @@ when 2 => -- #line 75
             sym.scinstal( tstring.vstr("INITIAL"), false );
 
 
-when 4 => -- #line 85
+when 4 => -- #line 87
 
             misc.set_unitname (nmstr);
 
 
-when 5 => -- #line 89
+when 5 => -- #line 91
 
             misc.set_option (nmstr);
 
 
-when 6 => -- #line 93
+when 6 => -- #line 95
+
+            misc.set_option (nmstr);
+
+
+when 7 => -- #line 99
 
                         misc.set_yydecl (nmstr);
                         if misc.Get_YYLex_Name'Length = 0 then
@@ -343,10 +348,15 @@ when 6 => -- #line 93
                         end if;
 
 
-when 8 => -- #line 101
+when 8 => -- #line 106
+
+                        misc.set_yyvar (nmstr);
+
+
+when 11 => -- #line 112
  misc.synerr( "unknown error processing section 1" );
 
-when 12 => -- #line 112
+when 15 => -- #line 123
 
              -- these productions are separate from the s1object
              -- rule because the semantics must be done before
@@ -356,19 +366,19 @@ when 12 => -- #line 112
             xcluflg := false;
 
 
-when 13 => -- #line 122
+when 16 => -- #line 133
  xcluflg := true;
 
-when 14 => -- #line 126
+when 17 => -- #line 137
  sym.scinstal( nmstr, xcluflg );
 
-when 15 => -- #line 129
+when 18 => -- #line 140
  sym.scinstal( nmstr, xcluflg );
 
-when 16 => -- #line 132
+when 19 => -- #line 143
  misc.synerr( "bad start condition list" );
 
-when 19 => -- #line 140
+when 22 => -- #line 151
 
             -- initialize for a parse of one rule
             trlcontxt := false;
@@ -382,7 +392,7 @@ when 19 => -- #line 140
             nfa.new_rule;
 
 
-when 20 => -- #line 155
+when 23 => -- #line 166
 
             pat := nfa.link_machines( yy.value_stack (yy.tos-1), yy.value_stack (yy.tos) );
             nfa.finish_rule( pat, variable_trail_rule,
@@ -404,7 +414,7 @@ when 20 => -- #line 155
             end if;
 
 
-when 21 => -- #line 177
+when 24 => -- #line 188
 
             pat := nfa.link_machines( yy.value_stack (yy.tos-1), yy.value_stack (yy.tos) );
             nfa.finish_rule( pat, variable_trail_rule,
@@ -416,7 +426,7 @@ when 21 => -- #line 177
             end loop;
 
 
-when 22 => -- #line 188
+when 25 => -- #line 199
 
             pat := nfa.link_machines( yy.value_stack (yy.tos-1), yy.value_stack (yy.tos) );
             nfa.finish_rule( pat, variable_trail_rule,
@@ -442,7 +452,7 @@ when 22 => -- #line 188
             end if;
 
 
-when 23 => -- #line 213
+when 26 => -- #line 224
 
             pat := nfa.link_machines( yy.value_stack (yy.tos-1), yy.value_stack (yy.tos) );
             nfa.finish_rule( pat, variable_trail_rule,
@@ -455,10 +465,10 @@ when 23 => -- #line 213
             end loop;
 
 
-when 24 => -- #line 226
+when 27 => -- #line 237
  build_eof_action;
 
-when 25 => -- #line 229
+when 28 => -- #line 240
 
             -- this EOF applies only to the INITIAL start cond.
             actvp := 1;
@@ -466,10 +476,10 @@ when 25 => -- #line 229
             build_eof_action;
 
 
-when 26 => -- #line 237
+when 29 => -- #line 248
  misc.synerr( "unrecognized rule" );
 
-when 28 => -- #line 244
+when 31 => -- #line 255
 
             scnum := sym.sclookup( nmstr );
             if (scnum = 0 ) then
@@ -483,7 +493,7 @@ when 28 => -- #line 244
             end if;
 
 
-when 29 => -- #line 258
+when 32 => -- #line 269
 
             scnum := sym.sclookup( nmstr );
             if (scnum = 0 ) then
@@ -497,10 +507,10 @@ when 29 => -- #line 258
             end if;
 
 
-when 30 => -- #line 272
+when 33 => -- #line 283
  misc.synerr( "bad start condition list" );
 
-when 31 => -- #line 276
+when 34 => -- #line 287
 
             if trlcontxt then
                 misc.synerr( "trailing context used twice" );
@@ -521,7 +531,7 @@ when 31 => -- #line 276
                         end if;
 
 
-when 32 => -- #line 297
+when 35 => -- #line 308
 
                 YYVal := nfa.mkstate( SYM_EPSILON );
 
@@ -535,14 +545,14 @@ when 32 => -- #line 297
                         end if;
 
 
-when 33 => -- #line 312
+when 36 => -- #line 323
 
             varlength := true;
 
             YYVal := nfa.mkor( yy.value_stack (yy.tos-2), yy.value_stack (yy.tos) );
 
 
-when 34 => -- #line 319
+when 37 => -- #line 330
 
             if ( transchar(lastst(yy.value_stack (yy.tos))) /= SYM_EPSILON ) then
                 -- provide final transition \now/ so it
@@ -596,10 +606,10 @@ when 34 => -- #line 319
             YYVal := nfa.link_machines( yy.value_stack (yy.tos-1), yy.value_stack (yy.tos) );
 
 
-when 35 => -- #line 373
+when 38 => -- #line 384
  YYVal := yy.value_stack (yy.tos);
 
-when 36 => -- #line 378
+when 39 => -- #line 389
 
             -- this rule is separate from the others for "re" so
             -- that the reduction will occur before the trailing
@@ -624,7 +634,7 @@ when 36 => -- #line 378
             YYVal := yy.value_stack (yy.tos-1);
 
 
-when 37 => -- #line 404
+when 40 => -- #line 415
 
             -- this is where concatenation of adjacent patterns
             -- gets done
@@ -632,31 +642,31 @@ when 37 => -- #line 404
             YYVal := nfa.link_machines( yy.value_stack (yy.tos-1), yy.value_stack (yy.tos) );
 
 
-when 38 => -- #line 412
+when 41 => -- #line 423
  YYVal := yy.value_stack (yy.tos);
 
-when 39 => -- #line 416
+when 42 => -- #line 427
 
             varlength := true;
 
             YYVal := nfa.mkclos( yy.value_stack (yy.tos-1) );
 
 
-when 40 => -- #line 423
+when 43 => -- #line 434
 
             varlength := true;
 
             YYVal := nfa.mkposcl( yy.value_stack (yy.tos-1) );
 
 
-when 41 => -- #line 430
+when 44 => -- #line 441
 
             varlength := true;
 
             YYVal := nfa.mkopt( yy.value_stack (yy.tos-1) );
 
 
-when 42 => -- #line 437
+when 45 => -- #line 448
 
             varlength := true;
 
@@ -672,7 +682,7 @@ when 42 => -- #line 437
                         end if;
 
 
-when 43 => -- #line 453
+when 46 => -- #line 464
 
             varlength := true;
 
@@ -684,7 +694,7 @@ when 43 => -- #line 453
             end if;
 
 
-when 44 => -- #line 465
+when 47 => -- #line 476
 
             -- the singleton could be something like "(foo)",
             -- in which case we have no idea what its length
@@ -700,7 +710,7 @@ when 44 => -- #line 465
             end if;
 
 
-when 45 => -- #line 481
+when 48 => -- #line 492
 
             if ( not madeany ) then
                 -- create the '.' character class
@@ -722,7 +732,7 @@ when 45 => -- #line 481
             YYVal := nfa.mkstate( -anyccl );
 
 
-when 46 => -- #line 503
+when 49 => -- #line 514
 
             if ( not cclsorted ) then
                 -- sort characters for fast searching.  We use a
@@ -743,20 +753,20 @@ when 46 => -- #line 503
             YYVal := nfa.mkstate( -yy.value_stack (yy.tos) );
 
 
-when 47 => -- #line 524
+when 50 => -- #line 535
 
             rulelen := rulelen + 1;
 
             YYVal := nfa.mkstate( -yy.value_stack (yy.tos) );
 
 
-when 48 => -- #line 531
+when 51 => -- #line 542
  YYVal := yy.value_stack (yy.tos-1);
 
-when 49 => -- #line 534
+when 52 => -- #line 545
  YYVal := yy.value_stack (yy.tos-1);
 
-when 50 => -- #line 537
+when 53 => -- #line 548
 
             rulelen := rulelen + 1;
 
@@ -771,10 +781,10 @@ when 50 => -- #line 537
             YYVal := nfa.mkstate( yy.value_stack (yy.tos) );
 
 
-when 51 => -- #line 553
+when 54 => -- #line 564
  YYVal := yy.value_stack (yy.tos-1);
 
-when 52 => -- #line 556
+when 55 => -- #line 567
 
             -- *Sigh* - to be compatible Unix lex, negated ccls
             -- match newlines
@@ -782,7 +792,7 @@ when 52 => -- #line 556
             YYVal := yy.value_stack (yy.tos-1);
 
 
-when 53 => -- #line 565
+when 56 => -- #line 576
 
             if ( yy.value_stack (yy.tos-2) > yy.value_stack (yy.tos) ) then
                 misc.synerr( "negative range in character class" );
@@ -810,7 +820,7 @@ when 53 => -- #line 565
             YYVal := yy.value_stack (yy.tos-3);
 
 
-when 54 => -- #line 593
+when 57 => -- #line 604
 
             if ( caseins ) then
                 if ( (yy.value_stack (yy.tos) >= CHARACTER'POS('A')) and (yy.value_stack (yy.tos) <= CHARACTER'POS('Z')) ) then
@@ -823,14 +833,14 @@ when 54 => -- #line 593
             YYVal := yy.value_stack (yy.tos-1);
 
 
-when 55 => -- #line 606
+when 58 => -- #line 617
 
             cclsorted := true;
             lastchar := 0;
             YYVal := ccl.cclinit;
 
 
-when 56 => -- #line 614
+when 59 => -- #line 625
 
             if ( caseins ) then
                 if ( (yy.value_stack (yy.tos) >= CHARACTER'POS('A')) and (yy.value_stack (yy.tos) <= CHARACTER'POS('Z')) ) then
@@ -843,7 +853,7 @@ when 56 => -- #line 614
             YYVal := nfa.link_machines( yy.value_stack (yy.tos-1), nfa.mkstate( yy.value_stack (yy.tos) ) );
 
 
-when 57 => -- #line 627
+when 60 => -- #line 638
  YYVal := nfa.mkstate( SYM_EPSILON );
 
                pragma Style_Checks (On);
