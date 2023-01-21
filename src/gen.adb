@@ -70,7 +70,7 @@ package body Gen is
       Indent_Up;
       Indent_Puts ("yy_last_accepting_state := yy_current_state;");
       Indent_Puts ("yy_last_accepting_cpos := yy_cp;");
-      if Yylineno then
+      if Use_Yylineno then
          Indent_Puts ("yy_last_yylineno := yylineno;");
          Indent_Puts ("yy_last_yylinecol := yylinecol;");
       end if;
@@ -94,7 +94,7 @@ package body Gen is
 
       if Fulltbl then
          Indent_Puts ("yy_cp := yy_last_accepting_cpos + 1;");
-         if Yylineno then
+         if Use_Yylineno then
             Indent_Puts ("yylineno := yy_last_yylineno;");
             Indent_Puts ("yylinecol := yy_last_yylinecol;");
          end if;
@@ -103,7 +103,7 @@ package body Gen is
          -- backtracking info for compressed tables is taken \after/
          -- yy_cp has been incremented for the next state
          Indent_Puts ("yy_cp := yy_last_accepting_cpos;");
-         if Yylineno then
+         if Use_Yylineno then
             Indent_Puts ("yylineno := yy_last_yylineno;");
             Indent_Puts ("yylinecol := yy_last_yylinecol;");
          end if;
@@ -274,7 +274,7 @@ package body Gen is
            ("yy_current_state := yy_nxt (yy_current_state, yy_ch_buf (yy_cp));");
          Indent_Puts ("while yy_current_state > 0 loop");
          Indent_Up;
-         if Yylineno then
+         if Use_Yylineno then
             Indent_Puts ("if yy_ch_buf (yy_cp) = ASCII.LF then");
             Indent_Up;
             Indent_Puts ("yylineno := yylineno + 1;");
@@ -307,7 +307,7 @@ package body Gen is
          Indent_Up;
 
          Gen_Next_State;
-         if Yylineno then
+         if Use_Yylineno then
             Indent_Puts ("if yy_ch_buf (yy_cp) = ASCII.LF then");
             Indent_Up;
             Indent_Puts ("yylineno := yylineno + 1;");
@@ -343,7 +343,7 @@ package body Gen is
          if not Interactive then
             Indent_Puts ("yy_cp := yy_last_accepting_cpos;");
             Indent_Puts ("yy_current_state := yy_last_accepting_state;");
-            if Yylineno then
+            if Use_Yylineno then
                Indent_Puts ("yylineno := yy_last_yylineno;");
                Indent_Puts ("yylinecol := yy_last_yylinecol;");
             end if;
@@ -624,9 +624,6 @@ package body Gen is
       Text_Io.Put ("      YY_END_OF_BUFFER : constant := ");
       Int_Io.Put (Num_Rules + 1, 1);
       Text_Io.Put_Line (";");
-
-      Indent_Puts ("      subtype yy_state_type is Integer;");
-      Indent_Puts ("      yy_current_state : yy_state_type;");
 
       -- now output the constants for the various start conditions
       Reset (Def_File, In_File);

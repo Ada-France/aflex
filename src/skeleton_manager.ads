@@ -23,7 +23,6 @@
 -- $Header: /co/ua/self/arcadia/aflex/ada/src/RCS/skeleton_managerS.a,v 1.3 90/01/12 15:20:38 self Exp Locker: self $
 
 package Skeleton_Manager is
-   procedure Initialize (Use_Text_Io : in Boolean);
    procedure Skelout;
    procedure Set_External_Skeleton;
 end Skeleton_Manager;

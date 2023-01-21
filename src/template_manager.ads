@@ -27,7 +27,28 @@
 --       copies of the template files in a known place.
 -- $Header: /co/ua/self/arcadia/aflex/ada/src/RCS/template_managerS.a,v 1.3 90/01/12 15:20:49 self Exp Locker: self $
 
+with Ada.Text_IO;
 package Template_Manager is
+
+   type Content_Array is array (Positive range <>) of access constant String;
+   type Content_Access is access constant Content_Array;
+
+   type Code_Filename is (YYTYPE_CODE, YYACTION_CODE, YYWRAP_CODE);
+
+   function Get_Filename (Code : in Code_Filename) return String;
+
+   generic
+      with function Has_Line return Boolean;
+      with function Get_Line return String;
+   procedure Template_Writer (Outfile  : in Ada.Text_IO.File_Type);
+
+   procedure Write_Template (Outfile  : in Ada.Text_IO.File_Type;
+                             Lines    : in Content_Array;
+                             Position : in out Positive);
+
    procedure Generate_Dfa_File;
    procedure Generate_Io_File;
+
+   procedure Cleanup;
+
 end Template_Manager;

@@ -70,6 +70,8 @@ package Misc is
    procedure Set_Filename (Str : in Vstring);
    procedure Set_Option (Opt : in Vstring);
    procedure Set_YYDecl (Str : in Vstring);
+   procedure Set_YYVar (Str : in Vstring);
    function Get_YYLex_Declaration return String;
    function Get_YYLex_Name return String;
+   function Get_YYVar_Name return String;
 end Misc;

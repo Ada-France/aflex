@@ -338,7 +338,7 @@ package Misc_Defs is
    Eofseen, Continued_Action, Private_Package : Boolean;
 
    --  Generate support for yylineno
-   Yylineno : Boolean;
+   Use_Yylineno : Boolean;
 
    --  When true, don't emit the Unput and YYunput methods in _IO package.
    No_Unput : Boolean;
@@ -348,6 +348,15 @@ package Misc_Defs is
 
    --  When true, don't emit the YYWrap support in _IO package.
    No_YYWrap : Boolean;
+
+   --  Use the recursive templates to generate a recursive parser.
+   Recursive : Boolean;
+
+   --  '-m' minimalist option is used.
+   Minimalist_With : Boolean;
+
+   --  The default IO buffer size (can be changed with %option bufsize=NNN).
+   YYBuf_Size  : Natural := 75_000;
 
    Syntaxerror : Boolean;
 

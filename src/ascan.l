@@ -34,23 +34,28 @@
 --  + Add "%unit" to support Ada-95 parent/child units
 --  + Less -gnatwa warnings
 
+%option yylineno
+
 %x SECT2 SECT2PROLOG SECT3 PICKUPDEF SC CARETISBOL NUM QUOTE
-%x FIRSTCCL CCL ACTION RECOVER BRACEERROR
+%x FIRSTCCL CCL ACTION RECOVER BRACEERROR CODEBLOCK_MATCH_BRACE
 %x ACTION_STRING
 %x YYDECL_STRING
 
 WS      [ \t\f]+
 OPTWS       [ \t\f]*
 NOT_WS      [^ \t\f\n]
+NL          \r?\n
 
 -- To be aflex'ed using "-i" : case insensitive
 NAME        [a-z_][a-z_0-9-]*
 NOT_NAME    [^a-z_\n]+
+NUM         [0-9]+
 
 DOT     "."
 UNAME       {NAME}({DOT}{NAME})+
 
 SCNAME      {NAME}
+OPTVAR      {NAME}={NUM}
 
 ESCSEQ      \\([^\n]|[0-9]{1,3})
 
@@ -65,15 +70,34 @@ ESCSEQ      \\([^\n]|[0-9]{1,3})
 ^"%x"           { return XSCDECL; }
 ^"%u"(nit)?     { return USCDECL; }
 ^"%o"(ption)?   { return OPTDECL; }
-^"%y"(ydecl)?{WS}+  { ENTER(YYDECL_STRING); return YYDECL; }
+^"%yydecl"?{WS}+  { ENTER(YYDECL_STRING); return YYDECL; }
+^"%yyvar"       { return YYVAR; }
 
 {WS}            { return WHITESPACE; }
+{OPTVAR}        { nmstr := vstr(yytext(1..YYLength)); return OPTVAR; }
+^%yytype{WS}?"{"{WS}? {
+                  Open_Code_Block (Template_Manager.Get_Filename (Template_Manager.YYTYPE_CODE));
+                  ENTER(CODEBLOCK_MATCH_BRACE);
+}
+^%yyaction{WS}?"{"{WS}? {
+                  Open_Code_Block (Template_Manager.Get_Filename (Template_Manager.YYACTION_CODE));
+                  ENTER(CODEBLOCK_MATCH_BRACE);
+}
+^%yywrap{WS}?"{"{WS}? {
+                  Open_Code_Block (Template_Manager.Get_Filename (Template_Manager.YYWRAP_CODE));
+                  ENTER(CODEBLOCK_MATCH_BRACE);
+}
 
 ^"%%".*         {
             sectnum := 2;
             misc.line_directive_out;
             ENTER(SECT2PROLOG);
             return SECTEND;
+            }
+
+^%[a-z]+{WS}?"{"{WS}? {
+               misc.synerr ("unrecognized code block");
+               ENTER(CODEBLOCK_MATCH_BRACE);
             }
 
 ^"%"[^%sux]" ".*\n  {
@@ -389,6 +413,46 @@ ESCSEQ      \\([^\n]|[0-9]{1,3})
                 ECHO;
               end if;
             }
+
+<CODEBLOCK_MATCH_BRACE>"}"     {
+                if Code_Block_Active then
+                   Ada.Text_IO.Close (Code_Block_File);
+                   Code_Block_Active := False;
+                end if;
+                ENTER(0);
+                return YYCODEBLOCK;
+            }
+
+<CODEBLOCK_MATCH_BRACE>"{"     {
+                --  brace_depth++;
+                if Code_Block_Active then
+                   Ada.Text_IO.Put (Code_Block_File, YYText);
+                end if;
+            }
+
+<CODEBLOCK_MATCH_BRACE>{NL}    {
+                Linenum := Linenum + 1;
+                if Code_Block_Active then
+                   Ada.Text_IO.New_Line (Code_Block_File);
+                end if;
+            }
+
+<CODEBLOCK_MATCH_BRACE>([^{}\r\n\[\]]+)|[^{}\r\n]  {
+                Linenum := Linenum + 1; 
+                if Code_Block_Active then
+                   Ada.Text_IO.Put (Code_Block_File, YYText);
+                end if;
+            }
+
+<CODEBLOCK_MATCH_BRACE><<EOF>>     {
+                misc.synerr ("unmatched '{' at line" & Natural'Image (Code_Block_Start));
+                if Code_Block_Active then
+                   Ada.Text_IO.Close (Code_Block_File);
+                end if;
+                ENTER(0);
+                return YYCODEBLOCK;
+            }
+
 %%
 with Parse_Tokens;
 package scanner is
@@ -400,6 +464,7 @@ pragma Warnings (Off);
 with Ada.Text_Io;
 with misc_defs, misc, sym, parse_tokens, int_io;
 with tstring, ascan_dfa, ascan_io;
+with Template_Manager;
 use misc_defs, parse_tokens, tstring;
 use ascan_dfa, ascan_io;
 package body scanner is
@@ -409,6 +474,20 @@ package body scanner is
 
    beglin : Boolean := False;
    i, bracelevel: Integer;
+   Code_Block_File   : Ada.Text_IO.File_Type;
+   Code_Block_Start  : Natural;
+   Code_Block_Active : Boolean := False;
+
+   procedure Open_Code_Block (Name : in String) is
+   begin
+      Code_Block_Start := YYlineno + 1;
+      Code_Block_Active := True;
+      Ada.Text_IO.Open (Code_Block_File, Ada.Text_IO.Append_File, Name);
+
+   exception
+      when Name_Error =>
+         Ada.Text_IO.Create (Code_Block_File, Ada.Text_IO.Append_File, Name);
+   end Open_Code_Block;
 
    function get_token return Token is
       toktype : Token;
@@ -532,6 +611,21 @@ package body scanner is
 
             when NUMBER =>
                Int_IO.Put (Standard_Error, YYLVal);
+
+            when OPTDECL =>
+               Ada.Text_IO.Put (Standard_Error, "%option ");
+               Ada.Text_IO.Put (Standard_Error, YYText);
+               Ada.Text_IO.Put (Standard_Error, ''');
+
+            when YYDECL =>
+               Ada.Text_IO.Put (Standard_Error, "%yydecl ");
+               Ada.Text_IO.Put (Standard_Error, YYText);
+               Ada.Text_IO.Put (Standard_Error, ''');
+
+            when YYCODEBLOCK =>
+               Ada.Text_IO.Put (Standard_Error, "%<code> {");
+               Ada.Text_IO.Put (Standard_Error, YYText);
+               Ada.Text_IO.Put (Standard_Error, '}');
 
             when PREVCCL =>
                Ada.Text_IO.Put (Standard_Error, '[');

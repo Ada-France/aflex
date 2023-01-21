@@ -24,6 +24,7 @@
 
 with Misc_Defs, Misc, Command_Line_Interface, Ecs, Text_Io, Parser;
 with Main_Body, Tstring, Parse_Tokens, Skeleton_Manager, External_File_Manager;
+with Template_Manager;
 with Int_Io;
 use Misc_Defs, Command_Line_Interface, Tstring, Text_Io;
 
@@ -31,7 +32,6 @@ package body Main_Body is
 
    Aflex_Version      : constant String := "1.6";
    Starttime, Endtime : Vstring;
-   Minimalist_With    : Boolean         := False;
 
    -- aflexend - terminate aflex
    --
@@ -42,6 +42,8 @@ package body Main_Body is
       Tblsiz : Integer;
    begin
       Termination_Status := Status;
+
+      Template_Manager.Cleanup;
 
       -- we'll return this value of the OS.
       if Is_Open (Skelfile) then
@@ -313,7 +315,7 @@ package body Main_Body is
       Gen_Line_Dirs      := True;
       Usemecs            := True;
       Useecs             := True;
-      Yylineno           := False;
+      Use_Yylineno       := False;
       Private_Package    := False;
 
       Use_Stdout := False;
@@ -400,8 +402,6 @@ package body Main_Body is
          Misc.Aflexerror ("full table and -I are (currently) incompatible");
       end if;
 
-      Skeleton_Manager.Initialize (not Minimalist_With);
-
       --initialize the statistics
       Starttime := Misc.Aflex_Gettime;
 
@@ -452,6 +452,7 @@ package body Main_Body is
 
       -- without a third argument create make an anonymous temp file.
       begin
+         Template_Manager.Cleanup;
          Create (Temp_Action_File, Out_File, "tmpact.miq");
          Create (Def_File, Out_File, "deffile.miq");
       exception

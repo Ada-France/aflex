@@ -27,7 +27,9 @@
 -- + Less GNAT warnings
 
 with Ada.Characters.Handling;
+with Ada.Strings.Fixed;
 with Misc, Main_Body, Int_Io, Calendar;
+with Ascan_DFA;
 
 package body Misc is
 
@@ -36,6 +38,7 @@ package body Misc is
    Unitname_Value   : Vstring;
    Lex_Filename     : Vstring;
    YYDecl_Name      : Vstring;
+   YYVar_Name       : Vstring;
 
    procedure Action_Out is
       Buf : Vstring;
@@ -332,8 +335,15 @@ package body Misc is
 
    procedure Set_Option (Opt : in Vstring) is
       Option : constant String := Str (Opt);
+      Pos    : constant Natural := Ada.Strings.Fixed.Index (Option, "=");
    begin
-      if Option = "case-sensitive" or Option = "casefull" then
+      if Pos > 0 then
+         if Option (Option'First .. Pos) = "bufsize=" then
+            Misc_Defs.YYBuf_Size := Natural'Value (Option (Pos + 1 .. Option'Last));
+         else
+            Synerr ("variable option '" & Option & "' is not recognized");
+         end if;
+      elsif Option = "case-sensitive" or Option = "casefull" then
          Misc_Defs.Caseins := False;
       elsif Option = "case-insensitive" or Option = "caseless" then
          Misc_Defs.Caseins := True;
@@ -346,7 +356,7 @@ package body Misc is
          Misc_Defs.Usemecs := False;
          Misc_Defs.Fulltbl := True;
       elsif Option = "yylineno" then
-         Misc_Defs.Yylineno := True;
+         Misc_Defs.Use_Yylineno := True;
       elsif Option = "nounput" then
          Misc_Defs.No_Unput := True;
       elsif Option = "unput" then
@@ -359,8 +369,10 @@ package body Misc is
          Misc_Defs.No_YYWrap := True;
       elsif Option = "yywrap" then
          Misc_Defs.No_YYWrap := False;
+      elsif Option = "recursive" then
+         Misc_Defs.Recursive := True;
       else
-         Aflexerror ("option '" & Option & "' is not recognized");
+         Synerr ("option '" & Option & "' is not recognized");
       end if;
    end Set_Option;
 
@@ -369,13 +381,26 @@ package body Misc is
       YYDecl_Name := Str;
    end Set_YYDecl;
 
-   function Get_YYLex_Declaration return String is
+   procedure Set_YYVar (Str : in Vstring) is
    begin
-      return "   " & Str (YYDecl_Name) & " is";
+      YYVar_Name := Str;
+   end Set_YYVar;
+
+   function Get_YYLex_Declaration return String is
+      Decl : constant String := Str (YYDecl_Name);
+   begin
+      if Decl'Length > 0 then
+         return "   " & Decl & " is";
+      else
+         return "";
+      end if;
    end Get_YYLex_Declaration;
 
    function Get_YYLex_Name return String is
       use Ada.Characters.Handling;
+
+      function Is_Alnum (C : Character) return Boolean
+        is (Is_Letter (C) or else C = '_' or else Is_Digit (C));
 
       Decl : constant String := Str (YYDecl_Name);
       Pos1 : Natural := Decl'First;
@@ -395,11 +420,21 @@ package body Misc is
          Pos1 := Pos1 + 1;
       end loop;
       Pos2 := Pos1;
-      while Pos2 <= Decl'Last and then Is_Letter (Decl (Pos2)) loop
+      while Pos2 <= Decl'Last and then Is_Alnum (Decl (Pos2)) loop
          Pos2 := Pos2 + 1;
       end loop;
       return Decl (Pos1 .. Pos2 - 1);
    end Get_YYLex_Name;
+
+   function Get_YYVar_Name return String is
+      Name : constant String := Str (YYVar_Name);
+   begin
+      if Name'Length = 0 then
+         return "Context";
+      else
+         return Name;
+      end if;
+   end Get_YYVar_Name;
 
    -- basename - find the basename of a file
    function Package_Name return String is
@@ -721,7 +756,10 @@ package body Misc is
       Syntaxerror := True;
       Put (Standard_Error, Lex_Filename);
       Text_Io.Put (Standard_Error, ":");
-      Put (Standard_Error, Integer'Image (Linenum));
+      --  Old Linenum is not reliable and wrong in most cases.
+      --  Put (Standard_Error, Integer'Image (Linenum));
+      --  Text_IO.Put (Standard_Error, ":");
+      Put (Standard_Error, Integer'Image (Ascan_DFA.YYlineno));
       Text_Io.Put (Standard_Error, ": syntax error: ");
       Text_Io.Put (Standard_Error, Str);
       Text_Io.New_Line (Standard_Error);

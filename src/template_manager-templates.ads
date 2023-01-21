@@ -1,13 +1,16 @@
 --  Advanced Resource Embedder 1.3.0
 package Template_Manager.Templates is
 
-   type Content_Array is array (Positive range <>) of access constant String;
-   type Content_Access is access constant Content_Array;
-
    body_dfa : aliased constant Content_Array;
    body_io : aliased constant Content_Array;
+   body_lex : aliased constant Content_Array;
+   body_recursive_dfa : aliased constant Content_Array;
+   body_recursive_io : aliased constant Content_Array;
+   body_recursive_lex : aliased constant Content_Array;
    spec_dfa : aliased constant Content_Array;
    spec_io : aliased constant Content_Array;
+   spec_recursive_dfa : aliased constant Content_Array;
+   spec_recursive_io : aliased constant Content_Array;
 
 private
 
@@ -107,566 +110,573 @@ private
        & "enerated by AFLEX.";
    L_42  : aliased constant String := "--           It is useless to modify it. "
        & "Change the "".Y"" & "".L"" files instead.";
-   L_43  : aliased constant String := "package body ${NAME}_IO is";
-   L_44  : aliased constant String := "";
-   L_45  : aliased constant String := "   --  gets input and stuffs it into 'buf"
+   L_43  : aliased constant String := "--  Template: templates/body-io.adb";
+   L_44  : aliased constant String := "package body ${NAME}_IO is";
+   L_45  : aliased constant String := "";
+   L_46  : aliased constant String := "   --  gets input and stuffs it into 'buf"
        & "'.  number of characters read, or YY_NULL,";
-   L_46  : aliased constant String := "   --  is returned in 'result'.";
-   L_47  : aliased constant String := "";
-   L_48  : aliased constant String := "   procedure YY_INPUT (buf      : out unb"
+   L_47  : aliased constant String := "   --  is returned in 'result'.";
+   L_48  : aliased constant String := "";
+   L_49  : aliased constant String := "   procedure YY_INPUT (buf      : out unb"
        & "ounded_character_array;";
-   L_49  : aliased constant String := "                       result   : out Int"
+   L_50  : aliased constant String := "                       result   : out Int"
        & "eger;";
-   L_50  : aliased constant String := "                       max_size : in Inte"
+   L_51  : aliased constant String := "                       max_size : in Inte"
        & "ger) is";
-   L_51  : aliased constant String := "      c   : Character;";
-   L_52  : aliased constant String := "      i   : Integer := 1;";
-   L_53  : aliased constant String := "      loc : Integer := buf'First;";
-   L_54  : aliased constant String := "%if error";
-   L_55  : aliased constant String := "   --    Since buf is an out parameter wh"
+   L_52  : aliased constant String := "      c   : Character;";
+   L_53  : aliased constant String := "      i   : Integer := 1;";
+   L_54  : aliased constant String := "      loc : Integer := buf'First;";
+   L_55  : aliased constant String := "%if error";
+   L_56  : aliased constant String := "   --    Since buf is an out parameter wh"
        & "ich is not readable";
-   L_56  : aliased constant String := "   --    and saved lines is a string poin"
+   L_57  : aliased constant String := "   --    and saved lines is a string poin"
        & "ter which space must";
-   L_57  : aliased constant String := "   --    be allocated after we know the s"
+   L_58  : aliased constant String := "   --    be allocated after we know the s"
        & "ize, we maintain";
-   L_58  : aliased constant String := "   --    an extra buffer to collect the i"
+   L_59  : aliased constant String := "   --    an extra buffer to collect the i"
        & "nput line and";
-   L_59  : aliased constant String := "   --    save it into the saved line 2.";
-   L_60  : aliased constant String := "      Temp_Line : String (1 .. YY_BUF_SIZ"
+   L_60  : aliased constant String := "   --    save it into the saved line 2.";
+   L_61  : aliased constant String := "      Temp_Line : String (1 .. YY_BUF_SIZ"
        & "E + 2);";
-   L_61  : aliased constant String := "%end";
-   L_62  : aliased constant String := "   begin";
-   L_63  : aliased constant String := "%if error";
-   L_64  : aliased constant String := "      -- buf := ( others => ASCII.NUL ); "
+   L_62  : aliased constant String := "%end";
+   L_63  : aliased constant String := "   begin";
+   L_64  : aliased constant String := "%if error";
+   L_65  : aliased constant String := "      -- buf := ( others => ASCII.NUL ); "
        & "-- CvdL: does not work in GNAT";
-   L_65  : aliased constant String := "      for j in buf'First .. buf'Last loop";
-   L_66  : aliased constant String := "         buf (j) := ASCII.NUL;";
-   L_67  : aliased constant String := "      end loop;";
-   L_68  : aliased constant String := "      -- Move the saved lines forward.";
-   L_69  : aliased constant String := "      Saved_Tok_Line1 := Saved_Tok_Line2;";
-   L_70  : aliased constant String := "      Line_Number_Of_Saved_Tok_Line1 := L"
+   L_66  : aliased constant String := "      for j in buf'First .. buf'Last loop";
+   L_67  : aliased constant String := "         buf (j) := ASCII.NUL;";
+   L_68  : aliased constant String := "      end loop;";
+   L_69  : aliased constant String := "      -- Move the saved lines forward.";
+   L_70  : aliased constant String := "      Saved_Tok_Line1 := Saved_Tok_Line2;";
+   L_71  : aliased constant String := "      Line_Number_Of_Saved_Tok_Line1 := L"
        & "ine_Number_Of_Saved_Tok_Line2;";
-   L_71  : aliased constant String := "%end";
-   L_72  : aliased constant String := "";
-   L_73  : aliased constant String := "      if Text_IO.Is_Open (user_input_file"
-       & ") then";
-   L_74  : aliased constant String := "         while i <= max_size loop";
-   L_75  : aliased constant String := "            --  Ada ate our newline, put "
+   L_72  : aliased constant String := "%end";
+   L_73  : aliased constant String := "";
+   L_74  : aliased constant String := "      if Ada.Text_IO.Is_Open (user_input_"
+       & "file) then";
+   L_75  : aliased constant String := "         while i <= max_size loop";
+   L_76  : aliased constant String := "            --  Ada ate our newline, put "
        & "it back on the end.";
-   L_76  : aliased constant String := "            if Text_IO.End_Of_Line (user_"
-       & "input_file) then";
-   L_77  : aliased constant String := "               buf (loc) := ASCII.LF;";
-   L_78  : aliased constant String := "               Text_IO.Skip_Line (user_in"
-       & "put_file, 1);";
-   L_79  : aliased constant String := "%if error";
-   L_80  : aliased constant String := "               --   We try to get one lin"
+   L_77  : aliased constant String := "            if Ada.Text_IO.End_Of_Line (u"
+       & "ser_input_file) then";
+   L_78  : aliased constant String := "               buf (loc) := ASCII.LF;";
+   L_79  : aliased constant String := "               Ada.Text_IO.Skip_Line (use"
+       & "r_input_file, 1);";
+   L_80  : aliased constant String := "%if error";
+   L_81  : aliased constant String := "               --   We try to get one lin"
        & "e by one line. So we return";
-   L_81  : aliased constant String := "               --   here because we saw t"
+   L_82  : aliased constant String := "               --   here because we saw t"
        & "he end_of_line.";
-   L_82  : aliased constant String := "               result := i;";
-   L_83  : aliased constant String := "               Temp_Line (i) := ASCII.LF;";
-   L_84  : aliased constant String := "               Saved_Tok_Line2 := new Str"
+   L_83  : aliased constant String := "               result := i;";
+   L_84  : aliased constant String := "               Temp_Line (i) := ASCII.LF;";
+   L_85  : aliased constant String := "               Saved_Tok_Line2 := new Str"
        & "ing (1 .. i);";
-   L_85  : aliased constant String := "               Saved_Tok_Line2 (1 .. i) :"
+   L_86  : aliased constant String := "               Saved_Tok_Line2 (1 .. i) :"
        & "= Temp_Line (1 .. i);";
-   L_86  : aliased constant String := "               Line_Number_Of_Saved_Tok_L"
+   L_87  : aliased constant String := "               Line_Number_Of_Saved_Tok_L"
        & "ine2 := Line_Number_Of_Saved_Tok_Line1 + 1;";
-   L_87  : aliased constant String := "               return;";
-   L_88  : aliased constant String := "%end";
-   L_89  : aliased constant String := "%if interactive";
-   L_90  : aliased constant String := "               i := i + 1; --  update cou"
+   L_88  : aliased constant String := "               return;";
+   L_89  : aliased constant String := "%end";
+   L_90  : aliased constant String := "%if interactive";
+   L_91  : aliased constant String := "               i := i + 1; --  update cou"
        & "nter, miss end of loop";
-   L_91  : aliased constant String := "               exit; --  in interactive m"
+   L_92  : aliased constant String := "               exit; --  in interactive m"
        & "ode return at end of line.";
-   L_92  : aliased constant String := "%end";
-   L_93  : aliased constant String := "            else";
-   L_94  : aliased constant String := "               --  UCI CODES CHANGED:";
-   L_95  : aliased constant String := "               --    The following codes "
+   L_93  : aliased constant String := "%end";
+   L_94  : aliased constant String := "            else";
+   L_95  : aliased constant String := "               --  UCI CODES CHANGED:";
+   L_96  : aliased constant String := "               --    The following codes "
        & "are modified. Previous codes is commented out.";
-   L_96  : aliased constant String := "               --    The purpose of doing"
+   L_97  : aliased constant String := "               --    The purpose of doing"
        & " this is to make it possible to set Temp_Line";
-   L_97  : aliased constant String := "               --    in Ayacc-extension s"
+   L_98  : aliased constant String := "               --    in Ayacc-extension s"
        & "pecific codes. Definitely, we can read the character";
-   L_98  : aliased constant String := "               --    into the Temp_Line a"
+   L_99  : aliased constant String := "               --    into the Temp_Line a"
        & "nd then set the buf. But Temp_Line will only";
-   L_99  : aliased constant String := "               --    be used in Ayacc-ext"
+   L_100 : aliased constant String := "               --    be used in Ayacc-ext"
        & "ension specific codes which makes";
-   L_100 : aliased constant String := "               --    this approach imposs"
+   L_101 : aliased constant String := "               --    this approach imposs"
        & "ible.";
-   L_101 : aliased constant String := "               Text_IO.Get (user_input_fi"
-       & "le, c);";
-   L_102 : aliased constant String := "               buf (loc) := c;";
-   L_103 : aliased constant String := "--             Text_IO.Get (user_input_fi"
-       & "le, buf (loc));";
-   L_104 : aliased constant String := "%if error";
-   L_105 : aliased constant String := "               Temp_Line (i) := c;";
-   L_106 : aliased constant String := "%end";
-   L_107 : aliased constant String := "            end if;";
-   L_108 : aliased constant String := "";
-   L_109 : aliased constant String := "            loc := loc + 1;";
-   L_110 : aliased constant String := "            i := i + 1;";
-   L_111 : aliased constant String := "         end loop;";
-   L_112 : aliased constant String := "      else";
-   L_113 : aliased constant String := "         while i <= max_size loop";
-   L_114 : aliased constant String := "            if Text_IO.End_Of_Line then -"
-       & "- Ada ate our newline, put it back on the end.";
-   L_115 : aliased constant String := "               buf (loc) := ASCII.LF;";
-   L_116 : aliased constant String := "               Text_IO.Skip_Line (1);";
-   L_117 : aliased constant String := "%if error";
-   L_118 : aliased constant String := "               --   We try to get one lin"
+   L_102 : aliased constant String := "               Ada.Text_IO.Get (user_inpu"
+       & "t_file, c);";
+   L_103 : aliased constant String := "               buf (loc) := c;";
+   L_104 : aliased constant String := "--             Ada.Text_IO.Get (user_inpu"
+       & "t_file, buf (loc));";
+   L_105 : aliased constant String := "%if error";
+   L_106 : aliased constant String := "               Temp_Line (i) := c;";
+   L_107 : aliased constant String := "%end";
+   L_108 : aliased constant String := "            end if;";
+   L_109 : aliased constant String := "";
+   L_110 : aliased constant String := "            loc := loc + 1;";
+   L_111 : aliased constant String := "            i := i + 1;";
+   L_112 : aliased constant String := "         end loop;";
+   L_113 : aliased constant String := "      else";
+   L_114 : aliased constant String := "         while i <= max_size loop";
+   L_115 : aliased constant String := "            if Ada.Text_IO.End_Of_Line th"
+       & "en -- Ada ate our newline, put it back on the end.";
+   L_116 : aliased constant String := "               buf (loc) := ASCII.LF;";
+   L_117 : aliased constant String := "               Ada.Text_IO.Skip_Line (1);";
+   L_118 : aliased constant String := "%if error";
+   L_119 : aliased constant String := "               --   We try to get one lin"
        & "e by one line. So we return";
-   L_119 : aliased constant String := "               --   here because we saw t"
+   L_120 : aliased constant String := "               --   here because we saw t"
        & "he end_of_line.";
-   L_120 : aliased constant String := "               result := i;";
-   L_121 : aliased constant String := "               Temp_Line (i) := ASCII.LF;";
-   L_122 : aliased constant String := "               Saved_Tok_Line2 := new Str"
+   L_121 : aliased constant String := "               result := i;";
+   L_122 : aliased constant String := "               Temp_Line (i) := ASCII.LF;";
+   L_123 : aliased constant String := "               Saved_Tok_Line2 := new Str"
        & "ing (1 .. i);";
-   L_123 : aliased constant String := "               Saved_Tok_Line2 (1 .. i) :"
+   L_124 : aliased constant String := "               Saved_Tok_Line2 (1 .. i) :"
        & "= Temp_Line (1 .. i);";
-   L_124 : aliased constant String := "               Line_Number_Of_Saved_Tok_L"
+   L_125 : aliased constant String := "               Line_Number_Of_Saved_Tok_L"
        & "ine2 := Line_Number_Of_Saved_Tok_Line1 + 1;";
-   L_125 : aliased constant String := "               return;";
-   L_126 : aliased constant String := "%end";
-   L_127 : aliased constant String := "";
-   L_128 : aliased constant String := "            else";
-   L_129 : aliased constant String := "               --  The following codes ar"
+   L_126 : aliased constant String := "               return;";
+   L_127 : aliased constant String := "%end";
+   L_128 : aliased constant String := "";
+   L_129 : aliased constant String := "            else";
+   L_130 : aliased constant String := "               --  The following codes ar"
        & "e modified. Previous codes is commented out.";
-   L_130 : aliased constant String := "               --  The purpose of doing t"
+   L_131 : aliased constant String := "               --  The purpose of doing t"
        & "his is to make it possible to set Temp_Line";
-   L_131 : aliased constant String := "               --  in Ayacc-extension spe"
+   L_132 : aliased constant String := "               --  in Ayacc-extension spe"
        & "cific codes. Definitely, we can read the character";
-   L_132 : aliased constant String := "               --  into the Temp_Line and"
+   L_133 : aliased constant String := "               --  into the Temp_Line and"
        & " then set the buf. But Temp_Line will only";
-   L_133 : aliased constant String := "               --  be used in Ayacc-exten"
+   L_134 : aliased constant String := "               --  be used in Ayacc-exten"
        & "sion specific codes which makes this approach impossible.";
-   L_134 : aliased constant String := "               Text_IO.Get (c);";
-   L_135 : aliased constant String := "               buf (loc) := c;";
-   L_136 : aliased constant String := "               --         get (buf (loc))"
+   L_135 : aliased constant String := "               Ada.Text_IO.Get (c);";
+   L_136 : aliased constant String := "               buf (loc) := c;";
+   L_137 : aliased constant String := "               --         get (buf (loc))"
        & ";";
-   L_137 : aliased constant String := "%if error";
-   L_138 : aliased constant String := "               Temp_Line (i) := c;";
-   L_139 : aliased constant String := "%end";
-   L_140 : aliased constant String := "            end if;";
-   L_141 : aliased constant String := "";
-   L_142 : aliased constant String := "            loc := loc + 1;";
-   L_143 : aliased constant String := "            i := i + 1;";
-   L_144 : aliased constant String := "         end loop;";
-   L_145 : aliased constant String := "      end if; --  for input file being st"
+   L_138 : aliased constant String := "%if error";
+   L_139 : aliased constant String := "               Temp_Line (i) := c;";
+   L_140 : aliased constant String := "%end";
+   L_141 : aliased constant String := "            end if;";
+   L_142 : aliased constant String := "";
+   L_143 : aliased constant String := "            loc := loc + 1;";
+   L_144 : aliased constant String := "            i := i + 1;";
+   L_145 : aliased constant String := "         end loop;";
+   L_146 : aliased constant String := "      end if; --  for input file being st"
        & "andard input";
-   L_146 : aliased constant String := "      result := i - 1;";
-   L_147 : aliased constant String := "";
-   L_148 : aliased constant String := "%if error";
-   L_149 : aliased constant String := "      --  Since we get one line by one li"
+   L_147 : aliased constant String := "      result := i - 1;";
+   L_148 : aliased constant String := "";
+   L_149 : aliased constant String := "%if error";
+   L_150 : aliased constant String := "      --  Since we get one line by one li"
        & "ne, if we";
-   L_150 : aliased constant String := "      --  reach here, it means that curre"
+   L_151 : aliased constant String := "      --  reach here, it means that curre"
        & "nt line have";
-   L_151 : aliased constant String := "      --  more that max_size characters. "
+   L_152 : aliased constant String := "      --  more that max_size characters. "
        & "So it is";
-   L_152 : aliased constant String := "      --  impossible to hold the whole li"
+   L_153 : aliased constant String := "      --  impossible to hold the whole li"
        & "ne. We";
-   L_153 : aliased constant String := "      --  report the warning message and "
+   L_154 : aliased constant String := "      --  report the warning message and "
        & "continue.";
-   L_154 : aliased constant String := "      buf (loc - 1) := Ascii.LF;";
-   L_155 : aliased constant String := "      if Text_IO.Is_Open (user_input_file"
-       & ") then";
-   L_156 : aliased constant String := "         Text_IO.Skip_Line (user_input_fi"
-       & "le, 1);";
-   L_157 : aliased constant String := "      else";
-   L_158 : aliased constant String := "         Text_IO.Skip_Line (1);";
-   L_159 : aliased constant String := "      end if;";
-   L_160 : aliased constant String := "      Temp_Line (i - 1) := ASCII.LF;";
-   L_161 : aliased constant String := "      Saved_Tok_Line2 := new String (1 .."
+   L_155 : aliased constant String := "      buf (loc - 1) := Ascii.LF;";
+   L_156 : aliased constant String := "      if Ada.Text_IO.Is_Open (user_input_"
+       & "file) then";
+   L_157 : aliased constant String := "         Ada.Text_IO.Skip_Line (user_inpu"
+       & "t_file, 1);";
+   L_158 : aliased constant String := "      else";
+   L_159 : aliased constant String := "         Ada.Text_IO.Skip_Line (1);";
+   L_160 : aliased constant String := "      end if;";
+   L_161 : aliased constant String := "      Temp_Line (i - 1) := ASCII.LF;";
+   L_162 : aliased constant String := "      Saved_Tok_Line2 := new String (1 .."
        & " i - 1);";
-   L_162 : aliased constant String := "      Saved_Tok_Line2 (1 .. i - 1) := Tem"
+   L_163 : aliased constant String := "      Saved_Tok_Line2 (1 .. i - 1) := Tem"
        & "p_Line (1 .. i - 1);";
-   L_163 : aliased constant String := "      Line_Number_Of_Saved_Tok_Line2 := L"
+   L_164 : aliased constant String := "      Line_Number_Of_Saved_Tok_Line2 := L"
        & "ine_Number_Of_Saved_Tok_Line1 + 1;";
-   L_164 : aliased constant String := "      Put_Line (""Input line """;
-   L_165 : aliased constant String := "                & Integer'Image ( Line_Nu"
+   L_165 : aliased constant String := "      Put_Line (""Input line """;
+   L_166 : aliased constant String := "                & Integer'Image ( Line_Nu"
        & "mber_Of_Saved_Tok_Line2 )";
-   L_166 : aliased constant String := "                & ""has more than """;
-   L_167 : aliased constant String := "                & Integer'Image ( max_siz"
+   L_167 : aliased constant String := "                & ""has more than """;
+   L_168 : aliased constant String := "                & Integer'Image ( max_siz"
        & "e )";
-   L_168 : aliased constant String := "                & "" characters, ... trun"
+   L_169 : aliased constant String := "                & "" characters, ... trun"
        & "cated."" );";
-   L_169 : aliased constant String := "%end";
-   L_170 : aliased constant String := "   exception";
-   L_171 : aliased constant String := "      when Text_IO.End_Error =>";
-   L_172 : aliased constant String := "         result := i - 1;";
-   L_173 : aliased constant String := "         --  when we hit EOF we need to s"
+   L_170 : aliased constant String := "%end";
+   L_171 : aliased constant String := "   exception";
+   L_172 : aliased constant String := "      when Ada.Text_IO.End_Error =>";
+   L_173 : aliased constant String := "         result := i - 1;";
+   L_174 : aliased constant String := "         --  when we hit EOF we need to s"
        & "et yy_eof_has_been_seen";
-   L_174 : aliased constant String := "         yy_eof_has_been_seen := True;";
-   L_175 : aliased constant String := "%if error";
-   L_176 : aliased constant String := "         --   Processing incomplete line.";
-   L_177 : aliased constant String := "         if i /= 1 then";
-   L_178 : aliased constant String := "            -- Current line is not empty "
+   L_175 : aliased constant String := "         yy_eof_has_been_seen := True;";
+   L_176 : aliased constant String := "%if error";
+   L_177 : aliased constant String := "         --   Processing incomplete line.";
+   L_178 : aliased constant String := "         if i /= 1 then";
+   L_179 : aliased constant String := "            -- Current line is not empty "
        & "but do not have end_of_line.";
-   L_179 : aliased constant String := "            -- So current line is incompl"
+   L_180 : aliased constant String := "            -- So current line is incompl"
        & "ete line. But we still need";
-   L_180 : aliased constant String := "            -- to save it.";
-   L_181 : aliased constant String := "            Saved_Tok_Line2 := new String"
+   L_181 : aliased constant String := "            -- to save it.";
+   L_182 : aliased constant String := "            Saved_Tok_Line2 := new String"
        & " (1 .. i - 1);";
-   L_182 : aliased constant String := "            Saved_Tok_Line2 (1 .. i - 1) "
+   L_183 : aliased constant String := "            Saved_Tok_Line2 (1 .. i - 1) "
        & ":= Temp_Line (1 .. i - 1);";
-   L_183 : aliased constant String := "            Line_Number_Of_Saved_Tok_Line"
+   L_184 : aliased constant String := "            Line_Number_Of_Saved_Tok_Line"
        & "2 := Line_Number_Of_Saved_Tok_Line1 + 1;";
-   L_184 : aliased constant String := "         end if;";
-   L_185 : aliased constant String := "%end";
-   L_186 : aliased constant String := "   end YY_INPUT;";
-   L_187 : aliased constant String := "";
-   L_188 : aliased constant String := "   --  yy_get_next_buffer - try to read i"
+   L_185 : aliased constant String := "         end if;";
+   L_186 : aliased constant String := "%end";
+   L_187 : aliased constant String := "   end YY_INPUT;";
+   L_188 : aliased constant String := "";
+   L_189 : aliased constant String := "   --  yy_get_next_buffer - try to read i"
        & "n new buffer";
-   L_189 : aliased constant String := "   --";
-   L_190 : aliased constant String := "   --  returns a code representing an act"
+   L_190 : aliased constant String := "   --";
+   L_191 : aliased constant String := "   --  returns a code representing an act"
        & "ion";
-   L_191 : aliased constant String := "   --     EOB_ACT_LAST_MATCH -";
-   L_192 : aliased constant String := "   --     EOB_ACT_RESTART_SCAN - restart "
+   L_192 : aliased constant String := "   --     EOB_ACT_LAST_MATCH -";
+   L_193 : aliased constant String := "   --     EOB_ACT_RESTART_SCAN - restart "
        & "the scanner";
-   L_193 : aliased constant String := "   --     EOB_ACT_END_OF_FILE - end of fi"
+   L_194 : aliased constant String := "   --     EOB_ACT_END_OF_FILE - end of fi"
        & "le";
-   L_194 : aliased constant String := "";
-   L_195 : aliased constant String := "   function yy_get_next_buffer return eob"
+   L_195 : aliased constant String := "";
+   L_196 : aliased constant String := "   function yy_get_next_buffer return eob"
        & "_action_type is";
-   L_196 : aliased constant String := "      dest           : Integer := 0;";
-   L_197 : aliased constant String := "      source         : Integer := yytext_"
+   L_197 : aliased constant String := "      dest           : Integer := 0;";
+   L_198 : aliased constant String := "      source         : Integer := yytext_"
        & "ptr - 1; -- copy prev. char, too";
-   L_198 : aliased constant String := "      number_to_move : Integer;";
-   L_199 : aliased constant String := "      ret_val        : eob_action_type;";
-   L_200 : aliased constant String := "      num_to_read    : Integer;";
-   L_201 : aliased constant String := "   begin";
-   L_202 : aliased constant String := "      if yy_c_buf_p > yy_n_chars + 1 then";
-   L_203 : aliased constant String := "         raise NULL_IN_INPUT;";
-   L_204 : aliased constant String := "      end if;";
-   L_205 : aliased constant String := "";
-   L_206 : aliased constant String := "      --  try to read more data";
-   L_207 : aliased constant String := "";
-   L_208 : aliased constant String := "      --  first move last chars to start "
+   L_199 : aliased constant String := "      number_to_move : Integer;";
+   L_200 : aliased constant String := "      ret_val        : eob_action_type;";
+   L_201 : aliased constant String := "      num_to_read    : Integer;";
+   L_202 : aliased constant String := "   begin";
+   L_203 : aliased constant String := "      if yy_c_buf_p > yy_n_chars + 1 then";
+   L_204 : aliased constant String := "         raise NULL_IN_INPUT;";
+   L_205 : aliased constant String := "      end if;";
+   L_206 : aliased constant String := "";
+   L_207 : aliased constant String := "      --  try to read more data";
+   L_208 : aliased constant String := "";
+   L_209 : aliased constant String := "      --  first move last chars to start "
        & "of buffer";
-   L_209 : aliased constant String := "      number_to_move := yy_c_buf_p - yyte"
+   L_210 : aliased constant String := "      number_to_move := yy_c_buf_p - yyte"
        & "xt_ptr;";
-   L_210 : aliased constant String := "";
-   L_211 : aliased constant String := "      for i in 0 .. number_to_move - 1 lo"
+   L_211 : aliased constant String := "";
+   L_212 : aliased constant String := "      for i in 0 .. number_to_move - 1 lo"
        & "op";
-   L_212 : aliased constant String := "         yy_ch_buf (dest) := yy_ch_buf (s"
+   L_213 : aliased constant String := "         yy_ch_buf (dest) := yy_ch_buf (s"
        & "ource);";
-   L_213 : aliased constant String := "         dest := dest + 1;";
-   L_214 : aliased constant String := "         source := source + 1;";
-   L_215 : aliased constant String := "      end loop;";
-   L_216 : aliased constant String := "";
-   L_217 : aliased constant String := "      if yy_eof_has_been_seen then";
-   L_218 : aliased constant String := "         --  don't do the read, it's not "
+   L_214 : aliased constant String := "         dest := dest + 1;";
+   L_215 : aliased constant String := "         source := source + 1;";
+   L_216 : aliased constant String := "      end loop;";
+   L_217 : aliased constant String := "";
+   L_218 : aliased constant String := "      if yy_eof_has_been_seen then";
+   L_219 : aliased constant String := "         --  don't do the read, it's not "
        & "guaranteed to return an EOF,";
-   L_219 : aliased constant String := "         --  just force an EOF";
-   L_220 : aliased constant String := "";
-   L_221 : aliased constant String := "         yy_n_chars := 0;";
-   L_222 : aliased constant String := "      else";
-   L_223 : aliased constant String := "         num_to_read := YY_BUF_SIZE - num"
+   L_220 : aliased constant String := "         --  just force an EOF";
+   L_221 : aliased constant String := "";
+   L_222 : aliased constant String := "         yy_n_chars := 0;";
+   L_223 : aliased constant String := "      else";
+   L_224 : aliased constant String := "         num_to_read := YY_BUF_SIZE - num"
        & "ber_to_move - 1;";
-   L_224 : aliased constant String := "";
-   L_225 : aliased constant String := "         if num_to_read > YY_READ_BUF_SIZ"
+   L_225 : aliased constant String := "";
+   L_226 : aliased constant String := "         if num_to_read > YY_READ_BUF_SIZ"
        & "E then";
-   L_226 : aliased constant String := "            num_to_read := YY_READ_BUF_SI"
+   L_227 : aliased constant String := "            num_to_read := YY_READ_BUF_SI"
        & "ZE;";
-   L_227 : aliased constant String := "         end if;";
-   L_228 : aliased constant String := "";
-   L_229 : aliased constant String := "         --  read in more data";
-   L_230 : aliased constant String := "         YY_INPUT (yy_ch_buf (number_to_m"
+   L_228 : aliased constant String := "         end if;";
+   L_229 : aliased constant String := "";
+   L_230 : aliased constant String := "         --  read in more data";
+   L_231 : aliased constant String := "         YY_INPUT (yy_ch_buf (number_to_m"
        & "ove .. yy_ch_buf'Last), yy_n_chars, num_to_read);";
-   L_231 : aliased constant String := "      end if;";
-   L_232 : aliased constant String := "      if yy_n_chars = 0 then";
-   L_233 : aliased constant String := "         if number_to_move = 1 then";
-   L_234 : aliased constant String := "            ret_val := EOB_ACT_END_OF_FIL"
+   L_232 : aliased constant String := "      end if;";
+   L_233 : aliased constant String := "      if yy_n_chars = 0 then";
+   L_234 : aliased constant String := "         if number_to_move = 1 then";
+   L_235 : aliased constant String := "            ret_val := EOB_ACT_END_OF_FIL"
        & "E;";
-   L_235 : aliased constant String := "         else";
-   L_236 : aliased constant String := "            ret_val := EOB_ACT_LAST_MATCH"
+   L_236 : aliased constant String := "         else";
+   L_237 : aliased constant String := "            ret_val := EOB_ACT_LAST_MATCH"
        & ";";
-   L_237 : aliased constant String := "         end if;";
-   L_238 : aliased constant String := "";
-   L_239 : aliased constant String := "         yy_eof_has_been_seen := True;";
-   L_240 : aliased constant String := "      else";
-   L_241 : aliased constant String := "         ret_val := EOB_ACT_RESTART_SCAN;";
-   L_242 : aliased constant String := "      end if;";
-   L_243 : aliased constant String := "";
-   L_244 : aliased constant String := "      yy_n_chars := yy_n_chars + number_t"
+   L_238 : aliased constant String := "         end if;";
+   L_239 : aliased constant String := "";
+   L_240 : aliased constant String := "         yy_eof_has_been_seen := True;";
+   L_241 : aliased constant String := "      else";
+   L_242 : aliased constant String := "         ret_val := EOB_ACT_RESTART_SCAN;";
+   L_243 : aliased constant String := "      end if;";
+   L_244 : aliased constant String := "";
+   L_245 : aliased constant String := "      yy_n_chars := yy_n_chars + number_t"
        & "o_move;";
-   L_245 : aliased constant String := "      yy_ch_buf (yy_n_chars) := YY_END_OF"
+   L_246 : aliased constant String := "      yy_ch_buf (yy_n_chars) := YY_END_OF"
        & "_BUFFER_CHAR;";
-   L_246 : aliased constant String := "      yy_ch_buf (yy_n_chars + 1) := YY_EN"
+   L_247 : aliased constant String := "      yy_ch_buf (yy_n_chars + 1) := YY_EN"
        & "D_OF_BUFFER_CHAR;";
-   L_247 : aliased constant String := "";
-   L_248 : aliased constant String := "      --  yytext begins at the second cha"
+   L_248 : aliased constant String := "";
+   L_249 : aliased constant String := "      --  yytext begins at the second cha"
        & "racter in";
-   L_249 : aliased constant String := "      --  yy_ch_buf; the first character "
+   L_250 : aliased constant String := "      --  yy_ch_buf; the first character "
        & "is the one which";
-   L_250 : aliased constant String := "      --  preceded it before reading in t"
+   L_251 : aliased constant String := "      --  preceded it before reading in t"
        & "he latest buffer;";
-   L_251 : aliased constant String := "      --  it needs to be kept around in c"
+   L_252 : aliased constant String := "      --  it needs to be kept around in c"
        & "ase it's a";
-   L_252 : aliased constant String := "      --  newline, so yy_get_previous_sta"
+   L_253 : aliased constant String := "      --  newline, so yy_get_previous_sta"
        & "te() will have";
-   L_253 : aliased constant String := "      --  with '^' rules active";
-   L_254 : aliased constant String := "";
-   L_255 : aliased constant String := "      yytext_ptr := 1;";
-   L_256 : aliased constant String := "";
-   L_257 : aliased constant String := "      return ret_val;";
-   L_258 : aliased constant String := "   end yy_get_next_buffer;";
-   L_259 : aliased constant String := "";
-   L_260 : aliased constant String := "%if unput";
-   L_261 : aliased constant String := "   procedure yyUnput (c : Character; yy_b"
+   L_254 : aliased constant String := "      --  with '^' rules active";
+   L_255 : aliased constant String := "";
+   L_256 : aliased constant String := "      yytext_ptr := 1;";
+   L_257 : aliased constant String := "";
+   L_258 : aliased constant String := "      return ret_val;";
+   L_259 : aliased constant String := "   end yy_get_next_buffer;";
+   L_260 : aliased constant String := "";
+   L_261 : aliased constant String := "%if unput";
+   L_262 : aliased constant String := "   procedure yyUnput (c : Character; yy_b"
        & "p : in out Integer) is";
-   L_262 : aliased constant String := "      number_to_move : Integer;";
-   L_263 : aliased constant String := "      dest : Integer;";
-   L_264 : aliased constant String := "      source : Integer;";
-   L_265 : aliased constant String := "      tmp_yy_cp : Integer;";
-   L_266 : aliased constant String := "   begin";
-   L_267 : aliased constant String := "      tmp_yy_cp := yy_c_buf_p;";
-   L_268 : aliased constant String := "      yy_ch_buf (tmp_yy_cp) := yy_hold_ch"
+   L_263 : aliased constant String := "      number_to_move : Integer;";
+   L_264 : aliased constant String := "      dest : Integer;";
+   L_265 : aliased constant String := "      source : Integer;";
+   L_266 : aliased constant String := "      tmp_yy_cp : Integer;";
+   L_267 : aliased constant String := "   begin";
+   L_268 : aliased constant String := "      tmp_yy_cp := yy_c_buf_p;";
+   L_269 : aliased constant String := "      yy_ch_buf (tmp_yy_cp) := yy_hold_ch"
        & "ar; --  undo effects of setting up yytext";
-   L_269 : aliased constant String := "";
-   L_270 : aliased constant String := "      if tmp_yy_cp < 2 then";
-   L_271 : aliased constant String := "         --  need to shift things up to m"
+   L_270 : aliased constant String := "";
+   L_271 : aliased constant String := "      if tmp_yy_cp < 2 then";
+   L_272 : aliased constant String := "         --  need to shift things up to m"
        & "ake room";
-   L_272 : aliased constant String := "         number_to_move := yy_n_chars + 2"
+   L_273 : aliased constant String := "         number_to_move := yy_n_chars + 2"
        & "; --  +2 for EOB chars";
-   L_273 : aliased constant String := "         dest := YY_BUF_SIZE + 2;";
-   L_274 : aliased constant String := "         source := number_to_move;";
-   L_275 : aliased constant String := "";
-   L_276 : aliased constant String := "         while source > 0 loop";
-   L_277 : aliased constant String := "            dest := dest - 1;";
-   L_278 : aliased constant String := "            source := source - 1;";
-   L_279 : aliased constant String := "            yy_ch_buf (dest) := yy_ch_buf"
+   L_274 : aliased constant String := "         dest := YY_BUF_SIZE + 2;";
+   L_275 : aliased constant String := "         source := number_to_move;";
+   L_276 : aliased constant String := "";
+   L_277 : aliased constant String := "         while source > 0 loop";
+   L_278 : aliased constant String := "            dest := dest - 1;";
+   L_279 : aliased constant String := "            source := source - 1;";
+   L_280 : aliased constant String := "            yy_ch_buf (dest) := yy_ch_buf"
        & " (source);";
-   L_280 : aliased constant String := "         end loop;";
-   L_281 : aliased constant String := "";
-   L_282 : aliased constant String := "         tmp_yy_cp := tmp_yy_cp + dest - "
+   L_281 : aliased constant String := "         end loop;";
+   L_282 : aliased constant String := "";
+   L_283 : aliased constant String := "         tmp_yy_cp := tmp_yy_cp + dest - "
        & "source;";
-   L_283 : aliased constant String := "         yy_bp := yy_bp + dest - source;";
-   L_284 : aliased constant String := "         yy_n_chars := YY_BUF_SIZE;";
-   L_285 : aliased constant String := "";
-   L_286 : aliased constant String := "         if tmp_yy_cp < 2 then";
-   L_287 : aliased constant String := "            raise PUSHBACK_OVERFLOW;";
-   L_288 : aliased constant String := "         end if;";
-   L_289 : aliased constant String := "      end if;";
-   L_290 : aliased constant String := "";
-   L_291 : aliased constant String := "      if tmp_yy_cp > yy_bp and then yy_ch"
+   L_284 : aliased constant String := "         yy_bp := yy_bp + dest - source;";
+   L_285 : aliased constant String := "         yy_n_chars := YY_BUF_SIZE;";
+   L_286 : aliased constant String := "";
+   L_287 : aliased constant String := "         if tmp_yy_cp < 2 then";
+   L_288 : aliased constant String := "            raise PUSHBACK_OVERFLOW;";
+   L_289 : aliased constant String := "         end if;";
+   L_290 : aliased constant String := "      end if;";
+   L_291 : aliased constant String := "";
+   L_292 : aliased constant String := "      if tmp_yy_cp > yy_bp and then yy_ch"
        & "_buf (tmp_yy_cp - 1) = ASCII.LF then";
-   L_292 : aliased constant String := "         yy_ch_buf (tmp_yy_cp - 2) := ASC"
+   L_293 : aliased constant String := "         yy_ch_buf (tmp_yy_cp - 2) := ASC"
        & "II.LF;";
-   L_293 : aliased constant String := "      end if;";
-   L_294 : aliased constant String := "";
-   L_295 : aliased constant String := "      tmp_yy_cp := tmp_yy_cp - 1;";
-   L_296 : aliased constant String := "      yy_ch_buf (tmp_yy_cp) := c;";
-   L_297 : aliased constant String := "";
-   L_298 : aliased constant String := "      --  Note:  this code is the text of"
+   L_294 : aliased constant String := "      end if;";
+   L_295 : aliased constant String := "";
+   L_296 : aliased constant String := "      tmp_yy_cp := tmp_yy_cp - 1;";
+   L_297 : aliased constant String := "      yy_ch_buf (tmp_yy_cp) := c;";
+   L_298 : aliased constant String := "";
+   L_299 : aliased constant String := "      --  Note:  this code is the text of"
        & " YY_DO_BEFORE_ACTION, only";
-   L_299 : aliased constant String := "      --         here we get different yy"
+   L_300 : aliased constant String := "      --         here we get different yy"
        & "_cp and yy_bp's";
-   L_300 : aliased constant String := "      yytext_ptr := yy_bp;";
-   L_301 : aliased constant String := "      yy_hold_char := yy_ch_buf (tmp_yy_c"
+   L_301 : aliased constant String := "      yytext_ptr := yy_bp;";
+   L_302 : aliased constant String := "      yy_hold_char := yy_ch_buf (tmp_yy_c"
        & "p);";
-   L_302 : aliased constant String := "      yy_ch_buf (tmp_yy_cp) := ASCII.NUL;";
-   L_303 : aliased constant String := "      yy_c_buf_p := tmp_yy_cp;";
-   L_304 : aliased constant String := "   end yyUnput;";
-   L_305 : aliased constant String := "";
-   L_306 : aliased constant String := "   procedure Unput (c : Character) is";
-   L_307 : aliased constant String := "   begin";
-   L_308 : aliased constant String := "      yyUnput (c, yy_bp);";
-   L_309 : aliased constant String := "   end Unput;";
-   L_310 : aliased constant String := "%end";
-   L_311 : aliased constant String := "";
-   L_312 : aliased constant String := "   function Input return Character is";
-   L_313 : aliased constant String := "      c : Character;";
-   L_314 : aliased constant String := "   begin";
-   L_315 : aliased constant String := "      yy_ch_buf (yy_c_buf_p) := yy_hold_c"
+   L_303 : aliased constant String := "      yy_ch_buf (tmp_yy_cp) := ASCII.NUL;";
+   L_304 : aliased constant String := "      yy_c_buf_p := tmp_yy_cp;";
+   L_305 : aliased constant String := "   end yyUnput;";
+   L_306 : aliased constant String := "";
+   L_307 : aliased constant String := "   procedure Unput (c : Character) is";
+   L_308 : aliased constant String := "   begin";
+   L_309 : aliased constant String := "      yyUnput (c, yy_bp);";
+   L_310 : aliased constant String := "   end Unput;";
+   L_311 : aliased constant String := "%end";
+   L_312 : aliased constant String := "";
+   L_313 : aliased constant String := "   function Input return Character is";
+   L_314 : aliased constant String := "      c : Character;";
+   L_315 : aliased constant String := "   begin";
+   L_316 : aliased constant String := "      yy_ch_buf (yy_c_buf_p) := yy_hold_c"
        & "har;";
-   L_316 : aliased constant String := "";
-   L_317 : aliased constant String := "      if yy_ch_buf (yy_c_buf_p) = YY_END_"
+   L_317 : aliased constant String := "";
+   L_318 : aliased constant String := "      if yy_ch_buf (yy_c_buf_p) = YY_END_"
        & "OF_BUFFER_CHAR then";
-   L_318 : aliased constant String := "         --  need more input";
-   L_319 : aliased constant String := "         yytext_ptr := yy_c_buf_p;";
-   L_320 : aliased constant String := "         yy_c_buf_p := yy_c_buf_p + 1;";
-   L_321 : aliased constant String := "";
-   L_322 : aliased constant String := "         case yy_get_next_buffer is";
-   L_323 : aliased constant String := "            --  this code, unfortunately,"
+   L_319 : aliased constant String := "         --  need more input";
+   L_320 : aliased constant String := "         yytext_ptr := yy_c_buf_p;";
+   L_321 : aliased constant String := "         yy_c_buf_p := yy_c_buf_p + 1;";
+   L_322 : aliased constant String := "";
+   L_323 : aliased constant String := "         case yy_get_next_buffer is";
+   L_324 : aliased constant String := "            --  this code, unfortunately,"
        & " is somewhat redundant with";
-   L_324 : aliased constant String := "            --  that above";
-   L_325 : aliased constant String := "";
-   L_326 : aliased constant String := "         when EOB_ACT_END_OF_FILE =>";
-   L_327 : aliased constant String := "%if yywrap";
-   L_328 : aliased constant String := "            if yyWrap then";
-   L_329 : aliased constant String := "               yy_c_buf_p := yytext_ptr;";
-   L_330 : aliased constant String := "               return ASCII.NUL;";
-   L_331 : aliased constant String := "            end if;";
-   L_332 : aliased constant String := "";
-   L_333 : aliased constant String := "            yy_ch_buf (0) := ASCII.LF;";
-   L_334 : aliased constant String := "            yy_n_chars := 1;";
-   L_335 : aliased constant String := "            yy_ch_buf (yy_n_chars) := YY_"
+   L_325 : aliased constant String := "            --  that above";
+   L_326 : aliased constant String := "";
+   L_327 : aliased constant String := "         when EOB_ACT_END_OF_FILE =>";
+   L_328 : aliased constant String := "%if yywrap";
+   L_329 : aliased constant String := "            if yyWrap then";
+   L_330 : aliased constant String := "               yy_c_buf_p := yytext_ptr;";
+   L_331 : aliased constant String := "               return ASCII.NUL;";
+   L_332 : aliased constant String := "            end if;";
+   L_333 : aliased constant String := "";
+   L_334 : aliased constant String := "            yy_ch_buf (0) := ASCII.LF;";
+   L_335 : aliased constant String := "            yy_n_chars := 1;";
+   L_336 : aliased constant String := "            yy_ch_buf (yy_n_chars) := YY_"
        & "END_OF_BUFFER_CHAR;";
-   L_336 : aliased constant String := "            yy_ch_buf (yy_n_chars + 1) :="
+   L_337 : aliased constant String := "            yy_ch_buf (yy_n_chars + 1) :="
        & " YY_END_OF_BUFFER_CHAR;";
-   L_337 : aliased constant String := "            yy_eof_has_been_seen := False"
+   L_338 : aliased constant String := "            yy_eof_has_been_seen := False"
        & ";";
-   L_338 : aliased constant String := "            yy_c_buf_p := 1;";
-   L_339 : aliased constant String := "            yytext_ptr := yy_c_buf_p;";
-   L_340 : aliased constant String := "            yy_hold_char := yy_ch_buf (yy"
+   L_339 : aliased constant String := "            yy_c_buf_p := 1;";
+   L_340 : aliased constant String := "            yytext_ptr := yy_c_buf_p;";
+   L_341 : aliased constant String := "            yy_hold_char := yy_ch_buf (yy"
        & "_c_buf_p);";
-   L_341 : aliased constant String := "";
-   L_342 : aliased constant String := "            return Input;";
-   L_343 : aliased constant String := "%else";
-   L_344 : aliased constant String := "            yy_c_buf_p := yytext_ptr;";
-   L_345 : aliased constant String := "            return ASCII.NUL;";
-   L_346 : aliased constant String := "%end";
-   L_347 : aliased constant String := "         when EOB_ACT_RESTART_SCAN =>";
-   L_348 : aliased constant String := "            yy_c_buf_p := yytext_ptr;";
-   L_349 : aliased constant String := "";
-   L_350 : aliased constant String := "         when EOB_ACT_LAST_MATCH =>";
-   L_351 : aliased constant String := "            raise UNEXPECTED_LAST_MATCH;";
-   L_352 : aliased constant String := "         end case;";
-   L_353 : aliased constant String := "      end if;";
-   L_354 : aliased constant String := "";
-   L_355 : aliased constant String := "      c := yy_ch_buf (yy_c_buf_p);";
-   L_356 : aliased constant String := "      yy_c_buf_p := yy_c_buf_p + 1;";
-   L_357 : aliased constant String := "      yy_hold_char := yy_ch_buf (yy_c_buf"
+   L_342 : aliased constant String := "";
+   L_343 : aliased constant String := "            return Input;";
+   L_344 : aliased constant String := "%else";
+   L_345 : aliased constant String := "            yy_c_buf_p := yytext_ptr;";
+   L_346 : aliased constant String := "            return ASCII.NUL;";
+   L_347 : aliased constant String := "%end";
+   L_348 : aliased constant String := "         when EOB_ACT_RESTART_SCAN =>";
+   L_349 : aliased constant String := "            yy_c_buf_p := yytext_ptr;";
+   L_350 : aliased constant String := "";
+   L_351 : aliased constant String := "         when EOB_ACT_LAST_MATCH =>";
+   L_352 : aliased constant String := "            raise UNEXPECTED_LAST_MATCH;";
+   L_353 : aliased constant String := "         end case;";
+   L_354 : aliased constant String := "      end if;";
+   L_355 : aliased constant String := "";
+   L_356 : aliased constant String := "      c := yy_ch_buf (yy_c_buf_p);";
+   L_357 : aliased constant String := "      yy_c_buf_p := yy_c_buf_p + 1;";
+   L_358 : aliased constant String := "      yy_hold_char := yy_ch_buf (yy_c_buf"
        & "_p);";
-   L_358 : aliased constant String := "";
-   L_359 : aliased constant String := "      return c;";
-   L_360 : aliased constant String := "   end Input;";
-   L_361 : aliased constant String := "";
-   L_362 : aliased constant String := "%if output";
-   L_363 : aliased constant String := "   procedure Output (c : Character) is";
-   L_364 : aliased constant String := "   begin";
-   L_365 : aliased constant String := "      if Is_Open (user_output_file) then";
-   L_366 : aliased constant String := "         Text_IO.Put (user_output_file, c"
-       & ");";
-   L_367 : aliased constant String := "      else";
-   L_368 : aliased constant String := "         Text_IO.Put (c);";
-   L_369 : aliased constant String := "      end if;";
-   L_370 : aliased constant String := "   end Output;";
-   L_371 : aliased constant String := "";
-   L_372 : aliased constant String := "   procedure Output_New_Line is";
-   L_373 : aliased constant String := "   begin";
-   L_374 : aliased constant String := "      if Is_Open (user_output_file) then";
-   L_375 : aliased constant String := "         Text_IO.New_Line (user_output_fi"
-       & "le);";
-   L_376 : aliased constant String := "      else";
-   L_377 : aliased constant String := "         Text_IO.New_Line;";
-   L_378 : aliased constant String := "      end if;";
-   L_379 : aliased constant String := "   end Output_New_Line;";
-   L_380 : aliased constant String := "";
-   L_381 : aliased constant String := "   function Output_Column return Text_IO."
-       & "Count is";
-   L_382 : aliased constant String := "   begin";
-   L_383 : aliased constant String := "      if Is_Open (user_output_file) then";
-   L_384 : aliased constant String := "         return Text_IO.Col (user_output_"
-       & "file);";
-   L_385 : aliased constant String := "      else";
-   L_386 : aliased constant String := "         return Text_IO.Col;";
-   L_387 : aliased constant String := "      end if;";
-   L_388 : aliased constant String := "   end Output_Column;";
-   L_389 : aliased constant String := "%end";
-   L_390 : aliased constant String := "%if error";
-   L_391 : aliased constant String := "";
-   L_392 : aliased constant String := "   function Input_Line return Text_IO.Cou"
-       & "nt is";
-   L_393 : aliased constant String := "   begin";
-   L_394 : aliased constant String := "      return Text_IO.Count (Line_Number_O"
-       & "f_Saved_Tok_Line2);";
-   L_395 : aliased constant String := "   end Input_Line;";
-   L_396 : aliased constant String := "%end";
-   L_397 : aliased constant String := "%if yywrap";
-   L_398 : aliased constant String := "";
-   L_399 : aliased constant String := "   --  default yywrap function - always t"
+   L_359 : aliased constant String := "";
+   L_360 : aliased constant String := "      return c;";
+   L_361 : aliased constant String := "   end Input;";
+   L_362 : aliased constant String := "";
+   L_363 : aliased constant String := "%if output";
+   L_364 : aliased constant String := "   procedure Output (c : Character) is";
+   L_365 : aliased constant String := "   begin";
+   L_366 : aliased constant String := "      if Ada.Text_IO.Is_Open (user_output"
+       & "_file) then";
+   L_367 : aliased constant String := "         Ada.Text_IO.Put (user_output_fil"
+       & "e, c);";
+   L_368 : aliased constant String := "      else";
+   L_369 : aliased constant String := "         Ada.Text_IO.Put (c);";
+   L_370 : aliased constant String := "      end if;";
+   L_371 : aliased constant String := "   end Output;";
+   L_372 : aliased constant String := "";
+   L_373 : aliased constant String := "   procedure Output_New_Line is";
+   L_374 : aliased constant String := "   begin";
+   L_375 : aliased constant String := "      if Ada.Text_IO.Is_Open (user_output"
+       & "_file) then";
+   L_376 : aliased constant String := "         Ada.Text_IO.New_Line (user_outpu"
+       & "t_file);";
+   L_377 : aliased constant String := "      else";
+   L_378 : aliased constant String := "         Ada.Text_IO.New_Line;";
+   L_379 : aliased constant String := "      end if;";
+   L_380 : aliased constant String := "   end Output_New_Line;";
+   L_381 : aliased constant String := "";
+   L_382 : aliased constant String := "   function Output_Column return Ada.Text"
+       & "_IO.Count is";
+   L_383 : aliased constant String := "   begin";
+   L_384 : aliased constant String := "      if Ada.Text_IO.Is_Open (user_output"
+       & "_file) then";
+   L_385 : aliased constant String := "         return Ada.Text_IO.Col (user_out"
+       & "put_file);";
+   L_386 : aliased constant String := "      else";
+   L_387 : aliased constant String := "         return Ada.Text_IO.Col;";
+   L_388 : aliased constant String := "      end if;";
+   L_389 : aliased constant String := "   end Output_Column;";
+   L_390 : aliased constant String := "%end";
+   L_391 : aliased constant String := "%if error";
+   L_392 : aliased constant String := "";
+   L_393 : aliased constant String := "   function Input_Line return Ada.Text_IO"
+       & ".Count is";
+   L_394 : aliased constant String := "   begin";
+   L_395 : aliased constant String := "      return Ada.Text_IO.Count (Line_Numb"
+       & "er_Of_Saved_Tok_Line2);";
+   L_396 : aliased constant String := "   end Input_Line;";
+   L_397 : aliased constant String := "%end";
+   L_398 : aliased constant String := "%if yywrap";
+   L_399 : aliased constant String := "";
+   L_400 : aliased constant String := "   --  default yywrap function - always t"
        & "reat EOF as an EOF";
-   L_400 : aliased constant String := "   function yyWrap return Boolean is";
-   L_401 : aliased constant String := "   begin";
-   L_402 : aliased constant String := "      return True;";
-   L_403 : aliased constant String := "   end yyWrap;";
-   L_404 : aliased constant String := "%end";
-   L_405 : aliased constant String := "";
-   L_406 : aliased constant String := "   procedure Open_Input (fname : in Strin"
+   L_401 : aliased constant String := "   function yyWrap return Boolean is";
+   L_402 : aliased constant String := "   begin";
+   L_403 : aliased constant String := "      return True;";
+   L_404 : aliased constant String := "   end yyWrap;";
+   L_405 : aliased constant String := "%end";
+   L_406 : aliased constant String := "";
+   L_407 : aliased constant String := "   procedure Open_Input (fname : in Strin"
        & "g) is";
-   L_407 : aliased constant String := "   begin";
-   L_408 : aliased constant String := "      yy_init := True;";
-   L_409 : aliased constant String := "      Open (user_input_file, Text_IO.In_F"
-       & "ile, fname);";
-   L_410 : aliased constant String := "   end Open_Input;";
-   L_411 : aliased constant String := "";
-   L_412 : aliased constant String := "%if output";
-   L_413 : aliased constant String := "   procedure Create_Output (fname : in St"
+   L_408 : aliased constant String := "   begin";
+   L_409 : aliased constant String := "      yy_init := True;";
+   L_410 : aliased constant String := "      Ada.Text_IO.Open (user_input_file, "
+       & "Ada.Text_IO.In_File, fname);";
+   L_411 : aliased constant String := "   end Open_Input;";
+   L_412 : aliased constant String := "";
+   L_413 : aliased constant String := "%if output";
+   L_414 : aliased constant String := "   procedure Create_Output (fname : in St"
        & "ring := """") is";
-   L_414 : aliased constant String := "   begin";
-   L_415 : aliased constant String := "      if fname /= """" then";
-   L_416 : aliased constant String := "         Create (user_output_file, Text_I"
-       & "O.Out_File, fname);";
-   L_417 : aliased constant String := "      end if;";
-   L_418 : aliased constant String := "   end Create_Output;";
-   L_419 : aliased constant String := "%end";
-   L_420 : aliased constant String := "";
-   L_421 : aliased constant String := "   procedure Close_Input is";
-   L_422 : aliased constant String := "   begin";
-   L_423 : aliased constant String := "      if Is_Open (user_input_file) then";
-   L_424 : aliased constant String := "         Text_IO.Close (user_input_file);";
-   L_425 : aliased constant String := "      end if;";
-   L_426 : aliased constant String := "   end Close_Input;";
-   L_427 : aliased constant String := "";
-   L_428 : aliased constant String := "%if output";
-   L_429 : aliased constant String := "   procedure Close_Output is";
-   L_430 : aliased constant String := "   begin";
-   L_431 : aliased constant String := "      if Is_Open (user_output_file) then";
-   L_432 : aliased constant String := "         Text_IO.Close (user_output_file)"
-       & ";";
-   L_433 : aliased constant String := "      end if;";
-   L_434 : aliased constant String := "   end Close_Output;";
-   L_435 : aliased constant String := "%end";
-   L_436 : aliased constant String := "";
-   L_437 : aliased constant String := "%if error";
-   L_438 : aliased constant String := "   procedure Yy_Get_Token_Line ( Yy_Line_"
+   L_415 : aliased constant String := "   begin";
+   L_416 : aliased constant String := "      if fname /= """" then";
+   L_417 : aliased constant String := "         Ada.Text_IO.Create (user_output_"
+       & "file, Ada.Text_IO.Out_File, fname);";
+   L_418 : aliased constant String := "      end if;";
+   L_419 : aliased constant String := "   end Create_Output;";
+   L_420 : aliased constant String := "%end";
+   L_421 : aliased constant String := "";
+   L_422 : aliased constant String := "   procedure Close_Input is";
+   L_423 : aliased constant String := "   begin";
+   L_424 : aliased constant String := "      if Ada.Text_IO.Is_Open (user_input_"
+       & "file) then";
+   L_425 : aliased constant String := "         Ada.Text_IO.Close (user_input_fi"
+       & "le);";
+   L_426 : aliased constant String := "      end if;";
+   L_427 : aliased constant String := "   end Close_Input;";
+   L_428 : aliased constant String := "";
+   L_429 : aliased constant String := "%if output";
+   L_430 : aliased constant String := "   procedure Close_Output is";
+   L_431 : aliased constant String := "   begin";
+   L_432 : aliased constant String := "      if Ada.Text_IO.Is_Open (user_output"
+       & "_file) then";
+   L_433 : aliased constant String := "         Ada.Text_IO.Close (user_output_f"
+       & "ile);";
+   L_434 : aliased constant String := "      end if;";
+   L_435 : aliased constant String := "   end Close_Output;";
+   L_436 : aliased constant String := "%end";
+   L_437 : aliased constant String := "";
+   L_438 : aliased constant String := "%if error";
+   L_439 : aliased constant String := "   procedure Yy_Get_Token_Line ( Yy_Line_"
        & "String : out String;";
-   L_439 : aliased constant String := "                                 Yy_Line_"
+   L_440 : aliased constant String := "                                 Yy_Line_"
        & "Length : out Natural ) is";
-   L_440 : aliased constant String := "   begin";
-   L_441 : aliased constant String := "      --  Currently processing line is ei"
+   L_441 : aliased constant String := "   begin";
+   L_442 : aliased constant String := "      --  Currently processing line is ei"
        & "ther in saved token line1 or";
-   L_442 : aliased constant String := "      --  in saved token line2.";
-   L_443 : aliased constant String := "      if Yy_Line_Number = Line_Number_Of_"
+   L_443 : aliased constant String := "      --  in saved token line2.";
+   L_444 : aliased constant String := "      if Yy_Line_Number = Line_Number_Of_"
        & "Saved_Tok_Line1 then";
-   L_444 : aliased constant String := "         Yy_Line_Length := Saved_Tok_Line"
+   L_445 : aliased constant String := "         Yy_Line_Length := Saved_Tok_Line"
        & "1.all'length;";
-   L_445 : aliased constant String := "         Yy_Line_String ( Yy_Line_String'"
+   L_446 : aliased constant String := "         Yy_Line_String ( Yy_Line_String'"
        & "First .. ( Yy_Line_String'First + Saved_Tok_Line1.all'length - 1 ))";
-   L_446 : aliased constant String := "           := Saved_Tok_Line1 ( 1 .. Save"
+   L_447 : aliased constant String := "           := Saved_Tok_Line1 ( 1 .. Save"
        & "d_Tok_Line1.all'length );";
-   L_447 : aliased constant String := "      else";
-   L_448 : aliased constant String := "         Yy_Line_Length := Saved_Tok_Line"
+   L_448 : aliased constant String := "      else";
+   L_449 : aliased constant String := "         Yy_Line_Length := Saved_Tok_Line"
        & "2.all'length;";
-   L_449 : aliased constant String := "         Yy_Line_String ( Yy_Line_String'"
+   L_450 : aliased constant String := "         Yy_Line_String ( Yy_Line_String'"
        & "First .. ( Yy_Line_String'First + Saved_Tok_Line2.all'length - 1 ))";
-   L_450 : aliased constant String := "           := Saved_Tok_Line2 ( 1 .. Save"
+   L_451 : aliased constant String := "           := Saved_Tok_Line2 ( 1 .. Save"
        & "d_Tok_Line2.all'length );";
-   L_451 : aliased constant String := "      end if;";
-   L_452 : aliased constant String := "   end Yy_Get_Token_Line;";
-   L_453 : aliased constant String := "";
-   L_454 : aliased constant String := "   function Yy_Line_Number return Natural"
+   L_452 : aliased constant String := "      end if;";
+   L_453 : aliased constant String := "   end Yy_Get_Token_Line;";
+   L_454 : aliased constant String := "";
+   L_455 : aliased constant String := "   function Yy_Line_Number return Natural"
        & " is";
-   L_455 : aliased constant String := "   begin";
-   L_456 : aliased constant String := "      return Tok_Begin_Line;";
-   L_457 : aliased constant String := "   end Yy_Line_Number;";
-   L_458 : aliased constant String := "";
-   L_459 : aliased constant String := "   function Yy_Begin_Column return Natura"
+   L_456 : aliased constant String := "   begin";
+   L_457 : aliased constant String := "      return Tok_Begin_Line;";
+   L_458 : aliased constant String := "   end Yy_Line_Number;";
+   L_459 : aliased constant String := "";
+   L_460 : aliased constant String := "   function Yy_Begin_Column return Natura"
        & "l is";
-   L_460 : aliased constant String := "   begin";
-   L_461 : aliased constant String := "      return Tok_Begin_Col;";
-   L_462 : aliased constant String := "   end Yy_Begin_Column;";
-   L_463 : aliased constant String := "";
-   L_464 : aliased constant String := "   function Yy_End_Column return Natural "
+   L_461 : aliased constant String := "   begin";
+   L_462 : aliased constant String := "      return Tok_Begin_Col;";
+   L_463 : aliased constant String := "   end Yy_Begin_Column;";
+   L_464 : aliased constant String := "";
+   L_465 : aliased constant String := "   function Yy_End_Column return Natural "
        & "is";
-   L_465 : aliased constant String := "   begin";
-   L_466 : aliased constant String := "      return Tok_End_Col;";
-   L_467 : aliased constant String := "   end Yy_End_Column;";
-   L_468 : aliased constant String := "";
-   L_469 : aliased constant String := "%end";
-   L_470 : aliased constant String := "";
-   L_471 : aliased constant String := "end ${NAME}_IO;";
+   L_466 : aliased constant String := "   begin";
+   L_467 : aliased constant String := "      return Tok_End_Col;";
+   L_468 : aliased constant String := "   end Yy_End_Column;";
+   L_469 : aliased constant String := "";
+   L_470 : aliased constant String := "%end";
+   L_471 : aliased constant String := "";
+   L_472 : aliased constant String := "end ${NAME}_IO;";
    body_io : aliased constant Content_Array :=
      (L_41'Access,
       L_42'Access,
@@ -1098,90 +1108,312 @@ private
       L_468'Access,
       L_469'Access,
       L_470'Access,
-      L_471'Access);
+      L_471'Access,
+      L_472'Access);
 
-   L_472 : aliased constant String := "--  Warning: This file is automatically g"
-       & "enerated by AFLEX.";
-   L_473 : aliased constant String := "--           It is useless to modify it. "
+   L_473 : aliased constant String := "--  Warning: This lexical scanner is auto"
+       & "matically generated by AFLEX.";
+   L_474 : aliased constant String := "--           It is useless to modify it. "
        & "Change the "".Y"" & "".L"" files instead.";
-   L_474 : aliased constant String := "%if private";
-   L_475 : aliased constant String := "package ${NAME}_DFA is";
-   L_476 : aliased constant String := "%else";
-   L_477 : aliased constant String := "package ${NAME}_DFA is";
-   L_478 : aliased constant String := "%end";
-   L_479 : aliased constant String := "";
-   L_480 : aliased constant String := "%if debug";
-   L_481 : aliased constant String := "   aflex_debug       : Boolean := True;";
-   L_482 : aliased constant String := "%else";
-   L_483 : aliased constant String := "   aflex_debug       : Boolean := False;";
-   L_484 : aliased constant String := "%end";
-   L_485 : aliased constant String := "%if yylineno";
-   L_486 : aliased constant String := "   yylineno          : Natural := 0;";
-   L_487 : aliased constant String := "   yylinecol         : Natural := 0;";
-   L_488 : aliased constant String := "   yy_last_yylineno  : Natural := 0;";
-   L_489 : aliased constant String := "   yy_last_yylinecol : Natural := 0;";
-   L_490 : aliased constant String := "%end";
-   L_491 : aliased constant String := "   yytext_ptr        : Integer; --  point"
-       & "s to start of yytext in buffer";
+   L_475 : aliased constant String := "--  Template: templates/body-lex.adb";
+   L_476 : aliased constant String := "%if minimalist";
+   L_477 : aliased constant String := "%else";
+   L_478 : aliased constant String := "with Ada.Text_IO; use Ada.Text_IO;";
+   L_479 : aliased constant String := "%end";
+   L_480 : aliased constant String := "%%1 user";
+   L_481 : aliased constant String := "";
+   L_482 : aliased constant String := "%yydecl";
+   L_483 : aliased constant String := "      subtype Short is Integer range -327"
+       & "68 .. 32767;";
+   L_484 : aliased constant String := "";
+   L_485 : aliased constant String := "      --  returned upon end-of-file";
+   L_486 : aliased constant String := "      YY_END_TOK : constant Integer := 0;";
+   L_487 : aliased constant String := "      subtype yy_state_type is Integer;";
+   L_488 : aliased constant String := "%%2 tables";
+   L_489 : aliased constant String := "      yy_act : Integer;";
+   L_490 : aliased constant String := "      yy_c   : Short;";
+   L_491 : aliased constant String := "      yy_current_state : yy_state_type;";
    L_492 : aliased constant String := "";
-   L_493 : aliased constant String := "   --  yy_ch_buf has to be 2 characters l"
-       & "onger than YY_BUF_SIZE because we need";
-   L_494 : aliased constant String := "   --  to put in 2 end-of-buffer characte"
-       & "rs (this is explained where it is";
-   L_495 : aliased constant String := "   --  done) at the end of yy_ch_buf";
-   L_496 : aliased constant String := "";
-   L_497 : aliased constant String := "   --  ----------------------------------"
-       & "------------------------------------------";
-   L_498 : aliased constant String := "   --  If the buffer size variable YY_REA"
-       & "D_BUF_SIZE is too small, then";
-   L_499 : aliased constant String := "   --  big comments won't be parsed and t"
-       & "he parser stops.";
-   L_500 : aliased constant String := "   --  YY_READ_BUF_SIZE should be at leas"
-       & "t as large as the number of ASCII bytes in";
-   L_501 : aliased constant String := "   --  comments that need to be parsed.";
-   L_502 : aliased constant String := "";
-   L_503 : aliased constant String := "   YY_READ_BUF_SIZE : constant Integer :="
-       & "  75_000;";
-   L_504 : aliased constant String := "   --  ----------------------------------"
-       & "------------------------------------------";
-   L_505 : aliased constant String := "";
-   L_506 : aliased constant String := "   YY_BUF_SIZE : constant Integer := YY_R"
-       & "EAD_BUF_SIZE * 2; --  size of input buffer";
-   L_507 : aliased constant String := "";
-   L_508 : aliased constant String := "   type unbounded_character_array is arra"
-       & "y (Integer range <>) of Character;";
-   L_509 : aliased constant String := "   subtype ch_buf_type is unbounded_chara"
-       & "cter_array (0 .. YY_BUF_SIZE + 1);";
-   L_510 : aliased constant String := "";
-   L_511 : aliased constant String := "   yy_ch_buf    : ch_buf_type;";
-   L_512 : aliased constant String := "   yy_cp, yy_bp : Integer;";
+   L_493 : aliased constant String := "      --  copy whatever the last rule mat"
+       & "ched to the standard output";
+   L_494 : aliased constant String := "%if echo";
+   L_495 : aliased constant String := "      procedure ECHO is";
+   L_496 : aliased constant String := "      begin";
+   L_497 : aliased constant String := "         if Ada.Text_IO.Is_Open (user_out"
+       & "put_file) then";
+   L_498 : aliased constant String := "            Ada.Text_IO.Put (user_output_"
+       & "file, YYText);";
+   L_499 : aliased constant String := "         else";
+   L_500 : aliased constant String := "            Ada.Text_IO.Put (YYText);";
+   L_501 : aliased constant String := "         end if;";
+   L_502 : aliased constant String := "      end ECHO;";
+   L_503 : aliased constant String := "%end";
+   L_504 : aliased constant String := "";
+   L_505 : aliased constant String := "      --  enter a start condition.";
+   L_506 : aliased constant String := "      --  Using procedure requires a () a"
+       & "fter the ENTER, but makes everything";
+   L_507 : aliased constant String := "      --  much neater.";
+   L_508 : aliased constant String := "";
+   L_509 : aliased constant String := "      procedure ENTER (state : Integer) i"
+       & "s";
+   L_510 : aliased constant String := "      begin";
+   L_511 : aliased constant String := "         yy_start := 1 + 2 * state;";
+   L_512 : aliased constant String := "      end ENTER;";
    L_513 : aliased constant String := "";
-   L_514 : aliased constant String := "   --  yy_hold_char holds the character l"
-       & "ost when yytext is formed";
-   L_515 : aliased constant String := "   yy_hold_char : Character;";
-   L_516 : aliased constant String := "   yy_c_buf_p   : Integer;   --  points t"
-       & "o current character in buffer";
-   L_517 : aliased constant String := "";
-   L_518 : aliased constant String := "   function YYText return String;";
-   L_519 : aliased constant String := "   function YYLength return Integer;";
-   L_520 : aliased constant String := "   procedure YY_DO_BEFORE_ACTION;";
-   L_521 : aliased constant String := "";
-   L_522 : aliased constant String := "   subtype yy_state_type is Integer;";
-   L_523 : aliased constant String := "";
-   L_524 : aliased constant String := "   --  These variables are needed between"
-       & " calls to YYLex.";
-   L_525 : aliased constant String := "   yy_init                 : Boolean := T"
-       & "rue; --  do we need to initialize YYLex?";
-   L_526 : aliased constant String := "   yy_start                : Integer := 0"
-       & "; --  current start state number";
-   L_527 : aliased constant String := "   yy_last_accepting_state : yy_state_typ"
+   L_514 : aliased constant String := "      --  action number for EOF rule of a"
+       & " given start state";
+   L_515 : aliased constant String := "      function YY_STATE_EOF (state : Inte"
+       & "ger) return Integer is";
+   L_516 : aliased constant String := "      begin";
+   L_517 : aliased constant String := "         return YY_END_OF_BUFFER + state "
+       & "+ 1;";
+   L_518 : aliased constant String := "      end YY_STATE_EOF;";
+   L_519 : aliased constant String := "";
+   L_520 : aliased constant String := "      --  return all but the first 'n' ma"
+       & "tched characters back to the input stream";
+   L_521 : aliased constant String := "      procedure yyless (n : Integer) is";
+   L_522 : aliased constant String := "      begin";
+   L_523 : aliased constant String := "         yy_ch_buf (yy_cp) := yy_hold_cha"
+       & "r; --  undo effects of setting up yytext";
+   L_524 : aliased constant String := "         yy_cp := yy_bp + n;";
+   L_525 : aliased constant String := "         yy_c_buf_p := yy_cp;";
+   L_526 : aliased constant String := "         YY_DO_BEFORE_ACTION; -- set up y"
+       & "ytext again";
+   L_527 : aliased constant String := "      end yyless;";
+   L_528 : aliased constant String := "";
+   L_529 : aliased constant String := "%if yyaction";
+   L_530 : aliased constant String := "      --  redefine this if you have somet"
+       & "hing you want each time.";
+   L_531 : aliased constant String := "      procedure YY_USER_ACTION is";
+   L_532 : aliased constant String := "      begin";
+   L_533 : aliased constant String := "%yyaction";
+   L_534 : aliased constant String := "      end YY_USER_ACTION;";
+   L_535 : aliased constant String := "%end";
+   L_536 : aliased constant String := "      --  yy_get_previous_state - get the"
+       & " state just before the EOB char was reached";
+   L_537 : aliased constant String := "";
+   L_538 : aliased constant String := "      function yy_get_previous_state retu"
+       & "rn yy_state_type is";
+   L_539 : aliased constant String := "         yy_current_state : yy_state_type"
+       & ";";
+   L_540 : aliased constant String := "         yy_c : Short;";
+   L_541 : aliased constant String := "%%3 ybp";
+   L_542 : aliased constant String := "      begin";
+   L_543 : aliased constant String := "%%3 startstate";
+   L_544 : aliased constant String := "";
+   L_545 : aliased constant String := "         for yy_cp in yytext_ptr .. yy_c_"
+       & "buf_p - 1 loop";
+   L_546 : aliased constant String := "%%4 nextstate";
+   L_547 : aliased constant String := "         end loop;";
+   L_548 : aliased constant String := "";
+   L_549 : aliased constant String := "         return yy_current_state;";
+   L_550 : aliased constant String := "      end yy_get_previous_state;";
+   L_551 : aliased constant String := "";
+   L_552 : aliased constant String := "      procedure yyrestart (input_file : F"
+       & "ile_Type) is";
+   L_553 : aliased constant String := "      begin";
+   L_554 : aliased constant String := "         Open_Input (Ada.Text_IO.Name (in"
+       & "put_file));";
+   L_555 : aliased constant String := "      end yyrestart;";
+   L_556 : aliased constant String := "";
+   L_557 : aliased constant String := "   begin -- of ${YYLEX}";
+   L_558 : aliased constant String := "      <<new_file>>";
+   L_559 : aliased constant String := "      --  this is where we enter upon enc"
+       & "ountering an end-of-file and";
+   L_560 : aliased constant String := "      --  yyWrap () indicating that we sh"
+       & "ould continue processing";
+   L_561 : aliased constant String := "";
+   L_562 : aliased constant String := "      if yy_init then";
+   L_563 : aliased constant String := "         if yy_start = 0 then";
+   L_564 : aliased constant String := "            yy_start := 1;      -- first "
+       & "start state";
+   L_565 : aliased constant String := "         end if;";
+   L_566 : aliased constant String := "";
+   L_567 : aliased constant String := "         --  we put in the '\n' and start"
+       & " reading from [1] so that an";
+   L_568 : aliased constant String := "         --  initial match-at-newline wil"
+       & "l be true.";
+   L_569 : aliased constant String := "";
+   L_570 : aliased constant String := "         yy_ch_buf (0) := ASCII.LF;";
+   L_571 : aliased constant String := "         yy_n_chars := 1;";
+   L_572 : aliased constant String := "";
+   L_573 : aliased constant String := "         --  we always need two end-of-bu"
+       & "ffer characters. The first causes";
+   L_574 : aliased constant String := "         --  a transition to the end-of-b"
+       & "uffer state. The second causes";
+   L_575 : aliased constant String := "         --  a jam in that state.";
+   L_576 : aliased constant String := "";
+   L_577 : aliased constant String := "         yy_ch_buf (yy_n_chars) := YY_END"
+       & "_OF_BUFFER_CHAR;";
+   L_578 : aliased constant String := "         yy_ch_buf (yy_n_chars + 1) := YY"
+       & "_END_OF_BUFFER_CHAR;";
+   L_579 : aliased constant String := "";
+   L_580 : aliased constant String := "         yy_eof_has_been_seen := False;";
+   L_581 : aliased constant String := "";
+   L_582 : aliased constant String := "         yytext_ptr := 1;";
+   L_583 : aliased constant String := "         yy_c_buf_p := yytext_ptr;";
+   L_584 : aliased constant String := "         yy_hold_char := yy_ch_buf (yy_c_"
+       & "buf_p);";
+   L_585 : aliased constant String := "         yy_init := False;";
+   L_586 : aliased constant String := "%if error";
+   L_587 : aliased constant String := "         --   Initialization";
+   L_588 : aliased constant String := "         tok_begin_line := 1;";
+   L_589 : aliased constant String := "         tok_end_line := 1;";
+   L_590 : aliased constant String := "         tok_begin_col := 0;";
+   L_591 : aliased constant String := "         tok_end_col := 0;";
+   L_592 : aliased constant String := "         token_at_end_of_line := False;";
+   L_593 : aliased constant String := "         line_number_of_saved_tok_line1 :"
+       & "= 0;";
+   L_594 : aliased constant String := "         line_number_of_saved_tok_line2 :"
+       & "= 0;";
+   L_595 : aliased constant String := "%end";
+   L_596 : aliased constant String := "      end if; -- yy_init";
+   L_597 : aliased constant String := "";
+   L_598 : aliased constant String := "      loop                -- loops until "
+       & "end-of-file is reached";
+   L_599 : aliased constant String := "%if error";
+   L_600 : aliased constant String := "         --    if last matched token is e"
+       & "nd_of_line, we must";
+   L_601 : aliased constant String := "         --    update the token_end_line "
+       & "and reset tok_end_col.";
+   L_602 : aliased constant String := "         if Token_At_End_Of_Line then";
+   L_603 : aliased constant String := "            Tok_End_Line := Tok_End_Line "
+       & "+ 1;";
+   L_604 : aliased constant String := "            Tok_End_Col := 0;";
+   L_605 : aliased constant String := "            Token_At_End_Of_Line := False"
+       & ";";
+   L_606 : aliased constant String := "         end if;";
+   L_607 : aliased constant String := "%end";
+   L_608 : aliased constant String := "";
+   L_609 : aliased constant String := "         yy_cp := yy_c_buf_p;";
+   L_610 : aliased constant String := "";
+   L_611 : aliased constant String := "         --  support of yytext";
+   L_612 : aliased constant String := "         yy_ch_buf (yy_cp) := yy_hold_cha"
+       & "r;";
+   L_613 : aliased constant String := "";
+   L_614 : aliased constant String := "         --  yy_bp points to the position"
+       & " in yy_ch_buf of the start of the";
+   L_615 : aliased constant String := "         --  current run.";
+   L_616 : aliased constant String := "%%5 action";
+   L_617 : aliased constant String := "";
+   L_618 : aliased constant String := "   <<next_action>>";
+   L_619 : aliased constant String := "%%6 action";
+   L_620 : aliased constant String := "         YY_DO_BEFORE_ACTION;";
+   L_621 : aliased constant String := "%if yyaction";
+   L_622 : aliased constant String := "         YY_USER_ACTION;";
+   L_623 : aliased constant String := "%end";
+   L_624 : aliased constant String := "";
+   L_625 : aliased constant String := "         if aflex_debug then  -- output a"
+       & "cceptance info. for (-d) debug mode";
+   L_626 : aliased constant String := "            Ada.Text_IO.Put (Standard_Err"
+       & "or, ""  -- Aflex.YYLex accept rule #"");";
+   L_627 : aliased constant String := "            Ada.Text_IO.Put (Standard_Err"
+       & "or, Integer'Image (yy_act));";
+   L_628 : aliased constant String := "            Ada.Text_IO.Put_Line (Standar"
+       & "d_Error, ""("""""" & YYText & """""")"");";
+   L_629 : aliased constant String := "         end if;";
+   L_630 : aliased constant String := "%if error";
+   L_631 : aliased constant String := "         --   Update tok_begin_line, tok_"
+       & "end_line, tok_begin_col and tok_end_col";
+   L_632 : aliased constant String := "         --   after matching the token.";
+   L_633 : aliased constant String := "         if yy_act /= YY_END_OF_BUFFER an"
+       & "d then yy_act /= 0 then";
+   L_634 : aliased constant String := "            -- Token are matched only whe"
+       & "n yy_act is not yy_end_of_buffer or 0.";
+   L_635 : aliased constant String := "            Tok_Begin_Line := Tok_End_Lin"
        & "e;";
-   L_528 : aliased constant String := "   yy_last_accepting_cpos  : Integer;";
-   L_529 : aliased constant String := "";
-   L_530 : aliased constant String := "end ${NAME}_DFA;";
-   spec_dfa : aliased constant Content_Array :=
-     (L_472'Access,
-      L_473'Access,
+   L_636 : aliased constant String := "            Tok_Begin_Col := Tok_End_Col "
+       & "+ 1;";
+   L_637 : aliased constant String := "            Tok_End_Col := Tok_Begin_Col "
+       & "+ yy_cp - yy_bp - 1;";
+   L_638 : aliased constant String := "            if yy_ch_buf ( yy_bp ) = ASCI"
+       & "I.LF then";
+   L_639 : aliased constant String := "               Token_At_End_Of_Line := Tr"
+       & "ue;";
+   L_640 : aliased constant String := "            end if;";
+   L_641 : aliased constant String := "         end if;";
+   L_642 : aliased constant String := "%end";
+   L_643 : aliased constant String := "";
+   L_644 : aliased constant String := "   <<do_action>>   -- this label is used "
+       & "only to access EOF actions";
+   L_645 : aliased constant String := "         case yy_act is";
+   L_646 : aliased constant String := "";
+   L_647 : aliased constant String := "%%7 action";
+   L_648 : aliased constant String := "";
+   L_649 : aliased constant String := "         when YY_END_OF_BUFFER =>";
+   L_650 : aliased constant String := "            --  undo the effects of YY_DO"
+       & "_BEFORE_ACTION";
+   L_651 : aliased constant String := "            yy_ch_buf (yy_cp) := yy_hold_"
+       & "char;";
+   L_652 : aliased constant String := "";
+   L_653 : aliased constant String := "            yytext_ptr := yy_bp;";
+   L_654 : aliased constant String := "";
+   L_655 : aliased constant String := "            case yy_get_next_buffer is";
+   L_656 : aliased constant String := "               when EOB_ACT_END_OF_FILE ="
+       & ">";
+   L_657 : aliased constant String := "                  if yyWrap then";
+   L_658 : aliased constant String := "                     --  note: because we"
+       & "'ve taken care in";
+   L_659 : aliased constant String := "                     --  yy_get_next_buff"
+       & "er() to have set up yytext,";
+   L_660 : aliased constant String := "                     --  we can now set u"
+       & "p yy_c_buf_p so that if some";
+   L_661 : aliased constant String := "                     --  total hoser (lik"
+       & "e aflex itself) wants";
+   L_662 : aliased constant String := "                     --  to call the scan"
+       & "ner after we return the";
+   L_663 : aliased constant String := "                     --  End_Of_Input, it"
+       & "'ll still work - another";
+   L_664 : aliased constant String := "                     --  End_Of_Input wil"
+       & "l get returned.";
+   L_665 : aliased constant String := "";
+   L_666 : aliased constant String := "                     yy_c_buf_p := yytext"
+       & "_ptr;";
+   L_667 : aliased constant String := "";
+   L_668 : aliased constant String := "                     yy_act := YY_STATE_E"
+       & "OF ((yy_start - 1) / 2);";
+   L_669 : aliased constant String := "";
+   L_670 : aliased constant String := "                     goto do_action;";
+   L_671 : aliased constant String := "                  else";
+   L_672 : aliased constant String := "                     --  start processing"
+       & " a new file";
+   L_673 : aliased constant String := "                     yy_init := True;";
+   L_674 : aliased constant String := "                     goto new_file;";
+   L_675 : aliased constant String := "                  end if;";
+   L_676 : aliased constant String := "";
+   L_677 : aliased constant String := "               when EOB_ACT_RESTART_SCAN "
+       & "=>";
+   L_678 : aliased constant String := "                  yy_c_buf_p := yytext_pt"
+       & "r;";
+   L_679 : aliased constant String := "                  yy_hold_char := yy_ch_b"
+       & "uf (yy_c_buf_p);";
+   L_680 : aliased constant String := "";
+   L_681 : aliased constant String := "               when EOB_ACT_LAST_MATCH =>";
+   L_682 : aliased constant String := "                  yy_c_buf_p := yy_n_char"
+       & "s;";
+   L_683 : aliased constant String := "                  yy_current_state := yy_"
+       & "get_previous_state;";
+   L_684 : aliased constant String := "                  yy_cp := yy_c_buf_p;";
+   L_685 : aliased constant String := "                  yy_bp := yytext_ptr;";
+   L_686 : aliased constant String := "                  goto next_action;";
+   L_687 : aliased constant String := "            end case; --  case yy_get_nex"
+       & "t_buffer()";
+   L_688 : aliased constant String := "";
+   L_689 : aliased constant String := "         when others =>";
+   L_690 : aliased constant String := "            Ada.Text_IO.Put (""action # """
+       & ");";
+   L_691 : aliased constant String := "            Ada.Text_IO.Put (Integer'Imag"
+       & "e (yy_act));";
+   L_692 : aliased constant String := "            Ada.Text_IO.New_Line;";
+   L_693 : aliased constant String := "            raise AFLEX_INTERNAL_ERROR;";
+   L_694 : aliased constant String := "         end case; --  case (yy_act)";
+   L_695 : aliased constant String := "      end loop; --  end of loop waiting f"
+       & "or end of file";
+   L_696 : aliased constant String := "   end ${YYLEX};";
+   L_697 : aliased constant String := "";
+   L_698 : aliased constant String := "%%8 user";
+   body_lex : aliased constant Content_Array :=
+     (L_473'Access,
       L_474'Access,
       L_475'Access,
       L_476'Access,
@@ -1238,156 +1470,8 @@ private
       L_527'Access,
       L_528'Access,
       L_529'Access,
-      L_530'Access);
-
-   L_531 : aliased constant String := "--  Warning: This file is automatically g"
-       & "enerated by AFLEX.";
-   L_532 : aliased constant String := "--           It is useless to modify it. "
-       & "Change the "".Y"" & "".L"" files instead.";
-   L_533 : aliased constant String := "with Ada.Text_IO; use Ada.Text_IO;";
-   L_534 : aliased constant String := "with ${NAME}_DFA; use ${NAME}_DFA;";
-   L_535 : aliased constant String := "%if private";
-   L_536 : aliased constant String := "package ${NAME}_IO is";
-   L_537 : aliased constant String := "%else";
-   L_538 : aliased constant String := "package ${NAME}_IO is";
-   L_539 : aliased constant String := "%end";
-   L_540 : aliased constant String := "";
-   L_541 : aliased constant String := "   user_input_file       : File_Type;";
-   L_542 : aliased constant String := "%if output";
-   L_543 : aliased constant String := "   user_output_file      : File_Type;";
-   L_544 : aliased constant String := "%end";
-   L_545 : aliased constant String := "   NULL_IN_INPUT         : exception;";
-   L_546 : aliased constant String := "   AFLEX_INTERNAL_ERROR  : exception;";
-   L_547 : aliased constant String := "   UNEXPECTED_LAST_MATCH : exception;";
-   L_548 : aliased constant String := "   PUSHBACK_OVERFLOW     : exception;";
-   L_549 : aliased constant String := "   AFLEX_SCANNER_JAMMED  : exception;";
-   L_550 : aliased constant String := "   type eob_action_type is (EOB_ACT_RESTA"
-       & "RT_SCAN,";
-   L_551 : aliased constant String := "                            EOB_ACT_END_O"
-       & "F_FILE,";
-   L_552 : aliased constant String := "                            EOB_ACT_LAST_"
-       & "MATCH);";
-   L_553 : aliased constant String := "   YY_END_OF_BUFFER_CHAR : constant Chara"
-       & "cter := ASCII.NUL;";
-   L_554 : aliased constant String := "   yy_n_chars            : Integer;      "
-       & " --  number of characters read into yy_ch_buf";
-   L_555 : aliased constant String := "";
-   L_556 : aliased constant String := "   --  true when we've seen an EOF for th"
-       & "e current input file";
-   L_557 : aliased constant String := "   yy_eof_has_been_seen  : Boolean;";
-   L_558 : aliased constant String := "";
-   L_559 : aliased constant String := "%if error";
-   L_560 : aliased constant String := "   --   In order to support YY_Get_Token_"
-       & "Line, we need";
-   L_561 : aliased constant String := "   --   a variable to hold current line.";
-   L_562 : aliased constant String := "   type String_Ptr is access String;";
-   L_563 : aliased constant String := "   Saved_Tok_Line1 : String_Ptr := Null;";
-   L_564 : aliased constant String := "   Line_Number_Of_Saved_Tok_Line1 : Integ"
-       & "er := 0;";
-   L_565 : aliased constant String := "   Saved_Tok_Line2 : String_Ptr := Null;";
-   L_566 : aliased constant String := "   Line_Number_Of_Saved_Tok_Line2 : Integ"
-       & "er := 0;";
-   L_567 : aliased constant String := "   -- Aflex will try to get next buffer b"
-       & "efore it processs the";
-   L_568 : aliased constant String := "   -- last token. Since now Aflex has bee"
-       & "n changed to accept";
-   L_569 : aliased constant String := "   -- one line by one line, the last toke"
-       & "n in the buffer is";
-   L_570 : aliased constant String := "   -- always end_of_line ( or end_of_buff"
-       & "er ). So before the";
-   L_571 : aliased constant String := "   -- end_of_line is processed, next line"
-       & " will be retrieved";
-   L_572 : aliased constant String := "   -- into the buffer. So we need to main"
-       & "tain two lines,";
-   L_573 : aliased constant String := "   -- which line will be returned in Get_"
-       & "Token_Line is";
-   L_574 : aliased constant String := "   -- determined according to the line nu"
-       & "mber. It is the same";
-   L_575 : aliased constant String := "   -- reason that we can not reinitialize"
-       & " tok_end_col to 0 in";
-   L_576 : aliased constant String := "   -- Yy_Input, but we must do it in yyle"
-       & "x after we process the";
-   L_577 : aliased constant String := "   -- end_of_line.";
-   L_578 : aliased constant String := "   Tok_Begin_Line : Integer := 1;";
-   L_579 : aliased constant String := "   Tok_End_Line   : Integer := 1;";
-   L_580 : aliased constant String := "   Tok_End_Col    : Integer := 0;";
-   L_581 : aliased constant String := "   Tok_Begin_Col  : Integer := 0;";
-   L_582 : aliased constant String := "   Token_At_End_Of_Line : Boolean := Fals"
-       & "e;";
-   L_583 : aliased constant String := "   -- Indicates whether or not last match"
-       & "ed token is end_of_line.";
-   L_584 : aliased constant String := "%end";
-   L_585 : aliased constant String := "";
-   L_586 : aliased constant String := "   procedure YY_INPUT (buf      : out unb"
-       & "ounded_character_array;";
-   L_587 : aliased constant String := "                       result   : out Int"
-       & "eger;";
-   L_588 : aliased constant String := "                       max_size : in Inte"
-       & "ger);";
-   L_589 : aliased constant String := "   function yy_get_next_buffer return eob"
-       & "_action_type;";
-   L_590 : aliased constant String := "%if unput";
-   L_591 : aliased constant String := "   procedure yyUnput (c : Character; yy_b"
-       & "p : in out Integer);";
-   L_592 : aliased constant String := "   procedure Unput (c : Character);";
-   L_593 : aliased constant String := "%end";
-   L_594 : aliased constant String := "   function Input return Character;";
-   L_595 : aliased constant String := "%if output";
-   L_596 : aliased constant String := "   procedure Output (c : Character);";
-   L_597 : aliased constant String := "   procedure Output_New_Line;";
-   L_598 : aliased constant String := "   function Output_Column return Text_IO."
-       & "Count;";
-   L_599 : aliased constant String := "%end";
-   L_600 : aliased constant String := "%if error";
-   L_601 : aliased constant String := "  function Input_Line return Text_IO.Coun"
-       & "t;";
-   L_602 : aliased constant String := "%end";
-   L_603 : aliased constant String := "%if yywrap";
-   L_604 : aliased constant String := "   function yyWrap return Boolean;";
-   L_605 : aliased constant String := "%end";
-   L_606 : aliased constant String := "   procedure Open_Input (fname : in Strin"
-       & "g);";
-   L_607 : aliased constant String := "   procedure Close_Input;";
-   L_608 : aliased constant String := "%if output";
-   L_609 : aliased constant String := "   procedure Create_Output (fname : in St"
-       & "ring := """");";
-   L_610 : aliased constant String := "   procedure Close_Output;";
-   L_611 : aliased constant String := "%end";
-   L_612 : aliased constant String := "";
-   L_613 : aliased constant String := "%if error";
-   L_614 : aliased constant String := "   procedure Yy_Get_Token_Line ( Yy_Line_"
-       & "String : out String;";
-   L_615 : aliased constant String := "                                 Yy_Line_"
-       & "Length : out Natural );";
-   L_616 : aliased constant String := "   --  Returnes the entire line in the in"
-       & "put, on which the currently";
-   L_617 : aliased constant String := "   --  matched token resides.";
-   L_618 : aliased constant String := "";
-   L_619 : aliased constant String := "   function Yy_Line_Number return Natural"
-       & ";";
-   L_620 : aliased constant String := "   --  Returns the line number of the cur"
-       & "rently matched token.";
-   L_621 : aliased constant String := "   --  In case a token spans lines, then "
-       & "the line number of the first line";
-   L_622 : aliased constant String := "   --  is returned.";
-   L_623 : aliased constant String := "";
-   L_624 : aliased constant String := "   function Yy_Begin_Column return Natura"
-       & "l;";
-   L_625 : aliased constant String := "   function Yy_End_Column return Natural;";
-   L_626 : aliased constant String := "   --  Returns the beginning and ending c"
-       & "olumn positions of the";
-   L_627 : aliased constant String := "   --  currently mathched token. If the t"
-       & "oken spans lines then the";
-   L_628 : aliased constant String := "   --  begin column number is the column "
-       & "number on the first line";
-   L_629 : aliased constant String := "   --  and the end columne number is the "
-       & "column number on the last line.";
-   L_630 : aliased constant String := "";
-   L_631 : aliased constant String := "%end";
-   L_632 : aliased constant String := "";
-   L_633 : aliased constant String := "end ${NAME}_IO;";
-   spec_io : aliased constant Content_Array :=
-     (L_531'Access,
+      L_530'Access,
+      L_531'Access,
       L_532'Access,
       L_533'Access,
       L_534'Access,
@@ -1489,6 +1573,2729 @@ private
       L_630'Access,
       L_631'Access,
       L_632'Access,
-      L_633'Access);
+      L_633'Access,
+      L_634'Access,
+      L_635'Access,
+      L_636'Access,
+      L_637'Access,
+      L_638'Access,
+      L_639'Access,
+      L_640'Access,
+      L_641'Access,
+      L_642'Access,
+      L_643'Access,
+      L_644'Access,
+      L_645'Access,
+      L_646'Access,
+      L_647'Access,
+      L_648'Access,
+      L_649'Access,
+      L_650'Access,
+      L_651'Access,
+      L_652'Access,
+      L_653'Access,
+      L_654'Access,
+      L_655'Access,
+      L_656'Access,
+      L_657'Access,
+      L_658'Access,
+      L_659'Access,
+      L_660'Access,
+      L_661'Access,
+      L_662'Access,
+      L_663'Access,
+      L_664'Access,
+      L_665'Access,
+      L_666'Access,
+      L_667'Access,
+      L_668'Access,
+      L_669'Access,
+      L_670'Access,
+      L_671'Access,
+      L_672'Access,
+      L_673'Access,
+      L_674'Access,
+      L_675'Access,
+      L_676'Access,
+      L_677'Access,
+      L_678'Access,
+      L_679'Access,
+      L_680'Access,
+      L_681'Access,
+      L_682'Access,
+      L_683'Access,
+      L_684'Access,
+      L_685'Access,
+      L_686'Access,
+      L_687'Access,
+      L_688'Access,
+      L_689'Access,
+      L_690'Access,
+      L_691'Access,
+      L_692'Access,
+      L_693'Access,
+      L_694'Access,
+      L_695'Access,
+      L_696'Access,
+      L_697'Access,
+      L_698'Access);
+
+   L_699 : aliased constant String := "--  Warning: This file is automatically g"
+       & "enerated by AFLEX.";
+   L_700 : aliased constant String := "--           It is useless to modify it. "
+       & "Change the "".Y"" & "".L"" files instead.";
+   L_701 : aliased constant String := "--  Template: templates/body-recursive-df"
+       & "a.adb";
+   L_702 : aliased constant String := "package body ${NAME}_DFA is";
+   L_703 : aliased constant String := "";
+   L_704 : aliased constant String := "   --  Nov 2002. Fixed insufficient buffe"
+       & "r size bug causing";
+   L_705 : aliased constant String := "   --  damage to comments at about the 10"
+       & "00-th character";
+   L_706 : aliased constant String := "";
+   L_707 : aliased constant String := "   function YYText (Context : in Context_"
+       & "Type) return String is";
+   L_708 : aliased constant String := "      J : Integer := Context.yytext_ptr;";
+   L_709 : aliased constant String := "   begin";
+   L_710 : aliased constant String := "      while J <= Context.yy_ch_buf'Last a"
+       & "nd then Context.yy_ch_buf (J) /= ASCII.NUL loop";
+   L_711 : aliased constant String := "         J := J + 1;";
+   L_712 : aliased constant String := "      end loop;";
+   L_713 : aliased constant String := "";
+   L_714 : aliased constant String := "      declare";
+   L_715 : aliased constant String := "         subtype Sliding_Type is String ("
+       & "1 .. J - Context.yytext_ptr);";
+   L_716 : aliased constant String := "      begin";
+   L_717 : aliased constant String := "         return Sliding_Type (Context.yy_"
+       & "ch_buf (Context.yytext_ptr .. J - 1));";
+   L_718 : aliased constant String := "      end;";
+   L_719 : aliased constant String := "   end YYText;";
+   L_720 : aliased constant String := "";
+   L_721 : aliased constant String := "   --  Returns the length of the matched "
+       & "text";
+   L_722 : aliased constant String := "";
+   L_723 : aliased constant String := "   function YYLength (Context : in Contex"
+       & "t_Type) return Integer is";
+   L_724 : aliased constant String := "   begin";
+   L_725 : aliased constant String := "      return Context.yy_cp - Context.yy_b"
+       & "p;";
+   L_726 : aliased constant String := "   end YYLength;";
+   L_727 : aliased constant String := "";
+   L_728 : aliased constant String := "   --  Done after the current pattern has"
+       & " been matched and before the";
+   L_729 : aliased constant String := "   --  corresponding action - sets up yyt"
+       & "ext";
+   L_730 : aliased constant String := "";
+   L_731 : aliased constant String := "   procedure YY_DO_BEFORE_ACTION (Context"
+       & " : in out Context_Type) is";
+   L_732 : aliased constant String := "   begin";
+   L_733 : aliased constant String := "      Context.yytext_ptr := Context.yy_bp"
+       & ";";
+   L_734 : aliased constant String := "      Context.yy_hold_char := Context.yy_"
+       & "ch_buf (Context.yy_cp);";
+   L_735 : aliased constant String := "      Context.yy_ch_buf (Context.yy_cp) :"
+       & "= ASCII.NUL;";
+   L_736 : aliased constant String := "      Context.yy_c_buf_p := Context.yy_cp"
+       & ";";
+   L_737 : aliased constant String := "   end YY_DO_BEFORE_ACTION;";
+   L_738 : aliased constant String := "";
+   L_739 : aliased constant String := "end ${NAME}_DFA;";
+   body_recursive_dfa : aliased constant Content_Array :=
+     (L_699'Access,
+      L_700'Access,
+      L_701'Access,
+      L_702'Access,
+      L_703'Access,
+      L_704'Access,
+      L_705'Access,
+      L_706'Access,
+      L_707'Access,
+      L_708'Access,
+      L_709'Access,
+      L_710'Access,
+      L_711'Access,
+      L_712'Access,
+      L_713'Access,
+      L_714'Access,
+      L_715'Access,
+      L_716'Access,
+      L_717'Access,
+      L_718'Access,
+      L_719'Access,
+      L_720'Access,
+      L_721'Access,
+      L_722'Access,
+      L_723'Access,
+      L_724'Access,
+      L_725'Access,
+      L_726'Access,
+      L_727'Access,
+      L_728'Access,
+      L_729'Access,
+      L_730'Access,
+      L_731'Access,
+      L_732'Access,
+      L_733'Access,
+      L_734'Access,
+      L_735'Access,
+      L_736'Access,
+      L_737'Access,
+      L_738'Access,
+      L_739'Access);
+
+   L_740 : aliased constant String := "--  Warning: This file is automatically g"
+       & "enerated by AFLEX.";
+   L_741 : aliased constant String := "--           It is useless to modify it. "
+       & "Change the "".Y"" & "".L"" files instead.";
+   L_742 : aliased constant String := "--  Template: templates/body-recursive-io"
+       & ".adb";
+   L_743 : aliased constant String := "package body ${NAME}_IO is";
+   L_744 : aliased constant String := "";
+   L_745 : aliased constant String := "   --  gets input and stuffs it into 'buf"
+       & "'.  number of characters read, or YY_NULL,";
+   L_746 : aliased constant String := "   --  is returned in 'result'.";
+   L_747 : aliased constant String := "";
+   L_748 : aliased constant String := "   procedure YY_INPUT (Context  : in out "
+       & "Context_Type;";
+   L_749 : aliased constant String := "                       buf      : out unb"
+       & "ounded_character_array;";
+   L_750 : aliased constant String := "                       result   : out Int"
+       & "eger;";
+   L_751 : aliased constant String := "                       max_size : in Inte"
+       & "ger) is";
+   L_752 : aliased constant String := "      c   : Character;";
+   L_753 : aliased constant String := "      i   : Integer := 1;";
+   L_754 : aliased constant String := "      loc : Integer := buf'First;";
+   L_755 : aliased constant String := "%if error";
+   L_756 : aliased constant String := "   --    Since buf is an out parameter wh"
+       & "ich is not readable";
+   L_757 : aliased constant String := "   --    and saved lines is a string poin"
+       & "ter which space must";
+   L_758 : aliased constant String := "   --    be allocated after we know the s"
+       & "ize, we maintain";
+   L_759 : aliased constant String := "   --    an extra buffer to collect the i"
+       & "nput line and";
+   L_760 : aliased constant String := "   --    save it into the saved line 2.";
+   L_761 : aliased constant String := "      Temp_Line : String (1 .. YY_BUF_SIZ"
+       & "E + 2);";
+   L_762 : aliased constant String := "%end";
+   L_763 : aliased constant String := "   begin";
+   L_764 : aliased constant String := "%if error";
+   L_765 : aliased constant String := "      -- buf := ( others => ASCII.NUL ); "
+       & "-- CvdL: does not work in GNAT";
+   L_766 : aliased constant String := "      for j in buf'First .. buf'Last loop";
+   L_767 : aliased constant String := "         buf (j) := ASCII.NUL;";
+   L_768 : aliased constant String := "      end loop;";
+   L_769 : aliased constant String := "      -- Move the saved lines forward.";
+   L_770 : aliased constant String := "      Context.Saved_Tok_Line1 := Context."
+       & "Saved_Tok_Line2;";
+   L_771 : aliased constant String := "      Context.Line_Number_Of_Saved_Tok_Li"
+       & "ne1 := Context.Line_Number_Of_Saved_Tok_Line2;";
+   L_772 : aliased constant String := "%end";
+   L_773 : aliased constant String := "";
+   L_774 : aliased constant String := "      if Ada.Text_IO.Is_Open (Context.use"
+       & "r_input_file) then";
+   L_775 : aliased constant String := "         while i <= max_size loop";
+   L_776 : aliased constant String := "            --  Ada ate our newline, put "
+       & "it back on the end.";
+   L_777 : aliased constant String := "            if Ada.Text_IO.End_Of_Line (C"
+       & "ontext.user_input_file) then";
+   L_778 : aliased constant String := "               buf (loc) := ASCII.LF;";
+   L_779 : aliased constant String := "               Ada.Text_IO.Skip_Line (Con"
+       & "text.user_input_file, 1);";
+   L_780 : aliased constant String := "%if error";
+   L_781 : aliased constant String := "               --   We try to get one lin"
+       & "e by one line. So we return";
+   L_782 : aliased constant String := "               --   here because we saw t"
+       & "he end_of_line.";
+   L_783 : aliased constant String := "               result := i;";
+   L_784 : aliased constant String := "               Temp_Line (i) := ASCII.LF;";
+   L_785 : aliased constant String := "               Context.Saved_Tok_Line2 :="
+       & " new String (1 .. i);";
+   L_786 : aliased constant String := "               Context.Saved_Tok_Line2 (1"
+       & " .. i) := Temp_Line (1 .. i);";
+   L_787 : aliased constant String := "               Context.Line_Number_Of_Sav"
+       & "ed_Tok_Line2 := Context.Line_Number_Of_Saved_Tok_Line1 + 1;";
+   L_788 : aliased constant String := "               return;";
+   L_789 : aliased constant String := "%end";
+   L_790 : aliased constant String := "%if interactive";
+   L_791 : aliased constant String := "               i := i + 1; --  update cou"
+       & "nter, miss end of loop";
+   L_792 : aliased constant String := "               exit; --  in interactive m"
+       & "ode return at end of line.";
+   L_793 : aliased constant String := "%end";
+   L_794 : aliased constant String := "            else";
+   L_795 : aliased constant String := "               --  UCI CODES CHANGED:";
+   L_796 : aliased constant String := "               --    The following codes "
+       & "are modified. Previous codes is commented out.";
+   L_797 : aliased constant String := "               --    The purpose of doing"
+       & " this is to make it possible to set Temp_Line";
+   L_798 : aliased constant String := "               --    in Ayacc-extension s"
+       & "pecific codes. Definitely, we can read the character";
+   L_799 : aliased constant String := "               --    into the Temp_Line a"
+       & "nd then set the buf. But Temp_Line will only";
+   L_800 : aliased constant String := "               --    be used in Ayacc-ext"
+       & "ension specific codes which makes";
+   L_801 : aliased constant String := "               --    this approach imposs"
+       & "ible.";
+   L_802 : aliased constant String := "               Ada.Text_IO.Get (Context.u"
+       & "ser_input_file, c);";
+   L_803 : aliased constant String := "               buf (loc) := c;";
+   L_804 : aliased constant String := "--             Ada.Text_IO.Get (Context.u"
+       & "ser_input_file, buf (loc));";
+   L_805 : aliased constant String := "%if error";
+   L_806 : aliased constant String := "               Temp_Line (i) := c;";
+   L_807 : aliased constant String := "%end";
+   L_808 : aliased constant String := "            end if;";
+   L_809 : aliased constant String := "";
+   L_810 : aliased constant String := "            loc := loc + 1;";
+   L_811 : aliased constant String := "            i := i + 1;";
+   L_812 : aliased constant String := "         end loop;";
+   L_813 : aliased constant String := "      else";
+   L_814 : aliased constant String := "         while i <= max_size loop";
+   L_815 : aliased constant String := "            if Ada.Text_IO.End_Of_Line th"
+       & "en -- Ada ate our newline, put it back on the end.";
+   L_816 : aliased constant String := "               buf (loc) := ASCII.LF;";
+   L_817 : aliased constant String := "               Ada.Text_IO.Skip_Line (1);";
+   L_818 : aliased constant String := "%if error";
+   L_819 : aliased constant String := "               --   We try to get one lin"
+       & "e by one line. So we return";
+   L_820 : aliased constant String := "               --   here because we saw t"
+       & "he end_of_line.";
+   L_821 : aliased constant String := "               result := i;";
+   L_822 : aliased constant String := "               Temp_Line (i) := ASCII.LF;";
+   L_823 : aliased constant String := "               Context.Saved_Tok_Line2 :="
+       & " new String (1 .. i);";
+   L_824 : aliased constant String := "               Context.Saved_Tok_Line2 (1"
+       & " .. i) := Temp_Line (1 .. i);";
+   L_825 : aliased constant String := "               Context.Line_Number_Of_Sav"
+       & "ed_Tok_Line2 := Context.Line_Number_Of_Saved_Tok_Line1 + 1;";
+   L_826 : aliased constant String := "               return;";
+   L_827 : aliased constant String := "%end";
+   L_828 : aliased constant String := "";
+   L_829 : aliased constant String := "            else";
+   L_830 : aliased constant String := "               --  The following codes ar"
+       & "e modified. Previous codes is commented out.";
+   L_831 : aliased constant String := "               --  The purpose of doing t"
+       & "his is to make it possible to set Temp_Line";
+   L_832 : aliased constant String := "               --  in Ayacc-extension spe"
+       & "cific codes. Definitely, we can read the character";
+   L_833 : aliased constant String := "               --  into the Temp_Line and"
+       & " then set the buf. But Temp_Line will only";
+   L_834 : aliased constant String := "               --  be used in Ayacc-exten"
+       & "sion specific codes which makes this approach impossible.";
+   L_835 : aliased constant String := "               Ada.Text_IO.Get (c);";
+   L_836 : aliased constant String := "               buf (loc) := c;";
+   L_837 : aliased constant String := "%if error";
+   L_838 : aliased constant String := "               Temp_Line (i) := c;";
+   L_839 : aliased constant String := "%end";
+   L_840 : aliased constant String := "            end if;";
+   L_841 : aliased constant String := "";
+   L_842 : aliased constant String := "            loc := loc + 1;";
+   L_843 : aliased constant String := "            i := i + 1;";
+   L_844 : aliased constant String := "         end loop;";
+   L_845 : aliased constant String := "      end if; --  for input file being st"
+       & "andard input";
+   L_846 : aliased constant String := "      result := i - 1;";
+   L_847 : aliased constant String := "";
+   L_848 : aliased constant String := "%if error";
+   L_849 : aliased constant String := "      --  Since we get one line by one li"
+       & "ne, if we";
+   L_850 : aliased constant String := "      --  reach here, it means that curre"
+       & "nt line have";
+   L_851 : aliased constant String := "      --  more that max_size characters. "
+       & "So it is";
+   L_852 : aliased constant String := "      --  impossible to hold the whole li"
+       & "ne. We";
+   L_853 : aliased constant String := "      --  report the warning message and "
+       & "continue.";
+   L_854 : aliased constant String := "      buf (loc - 1) := Ascii.LF;";
+   L_855 : aliased constant String := "      if Ada.Text_IO.Is_Open (Context.use"
+       & "r_input_file) then";
+   L_856 : aliased constant String := "         Ada.Text_IO.Skip_Line (Context.u"
+       & "ser_input_file, 1);";
+   L_857 : aliased constant String := "      else";
+   L_858 : aliased constant String := "         Ada.Text_IO.Skip_Line (1);";
+   L_859 : aliased constant String := "      end if;";
+   L_860 : aliased constant String := "      Temp_Line (i - 1) := ASCII.LF;";
+   L_861 : aliased constant String := "      Context.Saved_Tok_Line2 := new Stri"
+       & "ng (1 .. i - 1);";
+   L_862 : aliased constant String := "      Context.Saved_Tok_Line2 (1 .. i - 1"
+       & ") := Temp_Line (1 .. i - 1);";
+   L_863 : aliased constant String := "      Context.Line_Number_Of_Saved_Tok_Li"
+       & "ne2 := Context.Line_Number_Of_Saved_Tok_Line1 + 1;";
+   L_864 : aliased constant String := "      Put_Line (""Input line """;
+   L_865 : aliased constant String := "                & Integer'Image ( Context"
+       & ".Line_Number_Of_Saved_Tok_Line2 )";
+   L_866 : aliased constant String := "                & ""has more than """;
+   L_867 : aliased constant String := "                & Integer'Image ( max_siz"
+       & "e )";
+   L_868 : aliased constant String := "                & "" characters, ... trun"
+       & "cated."" );";
+   L_869 : aliased constant String := "%end";
+   L_870 : aliased constant String := "   exception";
+   L_871 : aliased constant String := "      when Ada.Text_IO.End_Error =>";
+   L_872 : aliased constant String := "         result := i - 1;";
+   L_873 : aliased constant String := "         --  when we hit EOF we need to s"
+       & "et yy_eof_has_been_seen";
+   L_874 : aliased constant String := "         Context.yy_eof_has_been_seen := "
+       & "True;";
+   L_875 : aliased constant String := "%if error";
+   L_876 : aliased constant String := "         --   Processing incomplete line.";
+   L_877 : aliased constant String := "         if i /= 1 then";
+   L_878 : aliased constant String := "            -- Current line is not empty "
+       & "but do not have end_of_line.";
+   L_879 : aliased constant String := "            -- So current line is incompl"
+       & "ete line. But we still need";
+   L_880 : aliased constant String := "            -- to save it.";
+   L_881 : aliased constant String := "            Context.Saved_Tok_Line2 := ne"
+       & "w String (1 .. i - 1);";
+   L_882 : aliased constant String := "            Context.Saved_Tok_Line2 (1 .."
+       & " i - 1) := Temp_Line (1 .. i - 1);";
+   L_883 : aliased constant String := "            Context.Line_Number_Of_Saved_"
+       & "Tok_Line2 := Context.Line_Number_Of_Saved_Tok_Line1 + 1;";
+   L_884 : aliased constant String := "         end if;";
+   L_885 : aliased constant String := "%end";
+   L_886 : aliased constant String := "   end YY_INPUT;";
+   L_887 : aliased constant String := "";
+   L_888 : aliased constant String := "   --  yy_get_next_buffer - try to read i"
+       & "n new buffer";
+   L_889 : aliased constant String := "   --";
+   L_890 : aliased constant String := "   --  returns a code representing an act"
+       & "ion";
+   L_891 : aliased constant String := "   --     EOB_ACT_LAST_MATCH -";
+   L_892 : aliased constant String := "   --     EOB_ACT_RESTART_SCAN - restart "
+       & "the scanner";
+   L_893 : aliased constant String := "   --     EOB_ACT_END_OF_FILE - end of fi"
+       & "le";
+   L_894 : aliased constant String := "";
+   L_895 : aliased constant String := "   function yy_get_next_buffer (Context :"
+       & " in out Context_Type) return eob_action_type is";
+   L_896 : aliased constant String := "      dest           : Integer := 0;";
+   L_897 : aliased constant String := "      source         : Integer := Context"
+       & ".dfa.yytext_ptr - 1; -- copy prev. char, too";
+   L_898 : aliased constant String := "      number_to_move : Integer;";
+   L_899 : aliased constant String := "      ret_val        : eob_action_type;";
+   L_900 : aliased constant String := "      num_to_read    : Integer;";
+   L_901 : aliased constant String := "   begin";
+   L_902 : aliased constant String := "      if Context.dfa.yy_c_buf_p > Context"
+       & ".yy_n_chars + 1 then";
+   L_903 : aliased constant String := "         raise NULL_IN_INPUT;";
+   L_904 : aliased constant String := "      end if;";
+   L_905 : aliased constant String := "";
+   L_906 : aliased constant String := "      --  try to read more data";
+   L_907 : aliased constant String := "";
+   L_908 : aliased constant String := "      --  first move last chars to start "
+       & "of buffer";
+   L_909 : aliased constant String := "      number_to_move := Context.dfa.yy_c_"
+       & "buf_p - Context.dfa.yytext_ptr;";
+   L_910 : aliased constant String := "";
+   L_911 : aliased constant String := "      for i in 0 .. number_to_move - 1 lo"
+       & "op";
+   L_912 : aliased constant String := "         Context.dfa.yy_ch_buf (dest) := "
+       & "Context.dfa.yy_ch_buf (source);";
+   L_913 : aliased constant String := "         dest := dest + 1;";
+   L_914 : aliased constant String := "         source := source + 1;";
+   L_915 : aliased constant String := "      end loop;";
+   L_916 : aliased constant String := "";
+   L_917 : aliased constant String := "      if Context.yy_eof_has_been_seen the"
+       & "n";
+   L_918 : aliased constant String := "         --  don't do the read, it's not "
+       & "guaranteed to return an EOF,";
+   L_919 : aliased constant String := "         --  just force an EOF";
+   L_920 : aliased constant String := "";
+   L_921 : aliased constant String := "         Context.yy_n_chars := 0;";
+   L_922 : aliased constant String := "      else";
+   L_923 : aliased constant String := "         num_to_read := YY_BUF_SIZE - num"
+       & "ber_to_move - 1;";
+   L_924 : aliased constant String := "";
+   L_925 : aliased constant String := "         if num_to_read > YY_READ_BUF_SIZ"
+       & "E then";
+   L_926 : aliased constant String := "            num_to_read := YY_READ_BUF_SI"
+       & "ZE;";
+   L_927 : aliased constant String := "         end if;";
+   L_928 : aliased constant String := "";
+   L_929 : aliased constant String := "         --  read in more data";
+   L_930 : aliased constant String := "         YY_INPUT (Context, Context.dfa.y"
+       & "y_ch_buf (number_to_move .. Context.dfa.yy_ch_buf'Last), Context.yy_n_ch"
+       & "ars, num_to_read);";
+   L_931 : aliased constant String := "      end if;";
+   L_932 : aliased constant String := "      if Context.yy_n_chars = 0 then";
+   L_933 : aliased constant String := "         if number_to_move = 1 then";
+   L_934 : aliased constant String := "            ret_val := EOB_ACT_END_OF_FIL"
+       & "E;";
+   L_935 : aliased constant String := "         else";
+   L_936 : aliased constant String := "            ret_val := EOB_ACT_LAST_MATCH"
+       & ";";
+   L_937 : aliased constant String := "         end if;";
+   L_938 : aliased constant String := "";
+   L_939 : aliased constant String := "         Context.yy_eof_has_been_seen := "
+       & "True;";
+   L_940 : aliased constant String := "      else";
+   L_941 : aliased constant String := "         ret_val := EOB_ACT_RESTART_SCAN;";
+   L_942 : aliased constant String := "      end if;";
+   L_943 : aliased constant String := "";
+   L_944 : aliased constant String := "      Context.yy_n_chars := Context.yy_n_"
+       & "chars + number_to_move;";
+   L_945 : aliased constant String := "      Context.dfa.yy_ch_buf (Context.yy_n"
+       & "_chars) := YY_END_OF_BUFFER_CHAR;";
+   L_946 : aliased constant String := "      Context.dfa.yy_ch_buf (Context.yy_n"
+       & "_chars + 1) := YY_END_OF_BUFFER_CHAR;";
+   L_947 : aliased constant String := "";
+   L_948 : aliased constant String := "      --  yytext begins at the second cha"
+       & "racter in";
+   L_949 : aliased constant String := "      --  yy_ch_buf; the first character "
+       & "is the one which";
+   L_950 : aliased constant String := "      --  preceded it before reading in t"
+       & "he latest buffer;";
+   L_951 : aliased constant String := "      --  it needs to be kept around in c"
+       & "ase it's a";
+   L_952 : aliased constant String := "      --  newline, so yy_get_previous_sta"
+       & "te() will have";
+   L_953 : aliased constant String := "      --  with '^' rules active";
+   L_954 : aliased constant String := "";
+   L_955 : aliased constant String := "      Context.dfa.yytext_ptr := 1;";
+   L_956 : aliased constant String := "";
+   L_957 : aliased constant String := "      return ret_val;";
+   L_958 : aliased constant String := "   end yy_get_next_buffer;";
+   L_959 : aliased constant String := "";
+   L_960 : aliased constant String := "%if unput";
+   L_961 : aliased constant String := "   procedure yyUnput (Context : in out Co"
+       & "ntext_Type;";
+   L_962 : aliased constant String := "                      c : Character; yy_b"
+       & "p : in out Integer) is";
+   L_963 : aliased constant String := "      number_to_move : Integer;";
+   L_964 : aliased constant String := "      dest : Integer;";
+   L_965 : aliased constant String := "      source : Integer;";
+   L_966 : aliased constant String := "      tmp_yy_cp : Integer;";
+   L_967 : aliased constant String := "   begin";
+   L_968 : aliased constant String := "      tmp_yy_cp := Context.dfa.yy_c_buf_p"
+       & ";";
+   L_969 : aliased constant String := "      Context.dfa.yy_ch_buf (tmp_yy_cp) :"
+       & "= Context.dfa.yy_hold_char; --  undo effects of setting up yytext";
+   L_970 : aliased constant String := "";
+   L_971 : aliased constant String := "      if tmp_yy_cp < 2 then";
+   L_972 : aliased constant String := "         --  need to shift things up to m"
+       & "ake room";
+   L_973 : aliased constant String := "         number_to_move := Context.yy_n_c"
+       & "hars + 2; --  +2 for EOB chars";
+   L_974 : aliased constant String := "         dest := YY_BUF_SIZE + 2;";
+   L_975 : aliased constant String := "         source := number_to_move;";
+   L_976 : aliased constant String := "";
+   L_977 : aliased constant String := "         while source > 0 loop";
+   L_978 : aliased constant String := "            dest := dest - 1;";
+   L_979 : aliased constant String := "            source := source - 1;";
+   L_980 : aliased constant String := "            Context.dfa.yy_ch_buf (dest) "
+       & ":= Context.dfa.yy_ch_buf (source);";
+   L_981 : aliased constant String := "         end loop;";
+   L_982 : aliased constant String := "";
+   L_983 : aliased constant String := "         tmp_yy_cp := tmp_yy_cp + dest - "
+       & "source;";
+   L_984 : aliased constant String := "         Context.dfa.yy_bp := Context.dfa"
+       & ".yy_bp + dest - source;";
+   L_985 : aliased constant String := "         Context.yy_n_chars := YY_BUF_SIZ"
+       & "E;";
+   L_986 : aliased constant String := "";
+   L_987 : aliased constant String := "         if tmp_yy_cp < 2 then";
+   L_988 : aliased constant String := "            raise PUSHBACK_OVERFLOW;";
+   L_989 : aliased constant String := "         end if;";
+   L_990 : aliased constant String := "      end if;";
+   L_991 : aliased constant String := "";
+   L_992 : aliased constant String := "      if tmp_yy_cp > yy_bp and then Conte"
+       & "xt.dfa.yy_ch_buf (tmp_yy_cp - 1) = ASCII.LF then";
+   L_993 : aliased constant String := "         Context.dfa.yy_ch_buf (tmp_yy_cp"
+       & " - 2) := ASCII.LF;";
+   L_994 : aliased constant String := "      end if;";
+   L_995 : aliased constant String := "";
+   L_996 : aliased constant String := "      tmp_yy_cp := tmp_yy_cp - 1;";
+   L_997 : aliased constant String := "      Context.dfa.yy_ch_buf (tmp_yy_cp) :"
+       & "= c;";
+   L_998 : aliased constant String := "";
+   L_999 : aliased constant String := "      --  Note:  this code is the text of"
+       & " YY_DO_BEFORE_ACTION, only";
+   L_1000: aliased constant String := "      --         here we get different yy"
+       & "_cp and yy_bp's";
+   L_1001: aliased constant String := "      Context.dfa.yytext_ptr := Context.d"
+       & "fa.yy_bp;";
+   L_1002: aliased constant String := "      Context.dfa.yy_hold_char := Context"
+       & ".dfa.yy_ch_buf (tmp_yy_cp);";
+   L_1003: aliased constant String := "      Context.dfa.yy_ch_buf (tmp_yy_cp) :"
+       & "= ASCII.NUL;";
+   L_1004: aliased constant String := "      Context.dfa.yy_c_buf_p := tmp_yy_cp"
+       & ";";
+   L_1005: aliased constant String := "   end yyUnput;";
+   L_1006: aliased constant String := "";
+   L_1007: aliased constant String := "   procedure Unput (Context : in out Cont"
+       & "ext_Type; c : Character) is";
+   L_1008: aliased constant String := "   begin";
+   L_1009: aliased constant String := "      yyUnput (Context, c, Context.dfa.yy"
+       & "_bp);";
+   L_1010: aliased constant String := "   end Unput;";
+   L_1011: aliased constant String := "%end";
+   L_1012: aliased constant String := "";
+   L_1013: aliased constant String := "   function Input (Context : in out Conte"
+       & "xt_Type) return Character is";
+   L_1014: aliased constant String := "      c : Character;";
+   L_1015: aliased constant String := "   begin";
+   L_1016: aliased constant String := "      Context.dfa.yy_ch_buf (Context.dfa."
+       & "yy_c_buf_p) := Context.dfa.yy_hold_char;";
+   L_1017: aliased constant String := "";
+   L_1018: aliased constant String := "      if Context.dfa.yy_ch_buf (Context.d"
+       & "fa.yy_c_buf_p) = YY_END_OF_BUFFER_CHAR then";
+   L_1019: aliased constant String := "         --  need more input";
+   L_1020: aliased constant String := "         Context.dfa.yytext_ptr := Contex"
+       & "t.dfa.yy_c_buf_p;";
+   L_1021: aliased constant String := "         Context.dfa.yy_c_buf_p := Contex"
+       & "t.dfa.yy_c_buf_p + 1;";
+   L_1022: aliased constant String := "";
+   L_1023: aliased constant String := "         case yy_get_next_buffer (Context"
+       & ") is";
+   L_1024: aliased constant String := "            --  this code, unfortunately,"
+       & " is somewhat redundant with";
+   L_1025: aliased constant String := "            --  that above";
+   L_1026: aliased constant String := "";
+   L_1027: aliased constant String := "         when EOB_ACT_END_OF_FILE =>";
+   L_1028: aliased constant String := "%if yywrap";
+   L_1029: aliased constant String := "            if yyWrap (Context) then";
+   L_1030: aliased constant String := "               Context.dfa.yy_c_buf_p := "
+       & "Context.dfa.yytext_ptr;";
+   L_1031: aliased constant String := "               return ASCII.NUL;";
+   L_1032: aliased constant String := "            end if;";
+   L_1033: aliased constant String := "";
+   L_1034: aliased constant String := "            Context.dfa.yy_ch_buf (0) := "
+       & "ASCII.LF;";
+   L_1035: aliased constant String := "            Context.yy_n_chars := 1;";
+   L_1036: aliased constant String := "            Context.dfa.yy_ch_buf (Contex"
+       & "t.yy_n_chars) := YY_END_OF_BUFFER_CHAR;";
+   L_1037: aliased constant String := "            Context.dfa.yy_ch_buf (Contex"
+       & "t.yy_n_chars + 1) := YY_END_OF_BUFFER_CHAR;";
+   L_1038: aliased constant String := "            Context.yy_eof_has_been_seen "
+       & ":= False;";
+   L_1039: aliased constant String := "            Context.yy_c_buf_p := 1;";
+   L_1040: aliased constant String := "            Context.dfa.yytext_ptr := Con"
+       & "text.dfa.yy_c_buf_p;";
+   L_1041: aliased constant String := "            Context.dfa.yy_hold_char := C"
+       & "ontext.dfa.yy_ch_buf (Context.yy_c_buf_p);";
+   L_1042: aliased constant String := "";
+   L_1043: aliased constant String := "            return Input;";
+   L_1044: aliased constant String := "%else";
+   L_1045: aliased constant String := "            Context.dfa.yy_c_buf_p := Con"
+       & "text.dfa.yytext_ptr;";
+   L_1046: aliased constant String := "            return ASCII.NUL;";
+   L_1047: aliased constant String := "%end";
+   L_1048: aliased constant String := "         when EOB_ACT_RESTART_SCAN =>";
+   L_1049: aliased constant String := "            Context.dfa.yy_c_buf_p := Con"
+       & "text.dfa.yytext_ptr;";
+   L_1050: aliased constant String := "";
+   L_1051: aliased constant String := "         when EOB_ACT_LAST_MATCH =>";
+   L_1052: aliased constant String := "            raise UNEXPECTED_LAST_MATCH;";
+   L_1053: aliased constant String := "         end case;";
+   L_1054: aliased constant String := "      end if;";
+   L_1055: aliased constant String := "";
+   L_1056: aliased constant String := "      c := Context.dfa.yy_ch_buf (Context"
+       & ".dfa.yy_c_buf_p);";
+   L_1057: aliased constant String := "      Context.dfa.yy_c_buf_p := Context.d"
+       & "fa.yy_c_buf_p + 1;";
+   L_1058: aliased constant String := "      Context.dfa.yy_hold_char := Context"
+       & ".dfa.yy_ch_buf (Context.dfa.yy_c_buf_p);";
+   L_1059: aliased constant String := "";
+   L_1060: aliased constant String := "      return c;";
+   L_1061: aliased constant String := "   end Input;";
+   L_1062: aliased constant String := "";
+   L_1063: aliased constant String := "%if output";
+   L_1064: aliased constant String := "   procedure Output (Context : in out Con"
+       & "text_Type; c : Character) is";
+   L_1065: aliased constant String := "   begin";
+   L_1066: aliased constant String := "      if Ada.Text_IO.Is_Open (Context.use"
+       & "r_output_file) then";
+   L_1067: aliased constant String := "         Ada.Text_IO.Put (Context.user_ou"
+       & "tput_file, c);";
+   L_1068: aliased constant String := "      else";
+   L_1069: aliased constant String := "         Ada.Text_IO.Put (c);";
+   L_1070: aliased constant String := "      end if;";
+   L_1071: aliased constant String := "   end Output;";
+   L_1072: aliased constant String := "";
+   L_1073: aliased constant String := "   procedure Output_New_Line (Context : i"
+       & "n out Context_Type) is";
+   L_1074: aliased constant String := "   begin";
+   L_1075: aliased constant String := "      if Ada.Text_IO.Is_Open (Context.use"
+       & "r_output_file) then";
+   L_1076: aliased constant String := "         Ada.Text_IO.New_Line (Context.us"
+       & "er_output_file);";
+   L_1077: aliased constant String := "      else";
+   L_1078: aliased constant String := "         Ada.Text_IO.New_Line;";
+   L_1079: aliased constant String := "      end if;";
+   L_1080: aliased constant String := "   end Output_New_Line;";
+   L_1081: aliased constant String := "";
+   L_1082: aliased constant String := "   function Output_Column (Context : in C"
+       & "ontext_Type) return Ada.Text_IO.Count is";
+   L_1083: aliased constant String := "   begin";
+   L_1084: aliased constant String := "      if Ada.Text_IO.Is_Open (Context.use"
+       & "r_output_file) then";
+   L_1085: aliased constant String := "         return Ada.Text_IO.Col (Context."
+       & "user_output_file);";
+   L_1086: aliased constant String := "      else";
+   L_1087: aliased constant String := "         return Ada.Text_IO.Col;";
+   L_1088: aliased constant String := "      end if;";
+   L_1089: aliased constant String := "   end Output_Column;";
+   L_1090: aliased constant String := "%end";
+   L_1091: aliased constant String := "%if error";
+   L_1092: aliased constant String := "";
+   L_1093: aliased constant String := "   function Input_Line (Context : in Cont"
+       & "ext_Type) return Ada.Text_IO.Count is";
+   L_1094: aliased constant String := "   begin";
+   L_1095: aliased constant String := "      return Ada.Text_IO.Count (Context.L"
+       & "ine_Number_Of_Saved_Tok_Line2);";
+   L_1096: aliased constant String := "   end Input_Line;";
+   L_1097: aliased constant String := "%end";
+   L_1098: aliased constant String := "%if yywrap";
+   L_1099: aliased constant String := "";
+   L_1100: aliased constant String := "   --  default yywrap function - always t"
+       & "reat EOF as an EOF";
+   L_1101: aliased constant String := "   function yyWrap (Context : in Context_"
+       & "Type) return Boolean is";
+   L_1102: aliased constant String := "   begin";
+   L_1103: aliased constant String := "      return True;";
+   L_1104: aliased constant String := "   end yyWrap;";
+   L_1105: aliased constant String := "%end";
+   L_1106: aliased constant String := "";
+   L_1107: aliased constant String := "   procedure Open_Input (Context : in out"
+       & " Context_Type; fname : in String) is";
+   L_1108: aliased constant String := "   begin";
+   L_1109: aliased constant String := "      Context.dfa.yy_init := True;";
+   L_1110: aliased constant String := "      Ada.Text_IO.Open (Context.user_inpu"
+       & "t_file, Ada.Text_IO.In_File, fname);";
+   L_1111: aliased constant String := "   end Open_Input;";
+   L_1112: aliased constant String := "";
+   L_1113: aliased constant String := "%if output";
+   L_1114: aliased constant String := "   procedure Create_Output (Context : in "
+       & "out Context_Type; fname : in String := """") is";
+   L_1115: aliased constant String := "   begin";
+   L_1116: aliased constant String := "      if fname /= """" then";
+   L_1117: aliased constant String := "         Ada.Text_IO.Create (Context.user"
+       & "_output_file, Ada.Text_IO.Out_File, fname);";
+   L_1118: aliased constant String := "      end if;";
+   L_1119: aliased constant String := "   end Create_Output;";
+   L_1120: aliased constant String := "%end";
+   L_1121: aliased constant String := "";
+   L_1122: aliased constant String := "   procedure Close_Input (Context : in ou"
+       & "t Context_Type) is";
+   L_1123: aliased constant String := "   begin";
+   L_1124: aliased constant String := "      if Ada.Text_IO.Is_Open (Context.use"
+       & "r_input_file) then";
+   L_1125: aliased constant String := "         Ada.Text_IO.Close (Context.user_"
+       & "input_file);";
+   L_1126: aliased constant String := "      end if;";
+   L_1127: aliased constant String := "   end Close_Input;";
+   L_1128: aliased constant String := "";
+   L_1129: aliased constant String := "%if output";
+   L_1130: aliased constant String := "   procedure Close_Output (Context : in o"
+       & "ut Context_Type) is";
+   L_1131: aliased constant String := "   begin";
+   L_1132: aliased constant String := "      if Ada.Text_IO.Is_Open (Context.use"
+       & "r_output_file) then";
+   L_1133: aliased constant String := "         Ada.Text_IO.Close (Context.user_"
+       & "output_file);";
+   L_1134: aliased constant String := "      end if;";
+   L_1135: aliased constant String := "   end Close_Output;";
+   L_1136: aliased constant String := "%end";
+   L_1137: aliased constant String := "";
+   L_1138: aliased constant String := "%if error";
+   L_1139: aliased constant String := "   procedure Yy_Get_Token_Line (Context :"
+       & " in out Context_Type;";
+   L_1140: aliased constant String := "                                Yy_Line_S"
+       & "tring : out String;";
+   L_1141: aliased constant String := "                                Yy_Line_L"
+       & "ength : out Natural ) is";
+   L_1142: aliased constant String := "   begin";
+   L_1143: aliased constant String := "      --  Currently processing line is ei"
+       & "ther in saved token line1 or";
+   L_1144: aliased constant String := "      --  in saved token line2.";
+   L_1145: aliased constant String := "      if Context.Yy_Line_Number = Context"
+       & ".Line_Number_Of_Saved_Tok_Line1 then";
+   L_1146: aliased constant String := "         Context.Yy_Line_Length := Contex"
+       & "t.Saved_Tok_Line1.all'length;";
+   L_1147: aliased constant String := "         Context.Yy_Line_String ( Context"
+       & ".Yy_Line_String'First .. ( Context.Yy_Line_String'First + Context.Saved_"
+       & "Tok_Line1.all'length - 1 ))";
+   L_1148: aliased constant String := "           := Context.Saved_Tok_Line1 ( 1"
+       & " .. Context.Saved_Tok_Line1.all'length );";
+   L_1149: aliased constant String := "      else";
+   L_1150: aliased constant String := "         Context.Yy_Line_Length := Contex"
+       & "t.Saved_Tok_Line2.all'length;";
+   L_1151: aliased constant String := "         Context.Yy_Line_String ( Context"
+       & ".Yy_Line_String'First .. ( Context.Yy_Line_String'First + Context.Saved_"
+       & "Tok_Line2.all'length - 1 ))";
+   L_1152: aliased constant String := "           := Context.Saved_Tok_Line2 ( 1"
+       & " .. Context.Saved_Tok_Line2.all'length );";
+   L_1153: aliased constant String := "      end if;";
+   L_1154: aliased constant String := "   end Yy_Get_Token_Line;";
+   L_1155: aliased constant String := "";
+   L_1156: aliased constant String := "   function Yy_Line_Number (Context : in "
+       & "Context_Type) return Natural is";
+   L_1157: aliased constant String := "   begin";
+   L_1158: aliased constant String := "      return Context.dfa.Tok_Begin_Line;";
+   L_1159: aliased constant String := "   end Yy_Line_Number;";
+   L_1160: aliased constant String := "";
+   L_1161: aliased constant String := "   function Yy_Begin_Column (Context : in"
+       & " Context_Type) return Natural is";
+   L_1162: aliased constant String := "   begin";
+   L_1163: aliased constant String := "      return Context.dfa.Tok_Begin_Col;";
+   L_1164: aliased constant String := "   end Yy_Begin_Column;";
+   L_1165: aliased constant String := "";
+   L_1166: aliased constant String := "   function Yy_End_Column (Context : in C"
+       & "ontext_Type) return Natural is";
+   L_1167: aliased constant String := "   begin";
+   L_1168: aliased constant String := "      return Context.dfa.Tok_End_Col;";
+   L_1169: aliased constant String := "   end Yy_End_Column;";
+   L_1170: aliased constant String := "";
+   L_1171: aliased constant String := "%end";
+   L_1172: aliased constant String := "";
+   L_1173: aliased constant String := "end ${NAME}_IO;";
+   body_recursive_io : aliased constant Content_Array :=
+     (L_740'Access,
+      L_741'Access,
+      L_742'Access,
+      L_743'Access,
+      L_744'Access,
+      L_745'Access,
+      L_746'Access,
+      L_747'Access,
+      L_748'Access,
+      L_749'Access,
+      L_750'Access,
+      L_751'Access,
+      L_752'Access,
+      L_753'Access,
+      L_754'Access,
+      L_755'Access,
+      L_756'Access,
+      L_757'Access,
+      L_758'Access,
+      L_759'Access,
+      L_760'Access,
+      L_761'Access,
+      L_762'Access,
+      L_763'Access,
+      L_764'Access,
+      L_765'Access,
+      L_766'Access,
+      L_767'Access,
+      L_768'Access,
+      L_769'Access,
+      L_770'Access,
+      L_771'Access,
+      L_772'Access,
+      L_773'Access,
+      L_774'Access,
+      L_775'Access,
+      L_776'Access,
+      L_777'Access,
+      L_778'Access,
+      L_779'Access,
+      L_780'Access,
+      L_781'Access,
+      L_782'Access,
+      L_783'Access,
+      L_784'Access,
+      L_785'Access,
+      L_786'Access,
+      L_787'Access,
+      L_788'Access,
+      L_789'Access,
+      L_790'Access,
+      L_791'Access,
+      L_792'Access,
+      L_793'Access,
+      L_794'Access,
+      L_795'Access,
+      L_796'Access,
+      L_797'Access,
+      L_798'Access,
+      L_799'Access,
+      L_800'Access,
+      L_801'Access,
+      L_802'Access,
+      L_803'Access,
+      L_804'Access,
+      L_805'Access,
+      L_806'Access,
+      L_807'Access,
+      L_808'Access,
+      L_809'Access,
+      L_810'Access,
+      L_811'Access,
+      L_812'Access,
+      L_813'Access,
+      L_814'Access,
+      L_815'Access,
+      L_816'Access,
+      L_817'Access,
+      L_818'Access,
+      L_819'Access,
+      L_820'Access,
+      L_821'Access,
+      L_822'Access,
+      L_823'Access,
+      L_824'Access,
+      L_825'Access,
+      L_826'Access,
+      L_827'Access,
+      L_828'Access,
+      L_829'Access,
+      L_830'Access,
+      L_831'Access,
+      L_832'Access,
+      L_833'Access,
+      L_834'Access,
+      L_835'Access,
+      L_836'Access,
+      L_837'Access,
+      L_838'Access,
+      L_839'Access,
+      L_840'Access,
+      L_841'Access,
+      L_842'Access,
+      L_843'Access,
+      L_844'Access,
+      L_845'Access,
+      L_846'Access,
+      L_847'Access,
+      L_848'Access,
+      L_849'Access,
+      L_850'Access,
+      L_851'Access,
+      L_852'Access,
+      L_853'Access,
+      L_854'Access,
+      L_855'Access,
+      L_856'Access,
+      L_857'Access,
+      L_858'Access,
+      L_859'Access,
+      L_860'Access,
+      L_861'Access,
+      L_862'Access,
+      L_863'Access,
+      L_864'Access,
+      L_865'Access,
+      L_866'Access,
+      L_867'Access,
+      L_868'Access,
+      L_869'Access,
+      L_870'Access,
+      L_871'Access,
+      L_872'Access,
+      L_873'Access,
+      L_874'Access,
+      L_875'Access,
+      L_876'Access,
+      L_877'Access,
+      L_878'Access,
+      L_879'Access,
+      L_880'Access,
+      L_881'Access,
+      L_882'Access,
+      L_883'Access,
+      L_884'Access,
+      L_885'Access,
+      L_886'Access,
+      L_887'Access,
+      L_888'Access,
+      L_889'Access,
+      L_890'Access,
+      L_891'Access,
+      L_892'Access,
+      L_893'Access,
+      L_894'Access,
+      L_895'Access,
+      L_896'Access,
+      L_897'Access,
+      L_898'Access,
+      L_899'Access,
+      L_900'Access,
+      L_901'Access,
+      L_902'Access,
+      L_903'Access,
+      L_904'Access,
+      L_905'Access,
+      L_906'Access,
+      L_907'Access,
+      L_908'Access,
+      L_909'Access,
+      L_910'Access,
+      L_911'Access,
+      L_912'Access,
+      L_913'Access,
+      L_914'Access,
+      L_915'Access,
+      L_916'Access,
+      L_917'Access,
+      L_918'Access,
+      L_919'Access,
+      L_920'Access,
+      L_921'Access,
+      L_922'Access,
+      L_923'Access,
+      L_924'Access,
+      L_925'Access,
+      L_926'Access,
+      L_927'Access,
+      L_928'Access,
+      L_929'Access,
+      L_930'Access,
+      L_931'Access,
+      L_932'Access,
+      L_933'Access,
+      L_934'Access,
+      L_935'Access,
+      L_936'Access,
+      L_937'Access,
+      L_938'Access,
+      L_939'Access,
+      L_940'Access,
+      L_941'Access,
+      L_942'Access,
+      L_943'Access,
+      L_944'Access,
+      L_945'Access,
+      L_946'Access,
+      L_947'Access,
+      L_948'Access,
+      L_949'Access,
+      L_950'Access,
+      L_951'Access,
+      L_952'Access,
+      L_953'Access,
+      L_954'Access,
+      L_955'Access,
+      L_956'Access,
+      L_957'Access,
+      L_958'Access,
+      L_959'Access,
+      L_960'Access,
+      L_961'Access,
+      L_962'Access,
+      L_963'Access,
+      L_964'Access,
+      L_965'Access,
+      L_966'Access,
+      L_967'Access,
+      L_968'Access,
+      L_969'Access,
+      L_970'Access,
+      L_971'Access,
+      L_972'Access,
+      L_973'Access,
+      L_974'Access,
+      L_975'Access,
+      L_976'Access,
+      L_977'Access,
+      L_978'Access,
+      L_979'Access,
+      L_980'Access,
+      L_981'Access,
+      L_982'Access,
+      L_983'Access,
+      L_984'Access,
+      L_985'Access,
+      L_986'Access,
+      L_987'Access,
+      L_988'Access,
+      L_989'Access,
+      L_990'Access,
+      L_991'Access,
+      L_992'Access,
+      L_993'Access,
+      L_994'Access,
+      L_995'Access,
+      L_996'Access,
+      L_997'Access,
+      L_998'Access,
+      L_999'Access,
+      L_1000'Access,
+      L_1001'Access,
+      L_1002'Access,
+      L_1003'Access,
+      L_1004'Access,
+      L_1005'Access,
+      L_1006'Access,
+      L_1007'Access,
+      L_1008'Access,
+      L_1009'Access,
+      L_1010'Access,
+      L_1011'Access,
+      L_1012'Access,
+      L_1013'Access,
+      L_1014'Access,
+      L_1015'Access,
+      L_1016'Access,
+      L_1017'Access,
+      L_1018'Access,
+      L_1019'Access,
+      L_1020'Access,
+      L_1021'Access,
+      L_1022'Access,
+      L_1023'Access,
+      L_1024'Access,
+      L_1025'Access,
+      L_1026'Access,
+      L_1027'Access,
+      L_1028'Access,
+      L_1029'Access,
+      L_1030'Access,
+      L_1031'Access,
+      L_1032'Access,
+      L_1033'Access,
+      L_1034'Access,
+      L_1035'Access,
+      L_1036'Access,
+      L_1037'Access,
+      L_1038'Access,
+      L_1039'Access,
+      L_1040'Access,
+      L_1041'Access,
+      L_1042'Access,
+      L_1043'Access,
+      L_1044'Access,
+      L_1045'Access,
+      L_1046'Access,
+      L_1047'Access,
+      L_1048'Access,
+      L_1049'Access,
+      L_1050'Access,
+      L_1051'Access,
+      L_1052'Access,
+      L_1053'Access,
+      L_1054'Access,
+      L_1055'Access,
+      L_1056'Access,
+      L_1057'Access,
+      L_1058'Access,
+      L_1059'Access,
+      L_1060'Access,
+      L_1061'Access,
+      L_1062'Access,
+      L_1063'Access,
+      L_1064'Access,
+      L_1065'Access,
+      L_1066'Access,
+      L_1067'Access,
+      L_1068'Access,
+      L_1069'Access,
+      L_1070'Access,
+      L_1071'Access,
+      L_1072'Access,
+      L_1073'Access,
+      L_1074'Access,
+      L_1075'Access,
+      L_1076'Access,
+      L_1077'Access,
+      L_1078'Access,
+      L_1079'Access,
+      L_1080'Access,
+      L_1081'Access,
+      L_1082'Access,
+      L_1083'Access,
+      L_1084'Access,
+      L_1085'Access,
+      L_1086'Access,
+      L_1087'Access,
+      L_1088'Access,
+      L_1089'Access,
+      L_1090'Access,
+      L_1091'Access,
+      L_1092'Access,
+      L_1093'Access,
+      L_1094'Access,
+      L_1095'Access,
+      L_1096'Access,
+      L_1097'Access,
+      L_1098'Access,
+      L_1099'Access,
+      L_1100'Access,
+      L_1101'Access,
+      L_1102'Access,
+      L_1103'Access,
+      L_1104'Access,
+      L_1105'Access,
+      L_1106'Access,
+      L_1107'Access,
+      L_1108'Access,
+      L_1109'Access,
+      L_1110'Access,
+      L_1111'Access,
+      L_1112'Access,
+      L_1113'Access,
+      L_1114'Access,
+      L_1115'Access,
+      L_1116'Access,
+      L_1117'Access,
+      L_1118'Access,
+      L_1119'Access,
+      L_1120'Access,
+      L_1121'Access,
+      L_1122'Access,
+      L_1123'Access,
+      L_1124'Access,
+      L_1125'Access,
+      L_1126'Access,
+      L_1127'Access,
+      L_1128'Access,
+      L_1129'Access,
+      L_1130'Access,
+      L_1131'Access,
+      L_1132'Access,
+      L_1133'Access,
+      L_1134'Access,
+      L_1135'Access,
+      L_1136'Access,
+      L_1137'Access,
+      L_1138'Access,
+      L_1139'Access,
+      L_1140'Access,
+      L_1141'Access,
+      L_1142'Access,
+      L_1143'Access,
+      L_1144'Access,
+      L_1145'Access,
+      L_1146'Access,
+      L_1147'Access,
+      L_1148'Access,
+      L_1149'Access,
+      L_1150'Access,
+      L_1151'Access,
+      L_1152'Access,
+      L_1153'Access,
+      L_1154'Access,
+      L_1155'Access,
+      L_1156'Access,
+      L_1157'Access,
+      L_1158'Access,
+      L_1159'Access,
+      L_1160'Access,
+      L_1161'Access,
+      L_1162'Access,
+      L_1163'Access,
+      L_1164'Access,
+      L_1165'Access,
+      L_1166'Access,
+      L_1167'Access,
+      L_1168'Access,
+      L_1169'Access,
+      L_1170'Access,
+      L_1171'Access,
+      L_1172'Access,
+      L_1173'Access);
+
+   L_1174: aliased constant String := "--  Warning: This lexical scanner is auto"
+       & "matically generated by AFLEX.";
+   L_1175: aliased constant String := "--           It is useless to modify it. "
+       & "Change the "".Y"" & "".L"" files instead.";
+   L_1176: aliased constant String := "--  Template: templates/body-recursive-le"
+       & "x.adb";
+   L_1177: aliased constant String := "%if minimalist";
+   L_1178: aliased constant String := "%else";
+   L_1179: aliased constant String := "with Ada.Text_IO; use Ada.Text_IO;";
+   L_1180: aliased constant String := "%end";
+   L_1181: aliased constant String := "%%1 user";
+   L_1182: aliased constant String := "";
+   L_1183: aliased constant String := "%yydecl";
+   L_1184: aliased constant String := "      subtype Short is Integer range -327"
+       & "68 .. 32767;";
+   L_1185: aliased constant String := "      yy_act : Integer;";
+   L_1186: aliased constant String := "      yy_c   : Short;";
+   L_1187: aliased constant String := "";
+   L_1188: aliased constant String := "      --  returned upon end-of-file";
+   L_1189: aliased constant String := "      YY_END_TOK : constant Integer := 0;";
+   L_1190: aliased constant String := "      subtype yy_state_type is Integer;";
+   L_1191: aliased constant String := "      yy_current_state : yy_state_type;";
+   L_1192: aliased constant String := "";
+   L_1193: aliased constant String := "      yylinecol : Integer renames ${YYVAR"
+       & "}.dfa.yylinecol;";
+   L_1194: aliased constant String := "      yylineno  : Integer renames ${YYVAR"
+       & "}.dfa.yylineno;";
+   L_1195: aliased constant String := "      yy_last_yylinecol : Integer renames"
+       & " ${YYVAR}.dfa.yy_last_yylinecol;";
+   L_1196: aliased constant String := "      yy_last_yylineno  : Integer renames"
+       & " ${YYVAR}.dfa.yy_last_yylineno;";
+   L_1197: aliased constant String := "      yy_eof_has_been_seen : Boolean rena"
+       & "mes ${YYVAR}.yy_eof_has_been_seen;";
+   L_1198: aliased constant String := "      aflex_debug : Boolean renames ${YYV"
+       & "AR}.dfa.aflex_debug;";
+   L_1199: aliased constant String := "      yy_init  : Boolean renames ${YYVAR}"
+       & ".dfa.yy_init;";
+   L_1200: aliased constant String := "      yy_c_buf_p  : Index renames ${YYVAR"
+       & "}.dfa.yy_c_buf_p;";
+   L_1201: aliased constant String := "      yy_start : yy_state_type renames ${"
+       & "YYVAR}.dfa.yy_start;";
+   L_1202: aliased constant String := "      yy_cp    : Index renames ${YYVAR}.d"
+       & "fa.yy_cp;";
+   L_1203: aliased constant String := "      yy_bp    : Index renames ${YYVAR}.d"
+       & "fa.yy_bp;";
+   L_1204: aliased constant String := "      yytext_ptr   : Index renames ${YYVA"
+       & "R}.dfa.yytext_ptr;";
+   L_1205: aliased constant String := "      yy_last_accepting_state : Lexer_DFA"
+       & ".yy_state_type renames ${YYVAR}.dfa.yy_last_accepting_state;";
+   L_1206: aliased constant String := "      yy_last_accepting_cpos  : Index ren"
+       & "ames ${YYVAR}.dfa.yy_last_accepting_cpos;";
+   L_1207: aliased constant String := "      yy_hold_char  : Character renames $"
+       & "{YYVAR}.dfa.yy_hold_char;";
+   L_1208: aliased constant String := "      yy_ch_buf     : Lexer_DFA.ch_buf_ty"
+       & "pe renames ${YYVAR}.dfa.yy_ch_buf;";
+   L_1209: aliased constant String := "      yy_n_chars    : Index renames ${YYV"
+       & "AR}.yy_n_chars;";
+   L_1210: aliased constant String := "      YYLVal : YYSType renames ${YYVAR}.Y"
+       & "YLVal;";
+   L_1211: aliased constant String := "      YYVal  : YYSType renames ${YYVAR}.Y"
+       & "YVal;";
+   L_1212: aliased constant String := "";
+   L_1213: aliased constant String := "      function yy_get_next_buffer return "
+       & "Lexer_IO.eob_action_type";
+   L_1214: aliased constant String := "        is (Lexer_IO.yy_get_next_buffer ("
+       & "${YYVAR}));";
+   L_1215: aliased constant String := "";
+   L_1216: aliased constant String := "      function YYText return String";
+   L_1217: aliased constant String := "        is (Lexer_DFA.YYText (${YYVAR}.df"
+       & "a));";
+   L_1218: aliased constant String := "";
+   L_1219: aliased constant String := "      procedure YY_DO_BEFORE_ACTION is";
+   L_1220: aliased constant String := "      begin";
+   L_1221: aliased constant String := "        Lexer_DFA.YY_DO_BEFORE_ACTION (${"
+       & "YYVAR}.dfa);";
+   L_1222: aliased constant String := "      end YY_DO_BEFORE_ACTION;";
+   L_1223: aliased constant String := "";
+   L_1224: aliased constant String := "%%2 tables";
+   L_1225: aliased constant String := "";
+   L_1226: aliased constant String := "      --  copy whatever the last rule mat"
+       & "ched to the standard output";
+   L_1227: aliased constant String := "%if echo";
+   L_1228: aliased constant String := "      procedure ECHO is";
+   L_1229: aliased constant String := "      begin";
+   L_1230: aliased constant String := "         if Ada.Text_IO.Is_Open (user_out"
+       & "put_file) then";
+   L_1231: aliased constant String := "            Ada.Text_IO.Put (user_output_"
+       & "file, YYText);";
+   L_1232: aliased constant String := "         else";
+   L_1233: aliased constant String := "            Ada.Text_IO.Put (YYText);";
+   L_1234: aliased constant String := "         end if;";
+   L_1235: aliased constant String := "      end ECHO;";
+   L_1236: aliased constant String := "%end";
+   L_1237: aliased constant String := "";
+   L_1238: aliased constant String := "      --  enter a start condition.";
+   L_1239: aliased constant String := "      --  Using procedure requires a () a"
+       & "fter the ENTER, but makes everything";
+   L_1240: aliased constant String := "      --  much neater.";
+   L_1241: aliased constant String := "";
+   L_1242: aliased constant String := "      procedure ENTER (state : Integer) i"
+       & "s";
+   L_1243: aliased constant String := "      begin";
+   L_1244: aliased constant String := "         yy_start := 1 + 2 * state;";
+   L_1245: aliased constant String := "      end ENTER;";
+   L_1246: aliased constant String := "";
+   L_1247: aliased constant String := "      --  action number for EOF rule of a"
+       & " given start state";
+   L_1248: aliased constant String := "      function YY_STATE_EOF (state : Inte"
+       & "ger) return Integer is";
+   L_1249: aliased constant String := "      begin";
+   L_1250: aliased constant String := "         return YY_END_OF_BUFFER + state "
+       & "+ 1;";
+   L_1251: aliased constant String := "      end YY_STATE_EOF;";
+   L_1252: aliased constant String := "";
+   L_1253: aliased constant String := "      --  return all but the first 'n' ma"
+       & "tched characters back to the input stream";
+   L_1254: aliased constant String := "      procedure yyless (n : Integer) is";
+   L_1255: aliased constant String := "      begin";
+   L_1256: aliased constant String := "         yy_ch_buf (yy_cp) := yy_hold_cha"
+       & "r; --  undo effects of setting up yytext";
+   L_1257: aliased constant String := "         yy_cp := yy_bp + n;";
+   L_1258: aliased constant String := "         yy_c_buf_p := yy_cp;";
+   L_1259: aliased constant String := "         YY_DO_BEFORE_ACTION; -- set up y"
+       & "ytext again";
+   L_1260: aliased constant String := "      end yyless;";
+   L_1261: aliased constant String := "%if yyaction";
+   L_1262: aliased constant String := "      --  redefine this if you have somet"
+       & "hing you want each time.";
+   L_1263: aliased constant String := "      procedure YY_USER_ACTION is";
+   L_1264: aliased constant String := "      begin";
+   L_1265: aliased constant String := "%yyaction";
+   L_1266: aliased constant String := "      end YY_USER_ACTION;";
+   L_1267: aliased constant String := "%end";
+   L_1268: aliased constant String := "      --  yy_get_previous_state - get the"
+       & " state just before the EOB char was reached";
+   L_1269: aliased constant String := "";
+   L_1270: aliased constant String := "      function yy_get_previous_state retu"
+       & "rn yy_state_type is";
+   L_1271: aliased constant String := "         yy_current_state : yy_state_type"
+       & ";";
+   L_1272: aliased constant String := "         yy_c : Short;";
+   L_1273: aliased constant String := "%%3 ybp";
+   L_1274: aliased constant String := "         --  yy_bp : constant Integer := "
+       & "yytext_ptr;";
+   L_1275: aliased constant String := "      begin";
+   L_1276: aliased constant String := "%%3 startstate";
+   L_1277: aliased constant String := "";
+   L_1278: aliased constant String := "         for yy_cp in yytext_ptr .. yy_c_"
+       & "buf_p - 1 loop";
+   L_1279: aliased constant String := "%%4 nextstate";
+   L_1280: aliased constant String := "         end loop;";
+   L_1281: aliased constant String := "";
+   L_1282: aliased constant String := "         return yy_current_state;";
+   L_1283: aliased constant String := "      end yy_get_previous_state;";
+   L_1284: aliased constant String := "";
+   L_1285: aliased constant String := "      procedure yyrestart (input_file : F"
+       & "ile_Type) is";
+   L_1286: aliased constant String := "      begin";
+   L_1287: aliased constant String := "         Open_Input (${YYVAR}, Ada.Text_I"
+       & "O.Name (input_file));";
+   L_1288: aliased constant String := "      end yyrestart;";
+   L_1289: aliased constant String := "";
+   L_1290: aliased constant String := "   begin -- of ${YYLEX}";
+   L_1291: aliased constant String := "%if yywrap";
+   L_1292: aliased constant String := "      <<new_file>>";
+   L_1293: aliased constant String := "      --  this is where we enter upon enc"
+       & "ountering an end-of-file and";
+   L_1294: aliased constant String := "      --  yyWrap () indicating that we sh"
+       & "ould continue processing";
+   L_1295: aliased constant String := "%end";
+   L_1296: aliased constant String := "";
+   L_1297: aliased constant String := "      if yy_init then";
+   L_1298: aliased constant String := "         if yy_start = 0 then";
+   L_1299: aliased constant String := "            yy_start := 1;      -- first "
+       & "start state";
+   L_1300: aliased constant String := "         end if;";
+   L_1301: aliased constant String := "";
+   L_1302: aliased constant String := "         --  we put in the '\n' and start"
+       & " reading from [1] so that an";
+   L_1303: aliased constant String := "         --  initial match-at-newline wil"
+       & "l be true.";
+   L_1304: aliased constant String := "";
+   L_1305: aliased constant String := "         yy_ch_buf (0) := ASCII.LF;";
+   L_1306: aliased constant String := "         yy_n_chars := 1;";
+   L_1307: aliased constant String := "";
+   L_1308: aliased constant String := "         --  we always need two end-of-bu"
+       & "ffer characters. The first causes";
+   L_1309: aliased constant String := "         --  a transition to the end-of-b"
+       & "uffer state. The second causes";
+   L_1310: aliased constant String := "         --  a jam in that state.";
+   L_1311: aliased constant String := "";
+   L_1312: aliased constant String := "         yy_ch_buf (yy_n_chars) := YY_END"
+       & "_OF_BUFFER_CHAR;";
+   L_1313: aliased constant String := "         yy_ch_buf (yy_n_chars + 1) := YY"
+       & "_END_OF_BUFFER_CHAR;";
+   L_1314: aliased constant String := "";
+   L_1315: aliased constant String := "         yy_eof_has_been_seen := False;";
+   L_1316: aliased constant String := "";
+   L_1317: aliased constant String := "         yytext_ptr := 1;";
+   L_1318: aliased constant String := "         yy_c_buf_p := yytext_ptr;";
+   L_1319: aliased constant String := "         yy_hold_char := yy_ch_buf (yy_c_"
+       & "buf_p);";
+   L_1320: aliased constant String := "         yy_init := False;";
+   L_1321: aliased constant String := "%if error";
+   L_1322: aliased constant String := "         --   Initialization";
+   L_1323: aliased constant String := "         tok_begin_line := 1;";
+   L_1324: aliased constant String := "         tok_end_line := 1;";
+   L_1325: aliased constant String := "         tok_begin_col := 0;";
+   L_1326: aliased constant String := "         tok_end_col := 0;";
+   L_1327: aliased constant String := "         token_at_end_of_line := False;";
+   L_1328: aliased constant String := "         line_number_of_saved_tok_line1 :"
+       & "= 0;";
+   L_1329: aliased constant String := "         line_number_of_saved_tok_line2 :"
+       & "= 0;";
+   L_1330: aliased constant String := "%end";
+   L_1331: aliased constant String := "      end if; -- yy_init";
+   L_1332: aliased constant String := "";
+   L_1333: aliased constant String := "      loop                -- loops until "
+       & "end-of-file is reached";
+   L_1334: aliased constant String := "%if error";
+   L_1335: aliased constant String := "         --    if last matched token is e"
+       & "nd_of_line, we must";
+   L_1336: aliased constant String := "         --    update the token_end_line "
+       & "and reset tok_end_col.";
+   L_1337: aliased constant String := "         if Token_At_End_Of_Line then";
+   L_1338: aliased constant String := "            Tok_End_Line := Tok_End_Line "
+       & "+ 1;";
+   L_1339: aliased constant String := "            Tok_End_Col := 0;";
+   L_1340: aliased constant String := "            Token_At_End_Of_Line := False"
+       & ";";
+   L_1341: aliased constant String := "         end if;";
+   L_1342: aliased constant String := "%end";
+   L_1343: aliased constant String := "";
+   L_1344: aliased constant String := "         yy_cp := yy_c_buf_p;";
+   L_1345: aliased constant String := "";
+   L_1346: aliased constant String := "         --  support of yytext";
+   L_1347: aliased constant String := "         yy_ch_buf (yy_cp) := yy_hold_cha"
+       & "r;";
+   L_1348: aliased constant String := "";
+   L_1349: aliased constant String := "         --  yy_bp points to the position"
+       & " in yy_ch_buf of the start of the";
+   L_1350: aliased constant String := "         --  current run.";
+   L_1351: aliased constant String := "%%5 action";
+   L_1352: aliased constant String := "";
+   L_1353: aliased constant String := "   <<next_action>>";
+   L_1354: aliased constant String := "%%6 action";
+   L_1355: aliased constant String := "         YY_DO_BEFORE_ACTION;";
+   L_1356: aliased constant String := "%if yyaction";
+   L_1357: aliased constant String := "         YY_USER_ACTION;";
+   L_1358: aliased constant String := "%end";
+   L_1359: aliased constant String := "";
+   L_1360: aliased constant String := "         if aflex_debug then  -- output a"
+       & "cceptance info. for (-d) debug mode";
+   L_1361: aliased constant String := "            Ada.Text_IO.Put (Standard_Err"
+       & "or, ""  -- Aflex.YYLex accept rule #"");";
+   L_1362: aliased constant String := "            Ada.Text_IO.Put (Standard_Err"
+       & "or, Integer'Image (yy_act));";
+   L_1363: aliased constant String := "            Ada.Text_IO.Put_Line (Standar"
+       & "d_Error, ""("""""" & YYText & """""")"");";
+   L_1364: aliased constant String := "         end if;";
+   L_1365: aliased constant String := "%if error";
+   L_1366: aliased constant String := "         --   Update tok_begin_line, tok_"
+       & "end_line, tok_begin_col and tok_end_col";
+   L_1367: aliased constant String := "         --   after matching the token.";
+   L_1368: aliased constant String := "         if yy_act /= YY_END_OF_BUFFER an"
+       & "d then yy_act /= 0 then";
+   L_1369: aliased constant String := "            -- Token are matched only whe"
+       & "n yy_act is not yy_end_of_buffer or 0.";
+   L_1370: aliased constant String := "            Tok_Begin_Line := Tok_End_Lin"
+       & "e;";
+   L_1371: aliased constant String := "            Tok_Begin_Col := Tok_End_Col "
+       & "+ 1;";
+   L_1372: aliased constant String := "            Tok_End_Col := Tok_Begin_Col "
+       & "+ yy_cp - yy_bp - 1;";
+   L_1373: aliased constant String := "            if yy_ch_buf ( yy_bp ) = ASCI"
+       & "I.LF then";
+   L_1374: aliased constant String := "               Token_At_End_Of_Line := Tr"
+       & "ue;";
+   L_1375: aliased constant String := "            end if;";
+   L_1376: aliased constant String := "         end if;";
+   L_1377: aliased constant String := "%end";
+   L_1378: aliased constant String := "";
+   L_1379: aliased constant String := "   <<do_action>>   -- this label is used "
+       & "only to access EOF actions";
+   L_1380: aliased constant String := "         case yy_act is";
+   L_1381: aliased constant String := "";
+   L_1382: aliased constant String := "%%7 action";
+   L_1383: aliased constant String := "";
+   L_1384: aliased constant String := "         when YY_END_OF_BUFFER =>";
+   L_1385: aliased constant String := "            --  undo the effects of YY_DO"
+       & "_BEFORE_ACTION";
+   L_1386: aliased constant String := "            yy_ch_buf (yy_cp) := yy_hold_"
+       & "char;";
+   L_1387: aliased constant String := "";
+   L_1388: aliased constant String := "            yytext_ptr := yy_bp;";
+   L_1389: aliased constant String := "";
+   L_1390: aliased constant String := "            case yy_get_next_buffer is";
+   L_1391: aliased constant String := "               when EOB_ACT_END_OF_FILE ="
+       & ">";
+   L_1392: aliased constant String := "%if yywrap";
+   L_1393: aliased constant String := "                  if yyWrap then";
+   L_1394: aliased constant String := "                     --  note: because we"
+       & "'ve taken care in";
+   L_1395: aliased constant String := "                     --  yy_get_next_buff"
+       & "er() to have set up yytext,";
+   L_1396: aliased constant String := "                     --  we can now set u"
+       & "p yy_c_buf_p so that if some";
+   L_1397: aliased constant String := "                     --  total hoser (lik"
+       & "e aflex itself) wants";
+   L_1398: aliased constant String := "                     --  to call the scan"
+       & "ner after we return the";
+   L_1399: aliased constant String := "                     --  End_Of_Input, it"
+       & "'ll still work - another";
+   L_1400: aliased constant String := "                     --  End_Of_Input wil"
+       & "l get returned.";
+   L_1401: aliased constant String := "";
+   L_1402: aliased constant String := "                     yy_c_buf_p := yytext"
+       & "_ptr;";
+   L_1403: aliased constant String := "";
+   L_1404: aliased constant String := "                     yy_act := YY_STATE_E"
+       & "OF ((yy_start - 1) / 2);";
+   L_1405: aliased constant String := "";
+   L_1406: aliased constant String := "                     goto do_action;";
+   L_1407: aliased constant String := "                  else";
+   L_1408: aliased constant String := "                     --  start processing"
+       & " a new file";
+   L_1409: aliased constant String := "                     yy_init := True;";
+   L_1410: aliased constant String := "                     goto new_file;";
+   L_1411: aliased constant String := "                  end if;";
+   L_1412: aliased constant String := "%else";
+   L_1413: aliased constant String := "                  --  note: because we've"
+       & " taken care in";
+   L_1414: aliased constant String := "                  --  yy_get_next_buffer("
+       & ") to have set up yytext,";
+   L_1415: aliased constant String := "                  --  we can now set up y"
+       & "y_c_buf_p so that if some";
+   L_1416: aliased constant String := "                  --  total hoser (like a"
+       & "flex itself) wants";
+   L_1417: aliased constant String := "                  --  to call the scanner"
+       & " after we return the";
+   L_1418: aliased constant String := "                  --  End_Of_Input, it'll"
+       & " still work - another";
+   L_1419: aliased constant String := "                  --  End_Of_Input will g"
+       & "et returned.";
+   L_1420: aliased constant String := "";
+   L_1421: aliased constant String := "                  yy_c_buf_p := yytext_pt"
+       & "r;";
+   L_1422: aliased constant String := "";
+   L_1423: aliased constant String := "                  yy_act := YY_STATE_EOF "
+       & "((yy_start - 1) / 2);";
+   L_1424: aliased constant String := "";
+   L_1425: aliased constant String := "                  goto do_action;";
+   L_1426: aliased constant String := "%end";
+   L_1427: aliased constant String := "";
+   L_1428: aliased constant String := "               when EOB_ACT_RESTART_SCAN "
+       & "=>";
+   L_1429: aliased constant String := "                  yy_c_buf_p := yytext_pt"
+       & "r;";
+   L_1430: aliased constant String := "                  yy_hold_char := yy_ch_b"
+       & "uf (yy_c_buf_p);";
+   L_1431: aliased constant String := "";
+   L_1432: aliased constant String := "               when EOB_ACT_LAST_MATCH =>";
+   L_1433: aliased constant String := "                  yy_c_buf_p := yy_n_char"
+       & "s;";
+   L_1434: aliased constant String := "                  yy_current_state := yy_"
+       & "get_previous_state;";
+   L_1435: aliased constant String := "                  yy_cp := yy_c_buf_p;";
+   L_1436: aliased constant String := "                  yy_bp := yytext_ptr;";
+   L_1437: aliased constant String := "                  goto next_action;";
+   L_1438: aliased constant String := "";
+   L_1439: aliased constant String := "            end case; --  case yy_get_nex"
+       & "t_buffer()";
+   L_1440: aliased constant String := "";
+   L_1441: aliased constant String := "         when others =>";
+   L_1442: aliased constant String := "            Ada.Text_IO.Put (""action # """
+       & ");";
+   L_1443: aliased constant String := "            Ada.Text_IO.Put (Integer'Imag"
+       & "e (yy_act));";
+   L_1444: aliased constant String := "            Ada.Text_IO.New_Line;";
+   L_1445: aliased constant String := "            raise AFLEX_INTERNAL_ERROR;";
+   L_1446: aliased constant String := "";
+   L_1447: aliased constant String := "         end case; --  case (yy_act)";
+   L_1448: aliased constant String := "      end loop; --  end of loop waiting f"
+       & "or end of file";
+   L_1449: aliased constant String := "   end ${YYLEX};";
+   L_1450: aliased constant String := "";
+   L_1451: aliased constant String := "%%8 user";
+   body_recursive_lex : aliased constant Content_Array :=
+     (L_1174'Access,
+      L_1175'Access,
+      L_1176'Access,
+      L_1177'Access,
+      L_1178'Access,
+      L_1179'Access,
+      L_1180'Access,
+      L_1181'Access,
+      L_1182'Access,
+      L_1183'Access,
+      L_1184'Access,
+      L_1185'Access,
+      L_1186'Access,
+      L_1187'Access,
+      L_1188'Access,
+      L_1189'Access,
+      L_1190'Access,
+      L_1191'Access,
+      L_1192'Access,
+      L_1193'Access,
+      L_1194'Access,
+      L_1195'Access,
+      L_1196'Access,
+      L_1197'Access,
+      L_1198'Access,
+      L_1199'Access,
+      L_1200'Access,
+      L_1201'Access,
+      L_1202'Access,
+      L_1203'Access,
+      L_1204'Access,
+      L_1205'Access,
+      L_1206'Access,
+      L_1207'Access,
+      L_1208'Access,
+      L_1209'Access,
+      L_1210'Access,
+      L_1211'Access,
+      L_1212'Access,
+      L_1213'Access,
+      L_1214'Access,
+      L_1215'Access,
+      L_1216'Access,
+      L_1217'Access,
+      L_1218'Access,
+      L_1219'Access,
+      L_1220'Access,
+      L_1221'Access,
+      L_1222'Access,
+      L_1223'Access,
+      L_1224'Access,
+      L_1225'Access,
+      L_1226'Access,
+      L_1227'Access,
+      L_1228'Access,
+      L_1229'Access,
+      L_1230'Access,
+      L_1231'Access,
+      L_1232'Access,
+      L_1233'Access,
+      L_1234'Access,
+      L_1235'Access,
+      L_1236'Access,
+      L_1237'Access,
+      L_1238'Access,
+      L_1239'Access,
+      L_1240'Access,
+      L_1241'Access,
+      L_1242'Access,
+      L_1243'Access,
+      L_1244'Access,
+      L_1245'Access,
+      L_1246'Access,
+      L_1247'Access,
+      L_1248'Access,
+      L_1249'Access,
+      L_1250'Access,
+      L_1251'Access,
+      L_1252'Access,
+      L_1253'Access,
+      L_1254'Access,
+      L_1255'Access,
+      L_1256'Access,
+      L_1257'Access,
+      L_1258'Access,
+      L_1259'Access,
+      L_1260'Access,
+      L_1261'Access,
+      L_1262'Access,
+      L_1263'Access,
+      L_1264'Access,
+      L_1265'Access,
+      L_1266'Access,
+      L_1267'Access,
+      L_1268'Access,
+      L_1269'Access,
+      L_1270'Access,
+      L_1271'Access,
+      L_1272'Access,
+      L_1273'Access,
+      L_1274'Access,
+      L_1275'Access,
+      L_1276'Access,
+      L_1277'Access,
+      L_1278'Access,
+      L_1279'Access,
+      L_1280'Access,
+      L_1281'Access,
+      L_1282'Access,
+      L_1283'Access,
+      L_1284'Access,
+      L_1285'Access,
+      L_1286'Access,
+      L_1287'Access,
+      L_1288'Access,
+      L_1289'Access,
+      L_1290'Access,
+      L_1291'Access,
+      L_1292'Access,
+      L_1293'Access,
+      L_1294'Access,
+      L_1295'Access,
+      L_1296'Access,
+      L_1297'Access,
+      L_1298'Access,
+      L_1299'Access,
+      L_1300'Access,
+      L_1301'Access,
+      L_1302'Access,
+      L_1303'Access,
+      L_1304'Access,
+      L_1305'Access,
+      L_1306'Access,
+      L_1307'Access,
+      L_1308'Access,
+      L_1309'Access,
+      L_1310'Access,
+      L_1311'Access,
+      L_1312'Access,
+      L_1313'Access,
+      L_1314'Access,
+      L_1315'Access,
+      L_1316'Access,
+      L_1317'Access,
+      L_1318'Access,
+      L_1319'Access,
+      L_1320'Access,
+      L_1321'Access,
+      L_1322'Access,
+      L_1323'Access,
+      L_1324'Access,
+      L_1325'Access,
+      L_1326'Access,
+      L_1327'Access,
+      L_1328'Access,
+      L_1329'Access,
+      L_1330'Access,
+      L_1331'Access,
+      L_1332'Access,
+      L_1333'Access,
+      L_1334'Access,
+      L_1335'Access,
+      L_1336'Access,
+      L_1337'Access,
+      L_1338'Access,
+      L_1339'Access,
+      L_1340'Access,
+      L_1341'Access,
+      L_1342'Access,
+      L_1343'Access,
+      L_1344'Access,
+      L_1345'Access,
+      L_1346'Access,
+      L_1347'Access,
+      L_1348'Access,
+      L_1349'Access,
+      L_1350'Access,
+      L_1351'Access,
+      L_1352'Access,
+      L_1353'Access,
+      L_1354'Access,
+      L_1355'Access,
+      L_1356'Access,
+      L_1357'Access,
+      L_1358'Access,
+      L_1359'Access,
+      L_1360'Access,
+      L_1361'Access,
+      L_1362'Access,
+      L_1363'Access,
+      L_1364'Access,
+      L_1365'Access,
+      L_1366'Access,
+      L_1367'Access,
+      L_1368'Access,
+      L_1369'Access,
+      L_1370'Access,
+      L_1371'Access,
+      L_1372'Access,
+      L_1373'Access,
+      L_1374'Access,
+      L_1375'Access,
+      L_1376'Access,
+      L_1377'Access,
+      L_1378'Access,
+      L_1379'Access,
+      L_1380'Access,
+      L_1381'Access,
+      L_1382'Access,
+      L_1383'Access,
+      L_1384'Access,
+      L_1385'Access,
+      L_1386'Access,
+      L_1387'Access,
+      L_1388'Access,
+      L_1389'Access,
+      L_1390'Access,
+      L_1391'Access,
+      L_1392'Access,
+      L_1393'Access,
+      L_1394'Access,
+      L_1395'Access,
+      L_1396'Access,
+      L_1397'Access,
+      L_1398'Access,
+      L_1399'Access,
+      L_1400'Access,
+      L_1401'Access,
+      L_1402'Access,
+      L_1403'Access,
+      L_1404'Access,
+      L_1405'Access,
+      L_1406'Access,
+      L_1407'Access,
+      L_1408'Access,
+      L_1409'Access,
+      L_1410'Access,
+      L_1411'Access,
+      L_1412'Access,
+      L_1413'Access,
+      L_1414'Access,
+      L_1415'Access,
+      L_1416'Access,
+      L_1417'Access,
+      L_1418'Access,
+      L_1419'Access,
+      L_1420'Access,
+      L_1421'Access,
+      L_1422'Access,
+      L_1423'Access,
+      L_1424'Access,
+      L_1425'Access,
+      L_1426'Access,
+      L_1427'Access,
+      L_1428'Access,
+      L_1429'Access,
+      L_1430'Access,
+      L_1431'Access,
+      L_1432'Access,
+      L_1433'Access,
+      L_1434'Access,
+      L_1435'Access,
+      L_1436'Access,
+      L_1437'Access,
+      L_1438'Access,
+      L_1439'Access,
+      L_1440'Access,
+      L_1441'Access,
+      L_1442'Access,
+      L_1443'Access,
+      L_1444'Access,
+      L_1445'Access,
+      L_1446'Access,
+      L_1447'Access,
+      L_1448'Access,
+      L_1449'Access,
+      L_1450'Access,
+      L_1451'Access);
+
+   L_1452: aliased constant String := "--  Warning: This file is automatically g"
+       & "enerated by AFLEX.";
+   L_1453: aliased constant String := "--           It is useless to modify it. "
+       & "Change the "".Y"" & "".L"" files instead.";
+   L_1454: aliased constant String := "--  Template: templates/spec-dfa.ads";
+   L_1455: aliased constant String := "%if private";
+   L_1456: aliased constant String := "package ${NAME}_DFA is";
+   L_1457: aliased constant String := "%else";
+   L_1458: aliased constant String := "package ${NAME}_DFA is";
+   L_1459: aliased constant String := "%end";
+   L_1460: aliased constant String := "";
+   L_1461: aliased constant String := "%if debug";
+   L_1462: aliased constant String := "   aflex_debug       : Boolean := True;";
+   L_1463: aliased constant String := "%else";
+   L_1464: aliased constant String := "   aflex_debug       : Boolean := False;";
+   L_1465: aliased constant String := "%end";
+   L_1466: aliased constant String := "%if yylineno";
+   L_1467: aliased constant String := "   yylineno          : Natural := 0;";
+   L_1468: aliased constant String := "   yylinecol         : Natural := 0;";
+   L_1469: aliased constant String := "   yy_last_yylineno  : Natural := 0;";
+   L_1470: aliased constant String := "   yy_last_yylinecol : Natural := 0;";
+   L_1471: aliased constant String := "%end";
+   L_1472: aliased constant String := "   yytext_ptr        : Integer; --  point"
+       & "s to start of yytext in buffer";
+   L_1473: aliased constant String := "";
+   L_1474: aliased constant String := "   --  yy_ch_buf has to be 2 characters l"
+       & "onger than YY_BUF_SIZE because we need";
+   L_1475: aliased constant String := "   --  to put in 2 end-of-buffer characte"
+       & "rs (this is explained where it is";
+   L_1476: aliased constant String := "   --  done) at the end of yy_ch_buf";
+   L_1477: aliased constant String := "";
+   L_1478: aliased constant String := "   --  ----------------------------------"
+       & "------------------------------------------";
+   L_1479: aliased constant String := "   --  Buffer size is configured with:";
+   L_1480: aliased constant String := "   --  %option bufsize=${YYBUFSIZE}";
+   L_1481: aliased constant String := "";
+   L_1482: aliased constant String := "   YY_READ_BUF_SIZE : constant Integer :="
+       & " ${YYBUFSIZE};";
+   L_1483: aliased constant String := "   --  ----------------------------------"
+       & "------------------------------------------";
+   L_1484: aliased constant String := "";
+   L_1485: aliased constant String := "   YY_BUF_SIZE : constant Integer := YY_R"
+       & "EAD_BUF_SIZE * 2; --  size of input buffer";
+   L_1486: aliased constant String := "";
+   L_1487: aliased constant String := "   type unbounded_character_array is arra"
+       & "y (Integer range <>) of Character;";
+   L_1488: aliased constant String := "   subtype ch_buf_type is unbounded_chara"
+       & "cter_array (0 .. YY_BUF_SIZE + 1);";
+   L_1489: aliased constant String := "";
+   L_1490: aliased constant String := "   yy_ch_buf    : ch_buf_type;";
+   L_1491: aliased constant String := "   yy_cp, yy_bp : Integer;";
+   L_1492: aliased constant String := "";
+   L_1493: aliased constant String := "   --  yy_hold_char holds the character l"
+       & "ost when yytext is formed";
+   L_1494: aliased constant String := "   yy_hold_char : Character;";
+   L_1495: aliased constant String := "   yy_c_buf_p   : Integer;   --  points t"
+       & "o current character in buffer";
+   L_1496: aliased constant String := "";
+   L_1497: aliased constant String := "   function YYText return String;";
+   L_1498: aliased constant String := "   function YYLength return Integer;";
+   L_1499: aliased constant String := "   procedure YY_DO_BEFORE_ACTION;";
+   L_1500: aliased constant String := "";
+   L_1501: aliased constant String := "   subtype yy_state_type is Integer;";
+   L_1502: aliased constant String := "";
+   L_1503: aliased constant String := "   --  These variables are needed between"
+       & " calls to YYLex.";
+   L_1504: aliased constant String := "   yy_init                 : Boolean := T"
+       & "rue; --  do we need to initialize YYLex?";
+   L_1505: aliased constant String := "   yy_start                : Integer := 0"
+       & "; --  current start state number";
+   L_1506: aliased constant String := "   yy_last_accepting_state : yy_state_typ"
+       & "e;";
+   L_1507: aliased constant String := "   yy_last_accepting_cpos  : Integer;";
+   L_1508: aliased constant String := "";
+   L_1509: aliased constant String := "end ${NAME}_DFA;";
+   spec_dfa : aliased constant Content_Array :=
+     (L_1452'Access,
+      L_1453'Access,
+      L_1454'Access,
+      L_1455'Access,
+      L_1456'Access,
+      L_1457'Access,
+      L_1458'Access,
+      L_1459'Access,
+      L_1460'Access,
+      L_1461'Access,
+      L_1462'Access,
+      L_1463'Access,
+      L_1464'Access,
+      L_1465'Access,
+      L_1466'Access,
+      L_1467'Access,
+      L_1468'Access,
+      L_1469'Access,
+      L_1470'Access,
+      L_1471'Access,
+      L_1472'Access,
+      L_1473'Access,
+      L_1474'Access,
+      L_1475'Access,
+      L_1476'Access,
+      L_1477'Access,
+      L_1478'Access,
+      L_1479'Access,
+      L_1480'Access,
+      L_1481'Access,
+      L_1482'Access,
+      L_1483'Access,
+      L_1484'Access,
+      L_1485'Access,
+      L_1486'Access,
+      L_1487'Access,
+      L_1488'Access,
+      L_1489'Access,
+      L_1490'Access,
+      L_1491'Access,
+      L_1492'Access,
+      L_1493'Access,
+      L_1494'Access,
+      L_1495'Access,
+      L_1496'Access,
+      L_1497'Access,
+      L_1498'Access,
+      L_1499'Access,
+      L_1500'Access,
+      L_1501'Access,
+      L_1502'Access,
+      L_1503'Access,
+      L_1504'Access,
+      L_1505'Access,
+      L_1506'Access,
+      L_1507'Access,
+      L_1508'Access,
+      L_1509'Access);
+
+   L_1510: aliased constant String := "--  Warning: This file is automatically g"
+       & "enerated by AFLEX.";
+   L_1511: aliased constant String := "--           It is useless to modify it. "
+       & "Change the "".Y"" & "".L"" files instead.";
+   L_1512: aliased constant String := "--  Template: templates/spec-io.ads";
+   L_1513: aliased constant String := "with Ada.Text_IO;";
+   L_1514: aliased constant String := "with ${NAME}_DFA; use ${NAME}_DFA;";
+   L_1515: aliased constant String := "%if private";
+   L_1516: aliased constant String := "package ${NAME}_IO is";
+   L_1517: aliased constant String := "%else";
+   L_1518: aliased constant String := "package ${NAME}_IO is";
+   L_1519: aliased constant String := "%end";
+   L_1520: aliased constant String := "";
+   L_1521: aliased constant String := "   user_input_file       : Ada.Text_IO.Fi"
+       & "le_Type;";
+   L_1522: aliased constant String := "%if output";
+   L_1523: aliased constant String := "   user_output_file      : Ada.Text_IO.Fi"
+       & "le_Type;";
+   L_1524: aliased constant String := "%end";
+   L_1525: aliased constant String := "   NULL_IN_INPUT         : exception;";
+   L_1526: aliased constant String := "   AFLEX_INTERNAL_ERROR  : exception;";
+   L_1527: aliased constant String := "   UNEXPECTED_LAST_MATCH : exception;";
+   L_1528: aliased constant String := "   PUSHBACK_OVERFLOW     : exception;";
+   L_1529: aliased constant String := "   AFLEX_SCANNER_JAMMED  : exception;";
+   L_1530: aliased constant String := "   type eob_action_type is (EOB_ACT_RESTA"
+       & "RT_SCAN,";
+   L_1531: aliased constant String := "                            EOB_ACT_END_O"
+       & "F_FILE,";
+   L_1532: aliased constant String := "                            EOB_ACT_LAST_"
+       & "MATCH);";
+   L_1533: aliased constant String := "   YY_END_OF_BUFFER_CHAR : constant Chara"
+       & "cter := ASCII.NUL;";
+   L_1534: aliased constant String := "   yy_n_chars            : Integer;      "
+       & " --  number of characters read into yy_ch_buf";
+   L_1535: aliased constant String := "";
+   L_1536: aliased constant String := "   --  true when we've seen an EOF for th"
+       & "e current input file";
+   L_1537: aliased constant String := "   yy_eof_has_been_seen  : Boolean;";
+   L_1538: aliased constant String := "";
+   L_1539: aliased constant String := "%if error";
+   L_1540: aliased constant String := "   --   In order to support YY_Get_Token_"
+       & "Line, we need";
+   L_1541: aliased constant String := "   --   a variable to hold current line.";
+   L_1542: aliased constant String := "   type String_Ptr is access String;";
+   L_1543: aliased constant String := "   Saved_Tok_Line1 : String_Ptr := Null;";
+   L_1544: aliased constant String := "   Line_Number_Of_Saved_Tok_Line1 : Integ"
+       & "er := 0;";
+   L_1545: aliased constant String := "   Saved_Tok_Line2 : String_Ptr := Null;";
+   L_1546: aliased constant String := "   Line_Number_Of_Saved_Tok_Line2 : Integ"
+       & "er := 0;";
+   L_1547: aliased constant String := "   -- Aflex will try to get next buffer b"
+       & "efore it processs the";
+   L_1548: aliased constant String := "   -- last token. Since now Aflex has bee"
+       & "n changed to accept";
+   L_1549: aliased constant String := "   -- one line by one line, the last toke"
+       & "n in the buffer is";
+   L_1550: aliased constant String := "   -- always end_of_line ( or end_of_buff"
+       & "er ). So before the";
+   L_1551: aliased constant String := "   -- end_of_line is processed, next line"
+       & " will be retrieved";
+   L_1552: aliased constant String := "   -- into the buffer. So we need to main"
+       & "tain two lines,";
+   L_1553: aliased constant String := "   -- which line will be returned in Get_"
+       & "Token_Line is";
+   L_1554: aliased constant String := "   -- determined according to the line nu"
+       & "mber. It is the same";
+   L_1555: aliased constant String := "   -- reason that we can not reinitialize"
+       & " tok_end_col to 0 in";
+   L_1556: aliased constant String := "   -- Yy_Input, but we must do it in yyle"
+       & "x after we process the";
+   L_1557: aliased constant String := "   -- end_of_line.";
+   L_1558: aliased constant String := "   Tok_Begin_Line : Integer := 1;";
+   L_1559: aliased constant String := "   Tok_End_Line   : Integer := 1;";
+   L_1560: aliased constant String := "   Tok_End_Col    : Integer := 0;";
+   L_1561: aliased constant String := "   Tok_Begin_Col  : Integer := 0;";
+   L_1562: aliased constant String := "   Token_At_End_Of_Line : Boolean := Fals"
+       & "e;";
+   L_1563: aliased constant String := "   -- Indicates whether or not last match"
+       & "ed token is end_of_line.";
+   L_1564: aliased constant String := "%end";
+   L_1565: aliased constant String := "";
+   L_1566: aliased constant String := "   procedure YY_INPUT (buf      : out unb"
+       & "ounded_character_array;";
+   L_1567: aliased constant String := "                       result   : out Int"
+       & "eger;";
+   L_1568: aliased constant String := "                       max_size : in Inte"
+       & "ger);";
+   L_1569: aliased constant String := "   function yy_get_next_buffer return eob"
+       & "_action_type;";
+   L_1570: aliased constant String := "%if unput";
+   L_1571: aliased constant String := "   procedure yyUnput (c : Character; yy_b"
+       & "p : in out Integer);";
+   L_1572: aliased constant String := "   procedure Unput (c : Character);";
+   L_1573: aliased constant String := "%end";
+   L_1574: aliased constant String := "   function Input return Character;";
+   L_1575: aliased constant String := "%if output";
+   L_1576: aliased constant String := "   procedure Output (c : Character);";
+   L_1577: aliased constant String := "   procedure Output_New_Line;";
+   L_1578: aliased constant String := "   function Output_Column return Ada.Text"
+       & "_IO.Count;";
+   L_1579: aliased constant String := "%end";
+   L_1580: aliased constant String := "%if error";
+   L_1581: aliased constant String := "   function Input_Line return Ada.Text_IO"
+       & ".Count;";
+   L_1582: aliased constant String := "%end";
+   L_1583: aliased constant String := "%if yywrap";
+   L_1584: aliased constant String := "   function yyWrap return Boolean;";
+   L_1585: aliased constant String := "%end";
+   L_1586: aliased constant String := "   procedure Open_Input (fname : in Strin"
+       & "g);";
+   L_1587: aliased constant String := "   procedure Close_Input;";
+   L_1588: aliased constant String := "%if output";
+   L_1589: aliased constant String := "   procedure Create_Output (fname : in St"
+       & "ring := """");";
+   L_1590: aliased constant String := "   procedure Close_Output;";
+   L_1591: aliased constant String := "%end";
+   L_1592: aliased constant String := "";
+   L_1593: aliased constant String := "%if error";
+   L_1594: aliased constant String := "   procedure Yy_Get_Token_Line ( Yy_Line_"
+       & "String : out String;";
+   L_1595: aliased constant String := "                                 Yy_Line_"
+       & "Length : out Natural );";
+   L_1596: aliased constant String := "   --  Returnes the entire line in the in"
+       & "put, on which the currently";
+   L_1597: aliased constant String := "   --  matched token resides.";
+   L_1598: aliased constant String := "";
+   L_1599: aliased constant String := "   function Yy_Line_Number return Natural"
+       & ";";
+   L_1600: aliased constant String := "   --  Returns the line number of the cur"
+       & "rently matched token.";
+   L_1601: aliased constant String := "   --  In case a token spans lines, then "
+       & "the line number of the first line";
+   L_1602: aliased constant String := "   --  is returned.";
+   L_1603: aliased constant String := "";
+   L_1604: aliased constant String := "   function Yy_Begin_Column return Natura"
+       & "l;";
+   L_1605: aliased constant String := "   function Yy_End_Column return Natural;";
+   L_1606: aliased constant String := "   --  Returns the beginning and ending c"
+       & "olumn positions of the";
+   L_1607: aliased constant String := "   --  currently mathched token. If the t"
+       & "oken spans lines then the";
+   L_1608: aliased constant String := "   --  begin column number is the column "
+       & "number on the first line";
+   L_1609: aliased constant String := "   --  and the end columne number is the "
+       & "column number on the last line.";
+   L_1610: aliased constant String := "";
+   L_1611: aliased constant String := "%end";
+   L_1612: aliased constant String := "";
+   L_1613: aliased constant String := "end ${NAME}_IO;";
+   spec_io : aliased constant Content_Array :=
+     (L_1510'Access,
+      L_1511'Access,
+      L_1512'Access,
+      L_1513'Access,
+      L_1514'Access,
+      L_1515'Access,
+      L_1516'Access,
+      L_1517'Access,
+      L_1518'Access,
+      L_1519'Access,
+      L_1520'Access,
+      L_1521'Access,
+      L_1522'Access,
+      L_1523'Access,
+      L_1524'Access,
+      L_1525'Access,
+      L_1526'Access,
+      L_1527'Access,
+      L_1528'Access,
+      L_1529'Access,
+      L_1530'Access,
+      L_1531'Access,
+      L_1532'Access,
+      L_1533'Access,
+      L_1534'Access,
+      L_1535'Access,
+      L_1536'Access,
+      L_1537'Access,
+      L_1538'Access,
+      L_1539'Access,
+      L_1540'Access,
+      L_1541'Access,
+      L_1542'Access,
+      L_1543'Access,
+      L_1544'Access,
+      L_1545'Access,
+      L_1546'Access,
+      L_1547'Access,
+      L_1548'Access,
+      L_1549'Access,
+      L_1550'Access,
+      L_1551'Access,
+      L_1552'Access,
+      L_1553'Access,
+      L_1554'Access,
+      L_1555'Access,
+      L_1556'Access,
+      L_1557'Access,
+      L_1558'Access,
+      L_1559'Access,
+      L_1560'Access,
+      L_1561'Access,
+      L_1562'Access,
+      L_1563'Access,
+      L_1564'Access,
+      L_1565'Access,
+      L_1566'Access,
+      L_1567'Access,
+      L_1568'Access,
+      L_1569'Access,
+      L_1570'Access,
+      L_1571'Access,
+      L_1572'Access,
+      L_1573'Access,
+      L_1574'Access,
+      L_1575'Access,
+      L_1576'Access,
+      L_1577'Access,
+      L_1578'Access,
+      L_1579'Access,
+      L_1580'Access,
+      L_1581'Access,
+      L_1582'Access,
+      L_1583'Access,
+      L_1584'Access,
+      L_1585'Access,
+      L_1586'Access,
+      L_1587'Access,
+      L_1588'Access,
+      L_1589'Access,
+      L_1590'Access,
+      L_1591'Access,
+      L_1592'Access,
+      L_1593'Access,
+      L_1594'Access,
+      L_1595'Access,
+      L_1596'Access,
+      L_1597'Access,
+      L_1598'Access,
+      L_1599'Access,
+      L_1600'Access,
+      L_1601'Access,
+      L_1602'Access,
+      L_1603'Access,
+      L_1604'Access,
+      L_1605'Access,
+      L_1606'Access,
+      L_1607'Access,
+      L_1608'Access,
+      L_1609'Access,
+      L_1610'Access,
+      L_1611'Access,
+      L_1612'Access,
+      L_1613'Access);
+
+   L_1614: aliased constant String := "--  Warning: This file is automatically g"
+       & "enerated by AFLEX.";
+   L_1615: aliased constant String := "--           It is useless to modify it. "
+       & "Change the "".Y"" & "".L"" files instead.";
+   L_1616: aliased constant String := "--  Template: templates/spec-recursive-df"
+       & "a.ads";
+   L_1617: aliased constant String := "%if private";
+   L_1618: aliased constant String := "private package ${NAME}_DFA is";
+   L_1619: aliased constant String := "%else";
+   L_1620: aliased constant String := "package ${NAME}_DFA is";
+   L_1621: aliased constant String := "%end";
+   L_1622: aliased constant String := "";
+   L_1623: aliased constant String := "   --  ----------------------------------"
+       & "------------------------------------------";
+   L_1624: aliased constant String := "   --  Buffer size is configured with:";
+   L_1625: aliased constant String := "   --  %option bufsize=${YYBUFSIZE}";
+   L_1626: aliased constant String := "";
+   L_1627: aliased constant String := "   YY_READ_BUF_SIZE : constant Integer :="
+       & " ${YYBUFSIZE};";
+   L_1628: aliased constant String := "   --  ----------------------------------"
+       & "------------------------------------------";
+   L_1629: aliased constant String := "";
+   L_1630: aliased constant String := "   YY_BUF_SIZE : constant Integer := YY_R"
+       & "EAD_BUF_SIZE * 2; --  size of input buffer";
+   L_1631: aliased constant String := "";
+   L_1632: aliased constant String := "   subtype Index is Natural range 0 .. YY"
+       & "_BUF_SIZE;";
+   L_1633: aliased constant String := "   type unbounded_character_array is arra"
+       & "y (Integer range <>) of Character;";
+   L_1634: aliased constant String := "   subtype ch_buf_type is unbounded_chara"
+       & "cter_array (0 .. YY_BUF_SIZE + 1);";
+   L_1635: aliased constant String := "";
+   L_1636: aliased constant String := "   subtype yy_state_type is Integer;";
+   L_1637: aliased constant String := "";
+   L_1638: aliased constant String := "   type Context_Type is limited record";
+   L_1639: aliased constant String := "%if debug";
+   L_1640: aliased constant String := "      aflex_debug       : Boolean := True"
+       & ";";
+   L_1641: aliased constant String := "%else";
+   L_1642: aliased constant String := "      aflex_debug       : Boolean := Fals"
+       & "e;";
+   L_1643: aliased constant String := "%end";
+   L_1644: aliased constant String := "%if yylineno";
+   L_1645: aliased constant String := "      yylineno          : Natural := 0;";
+   L_1646: aliased constant String := "      yylinecol         : Natural := 0;";
+   L_1647: aliased constant String := "      yy_last_yylineno  : Natural := 0;";
+   L_1648: aliased constant String := "      yy_last_yylinecol : Natural := 0;";
+   L_1649: aliased constant String := "%end";
+   L_1650: aliased constant String := "      yytext_ptr        : Integer; --  po"
+       & "ints to start of yytext in buffer";
+   L_1651: aliased constant String := "";
+   L_1652: aliased constant String := "      --  yy_ch_buf has to be 2 character"
+       & "s longer than YY_BUF_SIZE because we need";
+   L_1653: aliased constant String := "      --  to put in 2 end-of-buffer chara"
+       & "cters (this is explained where it is";
+   L_1654: aliased constant String := "      --  done) at the end of yy_ch_buf";
+   L_1655: aliased constant String := "";
+   L_1656: aliased constant String := "      yy_ch_buf    : ch_buf_type;";
+   L_1657: aliased constant String := "      yy_cp, yy_bp : Integer;";
+   L_1658: aliased constant String := "";
+   L_1659: aliased constant String := "      --  yy_hold_char holds the characte"
+       & "r lost when yytext is formed";
+   L_1660: aliased constant String := "      yy_hold_char : Character;";
+   L_1661: aliased constant String := "      yy_c_buf_p   : Integer;   --  point"
+       & "s to current character in buffer";
+   L_1662: aliased constant String := "";
+   L_1663: aliased constant String := "      --  These variables are needed betw"
+       & "een calls to YYLex.";
+   L_1664: aliased constant String := "      yy_init                 : Boolean :"
+       & "= True; --  do we need to initialize YYLex?";
+   L_1665: aliased constant String := "      yy_start                : Integer :"
+       & "= 0; --  current start state number";
+   L_1666: aliased constant String := "      yy_last_accepting_state : yy_state_"
+       & "type;";
+   L_1667: aliased constant String := "      yy_last_accepting_cpos  : Integer;";
+   L_1668: aliased constant String := "";
+   L_1669: aliased constant String := "   end record;";
+   L_1670: aliased constant String := "";
+   L_1671: aliased constant String := "   function YYText (Context : in Context_"
+       & "Type) return String;";
+   L_1672: aliased constant String := "   function YYLength (Context : in Contex"
+       & "t_Type) return Integer;";
+   L_1673: aliased constant String := "   procedure YY_DO_BEFORE_ACTION (Context"
+       & " : in out Context_Type);";
+   L_1674: aliased constant String := "";
+   L_1675: aliased constant String := "end ${NAME}_DFA;";
+   spec_recursive_dfa : aliased constant Content_Array :=
+     (L_1614'Access,
+      L_1615'Access,
+      L_1616'Access,
+      L_1617'Access,
+      L_1618'Access,
+      L_1619'Access,
+      L_1620'Access,
+      L_1621'Access,
+      L_1622'Access,
+      L_1623'Access,
+      L_1624'Access,
+      L_1625'Access,
+      L_1626'Access,
+      L_1627'Access,
+      L_1628'Access,
+      L_1629'Access,
+      L_1630'Access,
+      L_1631'Access,
+      L_1632'Access,
+      L_1633'Access,
+      L_1634'Access,
+      L_1635'Access,
+      L_1636'Access,
+      L_1637'Access,
+      L_1638'Access,
+      L_1639'Access,
+      L_1640'Access,
+      L_1641'Access,
+      L_1642'Access,
+      L_1643'Access,
+      L_1644'Access,
+      L_1645'Access,
+      L_1646'Access,
+      L_1647'Access,
+      L_1648'Access,
+      L_1649'Access,
+      L_1650'Access,
+      L_1651'Access,
+      L_1652'Access,
+      L_1653'Access,
+      L_1654'Access,
+      L_1655'Access,
+      L_1656'Access,
+      L_1657'Access,
+      L_1658'Access,
+      L_1659'Access,
+      L_1660'Access,
+      L_1661'Access,
+      L_1662'Access,
+      L_1663'Access,
+      L_1664'Access,
+      L_1665'Access,
+      L_1666'Access,
+      L_1667'Access,
+      L_1668'Access,
+      L_1669'Access,
+      L_1670'Access,
+      L_1671'Access,
+      L_1672'Access,
+      L_1673'Access,
+      L_1674'Access,
+      L_1675'Access);
+
+   L_1676: aliased constant String := "--  Warning: This file is automatically g"
+       & "enerated by AFLEX.";
+   L_1677: aliased constant String := "--           It is useless to modify it. "
+       & "Change the "".Y"" & "".L"" files instead.";
+   L_1678: aliased constant String := "--  Template: templates/spec-recursive-io"
+       & ".ads";
+   L_1679: aliased constant String := "with Ada.Text_IO;";
+   L_1680: aliased constant String := "with ${NAME}_DFA; use ${NAME}_DFA;";
+   L_1681: aliased constant String := "%if private";
+   L_1682: aliased constant String := "private package ${NAME}_IO is";
+   L_1683: aliased constant String := "%else";
+   L_1684: aliased constant String := "package ${NAME}_IO is";
+   L_1685: aliased constant String := "%end";
+   L_1686: aliased constant String := "";
+   L_1687: aliased constant String := "   NULL_IN_INPUT         : exception;";
+   L_1688: aliased constant String := "   AFLEX_INTERNAL_ERROR  : exception;";
+   L_1689: aliased constant String := "   UNEXPECTED_LAST_MATCH : exception;";
+   L_1690: aliased constant String := "   PUSHBACK_OVERFLOW     : exception;";
+   L_1691: aliased constant String := "   AFLEX_SCANNER_JAMMED  : exception;";
+   L_1692: aliased constant String := "   type eob_action_type is (EOB_ACT_RESTA"
+       & "RT_SCAN,";
+   L_1693: aliased constant String := "                            EOB_ACT_END_O"
+       & "F_FILE,";
+   L_1694: aliased constant String := "                            EOB_ACT_LAST_"
+       & "MATCH);";
+   L_1695: aliased constant String := "   YY_END_OF_BUFFER_CHAR : constant Chara"
+       & "cter := ASCII.NUL;";
+   L_1696: aliased constant String := "";
+   L_1697: aliased constant String := "%if error";
+   L_1698: aliased constant String := "   --   In order to support YY_Get_Token_"
+       & "Line, we need";
+   L_1699: aliased constant String := "   --   a variable to hold current line.";
+   L_1700: aliased constant String := "   type String_Ptr is access String;";
+   L_1701: aliased constant String := "%end";
+   L_1702: aliased constant String := "";
+   L_1703: aliased constant String := "   type Context_Type is limited record";
+   L_1704: aliased constant String := "      user_input_file       : Ada.Text_IO"
+       & ".File_Type;";
+   L_1705: aliased constant String := "%if output";
+   L_1706: aliased constant String := "      user_output_file      : Ada.Text_IO"
+       & ".File_Type;";
+   L_1707: aliased constant String := "%end";
+   L_1708: aliased constant String := "      yy_n_chars            : Integer;   "
+       & "    --  number of characters read into yy_ch_buf";
+   L_1709: aliased constant String := "";
+   L_1710: aliased constant String := "      --  true when we've seen an EOF for"
+       & " the current input file";
+   L_1711: aliased constant String := "      yy_eof_has_been_seen  : Boolean;";
+   L_1712: aliased constant String := "      dfa                   : ${NAME}_DFA"
+       & ".Context_Type;";
+   L_1713: aliased constant String := "      YYLVal                : YYSType;";
+   L_1714: aliased constant String := "      YYVal                 : YYSType;";
+   L_1715: aliased constant String := "%yytype";
+   L_1716: aliased constant String := "";
+   L_1717: aliased constant String := "%if error";
+   L_1718: aliased constant String := "      Saved_Tok_Line1 : String_Ptr := Nul"
+       & "l;";
+   L_1719: aliased constant String := "      Line_Number_Of_Saved_Tok_Line1 : In"
+       & "teger := 0;";
+   L_1720: aliased constant String := "      Saved_Tok_Line2 : String_Ptr := Nul"
+       & "l;";
+   L_1721: aliased constant String := "      Line_Number_Of_Saved_Tok_Line2 : In"
+       & "teger := 0;";
+   L_1722: aliased constant String := "      --  Aflex will try to get next buff"
+       & "er before it processs the";
+   L_1723: aliased constant String := "      --  last token. Since now Aflex has"
+       & " been changed to accept";
+   L_1724: aliased constant String := "      --  one line by one line, the last "
+       & "token in the buffer is";
+   L_1725: aliased constant String := "      --  always end_of_line ( or end_of_"
+       & "buffer ). So before the";
+   L_1726: aliased constant String := "      --  end_of_line is processed, next "
+       & "line will be retrieved";
+   L_1727: aliased constant String := "      --  into the buffer. So we need to "
+       & "maintain two lines,";
+   L_1728: aliased constant String := "      --  which line will be returned in "
+       & "Get_Token_Line is";
+   L_1729: aliased constant String := "      --  determined according to the lin"
+       & "e number. It is the same";
+   L_1730: aliased constant String := "      --  reason that we can not reinitia"
+       & "lize tok_end_col to 0 in";
+   L_1731: aliased constant String := "      --  Yy_Input, but we must do it in "
+       & "yylex after we process the";
+   L_1732: aliased constant String := "      --  end_of_line.";
+   L_1733: aliased constant String := "      Tok_Begin_Line : Integer := 1;";
+   L_1734: aliased constant String := "      Tok_End_Line   : Integer := 1;";
+   L_1735: aliased constant String := "      Tok_End_Col    : Integer := 0;";
+   L_1736: aliased constant String := "      Tok_Begin_Col  : Integer := 0;";
+   L_1737: aliased constant String := "      Token_At_End_Of_Line : Boolean := F"
+       & "alse;";
+   L_1738: aliased constant String := "      --  Indicates whether or not last m"
+       & "atched token is end_of_line.";
+   L_1739: aliased constant String := "%end";
+   L_1740: aliased constant String := "   end record;";
+   L_1741: aliased constant String := "";
+   L_1742: aliased constant String := "";
+   L_1743: aliased constant String := "   procedure YY_INPUT (Context  : in out "
+       & "Context_Type;";
+   L_1744: aliased constant String := "                       buf      : out unb"
+       & "ounded_character_array;";
+   L_1745: aliased constant String := "                       result   : out Int"
+       & "eger;";
+   L_1746: aliased constant String := "                       max_size : in Inte"
+       & "ger);";
+   L_1747: aliased constant String := "   function yy_get_next_buffer (Context :"
+       & " in out Context_Type) return eob_action_type;";
+   L_1748: aliased constant String := "%if unput";
+   L_1749: aliased constant String := "   procedure yyUnput (Context : in out Co"
+       & "ntext_Type;";
+   L_1750: aliased constant String := "                      c       : Character"
+       & ";";
+   L_1751: aliased constant String := "                      yy_bp   : in out In"
+       & "teger);";
+   L_1752: aliased constant String := "   procedure Unput (Context : in out Cont"
+       & "ext_Type;";
+   L_1753: aliased constant String := "                    c       : Character);";
+   L_1754: aliased constant String := "%end";
+   L_1755: aliased constant String := "   function Input (Context : in out Conte"
+       & "xt_Type) return Character;";
+   L_1756: aliased constant String := "%if output";
+   L_1757: aliased constant String := "   procedure Output (Context : in out Con"
+       & "text_Type; c : Character);";
+   L_1758: aliased constant String := "   procedure Output_New_Line (Context : i"
+       & "n out Context_Type);";
+   L_1759: aliased constant String := "   function Output_Column (Context : in C"
+       & "ontext_Type) return Ada.Text_IO.Count;";
+   L_1760: aliased constant String := "%end";
+   L_1761: aliased constant String := "%if error";
+   L_1762: aliased constant String := "   function Input_Line (Context : in Cont"
+       & "ext_Type) return Ada.Text_IO.Count;";
+   L_1763: aliased constant String := "%end";
+   L_1764: aliased constant String := "%if yywrap";
+   L_1765: aliased constant String := "   function yyWrap (Context : in Context_"
+       & "Type) return Boolean;";
+   L_1766: aliased constant String := "%end";
+   L_1767: aliased constant String := "   procedure Open_Input (Context : in out"
+       & " Context_Type; fname : in String);";
+   L_1768: aliased constant String := "   procedure Close_Input (Context : in ou"
+       & "t Context_Type);";
+   L_1769: aliased constant String := "%if output";
+   L_1770: aliased constant String := "   procedure Create_Output (Context : in "
+       & "out Context_Type) fname : in String := """");";
+   L_1771: aliased constant String := "   procedure Close_Output (Context : in o"
+       & "ut Context_Type);";
+   L_1772: aliased constant String := "%end";
+   L_1773: aliased constant String := "";
+   L_1774: aliased constant String := "%if error";
+   L_1775: aliased constant String := "   procedure Yy_Get_Token_Line (Context :"
+       & " in out Context_Type;";
+   L_1776: aliased constant String := "                                Yy_Line_S"
+       & "tring : out String;";
+   L_1777: aliased constant String := "                                Yy_Line_L"
+       & "ength : out Natural );";
+   L_1778: aliased constant String := "   --  Returnes the entire line in the in"
+       & "put, on which the currently";
+   L_1779: aliased constant String := "   --  matched token resides.";
+   L_1780: aliased constant String := "";
+   L_1781: aliased constant String := "   function Yy_Line_Number (Context : in "
+       & "Context_Type) return Natural;";
+   L_1782: aliased constant String := "   --  Returns the line number of the cur"
+       & "rently matched token.";
+   L_1783: aliased constant String := "   --  In case a token spans lines, then "
+       & "the line number of the first line";
+   L_1784: aliased constant String := "   --  is returned.";
+   L_1785: aliased constant String := "";
+   L_1786: aliased constant String := "   function Yy_Begin_Column (Context : in"
+       & " Context_Type) return Natural;";
+   L_1787: aliased constant String := "   function Yy_End_Column (Context : in C"
+       & "ontext_Type) return Natural;";
+   L_1788: aliased constant String := "   --  Returns the beginning and ending c"
+       & "olumn positions of the";
+   L_1789: aliased constant String := "   --  currently mathched token. If the t"
+       & "oken spans lines then the";
+   L_1790: aliased constant String := "   --  begin column number is the column "
+       & "number on the first line";
+   L_1791: aliased constant String := "   --  and the end columne number is the "
+       & "column number on the last line.";
+   L_1792: aliased constant String := "";
+   L_1793: aliased constant String := "%end";
+   L_1794: aliased constant String := "";
+   L_1795: aliased constant String := "end ${NAME}_IO;";
+   spec_recursive_io : aliased constant Content_Array :=
+     (L_1676'Access,
+      L_1677'Access,
+      L_1678'Access,
+      L_1679'Access,
+      L_1680'Access,
+      L_1681'Access,
+      L_1682'Access,
+      L_1683'Access,
+      L_1684'Access,
+      L_1685'Access,
+      L_1686'Access,
+      L_1687'Access,
+      L_1688'Access,
+      L_1689'Access,
+      L_1690'Access,
+      L_1691'Access,
+      L_1692'Access,
+      L_1693'Access,
+      L_1694'Access,
+      L_1695'Access,
+      L_1696'Access,
+      L_1697'Access,
+      L_1698'Access,
+      L_1699'Access,
+      L_1700'Access,
+      L_1701'Access,
+      L_1702'Access,
+      L_1703'Access,
+      L_1704'Access,
+      L_1705'Access,
+      L_1706'Access,
+      L_1707'Access,
+      L_1708'Access,
+      L_1709'Access,
+      L_1710'Access,
+      L_1711'Access,
+      L_1712'Access,
+      L_1713'Access,
+      L_1714'Access,
+      L_1715'Access,
+      L_1716'Access,
+      L_1717'Access,
+      L_1718'Access,
+      L_1719'Access,
+      L_1720'Access,
+      L_1721'Access,
+      L_1722'Access,
+      L_1723'Access,
+      L_1724'Access,
+      L_1725'Access,
+      L_1726'Access,
+      L_1727'Access,
+      L_1728'Access,
+      L_1729'Access,
+      L_1730'Access,
+      L_1731'Access,
+      L_1732'Access,
+      L_1733'Access,
+      L_1734'Access,
+      L_1735'Access,
+      L_1736'Access,
+      L_1737'Access,
+      L_1738'Access,
+      L_1739'Access,
+      L_1740'Access,
+      L_1741'Access,
+      L_1742'Access,
+      L_1743'Access,
+      L_1744'Access,
+      L_1745'Access,
+      L_1746'Access,
+      L_1747'Access,
+      L_1748'Access,
+      L_1749'Access,
+      L_1750'Access,
+      L_1751'Access,
+      L_1752'Access,
+      L_1753'Access,
+      L_1754'Access,
+      L_1755'Access,
+      L_1756'Access,
+      L_1757'Access,
+      L_1758'Access,
+      L_1759'Access,
+      L_1760'Access,
+      L_1761'Access,
+      L_1762'Access,
+      L_1763'Access,
+      L_1764'Access,
+      L_1765'Access,
+      L_1766'Access,
+      L_1767'Access,
+      L_1768'Access,
+      L_1769'Access,
+      L_1770'Access,
+      L_1771'Access,
+      L_1772'Access,
+      L_1773'Access,
+      L_1774'Access,
+      L_1775'Access,
+      L_1776'Access,
+      L_1777'Access,
+      L_1778'Access,
+      L_1779'Access,
+      L_1780'Access,
+      L_1781'Access,
+      L_1782'Access,
+      L_1783'Access,
+      L_1784'Access,
+      L_1785'Access,
+      L_1786'Access,
+      L_1787'Access,
+      L_1788'Access,
+      L_1789'Access,
+      L_1790'Access,
+      L_1791'Access,
+      L_1792'Access,
+      L_1793'Access,
+      L_1794'Access,
+      L_1795'Access);
 
 end Template_Manager.Templates;
