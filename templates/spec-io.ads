@@ -52,8 +52,8 @@ package ${NAME}_IO is
    Tok_Begin_Col  : Integer := 0;
    Token_At_End_Of_Line : Boolean := False;
    -- Indicates whether or not last matched token is end_of_line.
-%end
 
+%end
    procedure YY_INPUT (buf      : out unbounded_character_array;
                        result   : out Integer;
                        max_size : in Integer);
@@ -80,8 +80,8 @@ package ${NAME}_IO is
    procedure Create_Output (fname : in String := "");
    procedure Close_Output;
 %end
-
 %if error
+
    procedure Yy_Get_Token_Line ( Yy_Line_String : out String;
                                  Yy_Line_Length : out Natural );
    --  Returnes the entire line in the input, on which the currently
@@ -98,7 +98,6 @@ package ${NAME}_IO is
    --  currently mathched token. If the token spans lines then the
    --  begin column number is the column number on the first line
    --  and the end columne number is the column number on the last line.
-
 %end
 
 end ${NAME}_IO;

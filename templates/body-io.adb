@@ -29,8 +29,8 @@ package body ${NAME}_IO is
       -- Move the saved lines forward.
       Saved_Tok_Line1 := Saved_Tok_Line2;
       Line_Number_Of_Saved_Tok_Line1 := Line_Number_Of_Saved_Tok_Line2;
-%end
 
+%end
       if Ada.Text_IO.Is_Open (user_input_file) then
          while i <= max_size loop
             --  Ada ate our newline, put it back on the end.
@@ -144,6 +144,7 @@ package body ${NAME}_IO is
             Line_Number_Of_Saved_Tok_Line2 := Line_Number_Of_Saved_Tok_Line1 + 1;
          end if;
 %end
+
    end YY_INPUT;
 
    --  yy_get_next_buffer - try to read in new buffer
@@ -268,8 +269,8 @@ package body ${NAME}_IO is
    begin
       yyUnput (c, yy_bp);
    end Unput;
-%end
 
+%end
    function Input return Character is
       c : Character;
    begin
@@ -347,23 +348,23 @@ package body ${NAME}_IO is
          return Ada.Text_IO.Col;
       end if;
    end Output_Column;
+
 %end
 %if error
-
    function Input_Line return Ada.Text_IO.Count is
    begin
       return Ada.Text_IO.Count (Line_Number_Of_Saved_Tok_Line2);
    end Input_Line;
+
 %end
 %if yywrap
-
    --  default yywrap function - always treat EOF as an EOF
    function yyWrap return Boolean is
    begin
       return True;
    end yyWrap;
-%end
 
+%end
    procedure Open_Input (fname : in String) is
    begin
       yy_init := True;
@@ -377,8 +378,8 @@ package body ${NAME}_IO is
          Ada.Text_IO.Create (user_output_file, Ada.Text_IO.Out_File, fname);
       end if;
    end Create_Output;
-%end
 
+%end
    procedure Close_Input is
    begin
       if Ada.Text_IO.Is_Open (user_input_file) then
@@ -393,8 +394,8 @@ package body ${NAME}_IO is
          Ada.Text_IO.Close (user_output_file);
       end if;
    end Close_Output;
-%end
 
+%end
 %if error
    procedure Yy_Get_Token_Line ( Yy_Line_String : out String;
                                  Yy_Line_Length : out Natural ) is
@@ -426,7 +427,6 @@ package body ${NAME}_IO is
    begin
       return Tok_End_Col;
    end Yy_End_Column;
-
 %end
 
 end ${NAME}_IO;

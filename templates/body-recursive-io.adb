@@ -30,8 +30,8 @@ package body ${NAME}_IO is
       -- Move the saved lines forward.
       Context.Saved_Tok_Line1 := Context.Saved_Tok_Line2;
       Context.Line_Number_Of_Saved_Tok_Line1 := Context.Line_Number_Of_Saved_Tok_Line2;
-%end
 
+%end
       if Ada.Text_IO.Is_Open (Context.user_input_file) then
          while i <= max_size loop
             --  Ada ate our newline, put it back on the end.
@@ -269,8 +269,8 @@ package body ${NAME}_IO is
    begin
       yyUnput (Context, c, Context.dfa.yy_bp);
    end Unput;
-%end
 
+%end
    function Input (Context : in out Context_Type) return Character is
       c : Character;
    begin
@@ -348,23 +348,23 @@ package body ${NAME}_IO is
          return Ada.Text_IO.Col;
       end if;
    end Output_Column;
+
 %end
 %if error
-
    function Input_Line (Context : in Context_Type) return Ada.Text_IO.Count is
    begin
       return Ada.Text_IO.Count (Context.Line_Number_Of_Saved_Tok_Line2);
    end Input_Line;
+
 %end
 %if yywrap
-
    --  default yywrap function - always treat EOF as an EOF
    function yyWrap (Context : in Context_Type) return Boolean is
    begin
       return True;
    end yyWrap;
-%end
 
+%end
    procedure Open_Input (Context : in out Context_Type; fname : in String) is
    begin
       Context.dfa.yy_init := True;
@@ -378,8 +378,8 @@ package body ${NAME}_IO is
          Ada.Text_IO.Create (Context.user_output_file, Ada.Text_IO.Out_File, fname);
       end if;
    end Create_Output;
-%end
 
+%end
    procedure Close_Input (Context : in out Context_Type) is
    begin
       if Ada.Text_IO.Is_Open (Context.user_input_file) then
@@ -394,8 +394,8 @@ package body ${NAME}_IO is
          Ada.Text_IO.Close (Context.user_output_file);
       end if;
    end Close_Output;
-%end
 
+%end
 %if error
    procedure Yy_Get_Token_Line (Context : in out Context_Type;
                                 Yy_Line_String : out String;
@@ -428,7 +428,6 @@ package body ${NAME}_IO is
    begin
       return Context.dfa.Tok_End_Col;
    end Yy_End_Column;
-
 %end
 
 end ${NAME}_IO;

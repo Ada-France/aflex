@@ -23,8 +23,8 @@ package ${NAME}_IO is
    --   In order to support YY_Get_Token_Line, we need
    --   a variable to hold current line.
    type String_Ptr is access String;
-%end
 
+%end
    type Context_Type is limited record
       user_input_file       : Ada.Text_IO.File_Type;
 %if output
@@ -63,7 +63,6 @@ package ${NAME}_IO is
       --  Indicates whether or not last matched token is end_of_line.
 %end
    end record;
-
 
    procedure YY_INPUT (Context  : in out Context_Type;
                        buf      : out unbounded_character_array;
@@ -114,7 +113,6 @@ package ${NAME}_IO is
    --  currently mathched token. If the token spans lines then the
    --  begin column number is the column number on the first line
    --  and the end columne number is the column number on the last line.
-
 %end
 
 end ${NAME}_IO;
