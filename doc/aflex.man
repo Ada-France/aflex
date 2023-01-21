@@ -215,12 +215,18 @@ variables in the scanner to track the symbol current line and column.
 .TP
 nounput or unput
 Disable or enable the generation of the
-.I unput
+.I Unput
 and
 .I yyunput
 function in the
 .I _IO
-package.
+package.  If you don't use the
+.I yyunput
+no
+.I Unput
+procedure, you should be able to use the
+.I nounput
+option.
 .TP
 nooutput or output
 Enable or disable the generation of the
