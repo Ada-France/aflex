@@ -11,7 +11,13 @@ to keep the implementation small and easy to manage.  The following basic
 transformations are supported:
 
 - `%if, %else, %end` conditions are used to decide to emit or drop some portion,
+- `%yydecl` pattern is expanded according to the `%yydecl` declaration in the scanner file
+  or the default `YYLex` function declaration,
+- `%yytype` pattern is replaced by the content of the `%yytype {}` code block if there is one,
+- `%yyaction` pattern is replaced by the content of the `%yyaction {}` code block if there is one,
+- `%yywrap` pattern is replaced by the content of the `%yywrap {}` code block if there is one,
 - ${NAME} specific patterns are replaced by names that depend on the source grammar.
+- ${YYLEX} patterns are replaced by the `YYLex` function name
 
 The `%` must appear at beginning of the line and a `%` condition that is not
 recognized will generate a `Program_Error` when the template is expanded.
@@ -25,6 +31,8 @@ The following conditions are supported:
 
 | Condition        | Description                                                |
 |------------------|------------------------------------------------------------|
+| %if echo         | Generate the default ECHO rule (can be disabled by using -s option) |
+| %if minimalist   | Avoid emitting use and with clause to Ada.Text_IO (Aflex -m option is passed) |
 | %if private      | Generate Ada `private` package (Aflex -P option is passed) |
 | %if output       | Support `Output` in `_IO` package (can be disabled by using the `%option nooutput`) |
 | %if interactive  | Scanner in interactive mode (Aflex -I option is passed) |
@@ -33,6 +41,8 @@ The following conditions are supported:
 | %if yylineno     | Support `yylineno` generation (enabled by using the `%option yylineno`) |
 | %if unput        | Support `Unput` in `_IO` package (can be disabled by using the `%option nounput`) |
 | %if yywrap       | Support `yyWrap` in `_IO` package (can be disabled by using the `%option noyywrap`) |
+| %if yytype       | Define if the source file contains a `%yytype {}` code block |
+| %if yyaction     | Define if the source file contains a `%yyaction {}` code block |
 
 Note:
 - the template expander raises the `Program_Error` exception when a `%` pattern is not recognized.
@@ -48,6 +58,9 @@ The following string patterns are replaced:
 | Pattern   | Description                                         |
 |-----------|-----------------------------------------------------|
 | ${NAME}   | The name of the Ada lexer package that is generated |
+| ${YYLEX}  | The name of the scanner function.  The default is `YYLex` and it can be overriden by using the `%yydecl` definition in the scanner file |
+| ${YYVAR}  | The name of the YYLex context variable for a recursive scanner |
+| ${YYBUFSIZE} | The value of `YY_READ_BUF_SIZE` configured with `%option bufsize=NNN` (default 75_000) |
 
 ## Build
 
