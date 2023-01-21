@@ -24,12 +24,15 @@ This version brings a number of improvements:
 
 ## Version 1.6 - Under development
 
+- Fix #2: Missing `Input_Line` function when `-E` option is used
 - Support the flex options `%option output`, `%option nooutput`, `%option yywrap`,
-  `%option noyywrap`, `%option unput`, `%option nounput` to better control the
+  `%option noyywrap`, `%option unput`, `%option nounput`, `%option bufsize=NNN` to better control the
   generated `_IO` package.
 - Aflex templates provide more control for tuning the code generation and
   they are embedded with [Advanced Resource Embedder](https://gitlab.com/stcarrez/resource-embedder)
+- Support to define Ada code block in the scanner that is inserted in the generated scanner
 - New option -P to generate a private Ada package for DFA and IO
+- New directive `%option recursive` and `%yyvar` to generate a recursive scanner
 - New directive `%yydecl` to allow passing parameters to `YYLex`
   or change the default function name
 - Reformat code using `gnatpp`
