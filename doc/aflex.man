@@ -1,4 +1,4 @@
-.TH AFLEX 1 "December 2022" "Version 1.6"
+.TH AFLEX 1 "January 2023" "Version 1.6"
 .SH NAME
 aflex - fast lexical analyzer generator for Ada
 .SH SYNOPSIS
@@ -178,6 +178,89 @@ finite automatons.  This option is mostly for use in maintaining aflex.
 overrides the default internal skeleton from which aflex constructs
 its scanners.  You'll probably never need this option unless you are doing
 aflex maintenance or development.
+.\"
+.SH SCANNER OPTIONS
+.I aflex
+support the
+.I flex
+option directive in the input file but with only one name per line.  The syntax is
+.RS 5
+
+%option \fIname\fP
+.RE
+.PP
+The following options are supported:
+.TP
+case-sensitive or casefull
+Generate a case sensitive scanner (this is the default).
+.TP
+case-insensitive or caseless
+Generate a case insensitive scanner (similar to
+.B -i
+option)
+.TP
+interactive
+Generate an interactive scanner (similar to
+.B -I
+option).
+.TP
+full
+.TP
+yylineno
+Enable the generaton of
+.I yylineno
+and
+.I yylinecol
+variables in the scanner to track the symbol current line and column.
+.TP
+nounput or unput
+Disable or enable the generation of the
+.I unput
+and
+.I yyunput
+function in the
+.I _IO
+package.
+.TP
+nooutput or output
+Enable or disable the generation of the
+.I Output
+support in the
+.I _IO
+package.
+.TP
+noyywrap or yywrap
+Enable or disable the use and generation of the
+.I yywrap
+procedure to switch to another buffer or file when the end of a file is reached.
+.TP
+debug
+Enable the debug mode in the scanner (similar to the
+.B -d
+option).
+.TP
+recursive
+Generate a recursive scanner.  When a recursive scanner is generated, two limited
+Ada type record are generated in the
+.I _DFA
+and
+.I _IO
+packages to keep track of the current scanner state and the generated scanner
+does not use global variables.  The
+.I YYLex
+function must be called with a context parameter with the type
+.I Context_Type
+defined in the
+.I _IO
+package.
+.TP
+bufsize=NNN
+Controls the size of the read buffer used by the scanner.  The default value
+.I 75000
+has been increased over time to handle large content in the
+.I YYText
+variable.  This option allows to control the buffer size.
+.\"
 .SH INCOMPATIBILITIES WITH LEX
 .I aflex
 is fully compatible with
@@ -346,7 +429,7 @@ them with '#'.
 Ada style comments are supported instead of C style comments.
 .\"
 .IP \(bu 4
-All template files are internalized.
+All template files are internalized.  The recursive scanner uses specific templates.
 .\"
 .IP \(bu 4
 The input source file must end with a ".l" extension.
