@@ -86,7 +86,7 @@ options: doc/options.l bin/aflex
 generate:
 	@ERRORS=`sed -f templates/check.sed templates/*.ads templates/*.adb` ; \
 	if test "T$$ERRORS" = "T"; then \
-	   are -o src --rule=are-package.xml --var-access --content-only . ; \
+	   are -o src --rule=are-package.xml --no-type-declaration --var-access --content-only . ; \
 	else \
 	   echo "Invalid %if <option>, %else or %end option in template:"; \
 	   echo $$ERRORS; \
