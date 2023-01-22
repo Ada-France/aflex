@@ -59,7 +59,7 @@ The following string patterns are replaced:
 |-----------|-----------------------------------------------------|
 | ${NAME}   | The name of the Ada lexer package that is generated |
 | ${YYLEX}  | The name of the scanner function.  The default is `YYLex` and it can be overriden by using the `%yydecl` definition in the scanner file |
-| ${YYVAR}  | The name of the YYLex context variable for a recursive scanner |
+| ${YYVAR}  | The name of the YYLex context variable for a reentrant scanner |
 | ${YYBUFSIZE} | The value of `YY_READ_BUF_SIZE` configured with `%option bufsize=NNN` (default 75_000) |
 
 ## Build

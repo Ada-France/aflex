@@ -369,8 +369,8 @@ package body Misc is
          Misc_Defs.No_YYWrap := True;
       elsif Option = "yywrap" then
          Misc_Defs.No_YYWrap := False;
-      elsif Option = "recursive" then
-         Misc_Defs.Recursive := True;
+      elsif Option = "reentrant" then
+         Misc_Defs.Reentrant := True;
       else
          Synerr ("option '" & Option & "' is not recognized");
       end if;

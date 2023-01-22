@@ -349,8 +349,8 @@ package Misc_Defs is
    --  When true, don't emit the YYWrap support in _IO package.
    No_YYWrap : Boolean;
 
-   --  Use the recursive templates to generate a recursive parser.
-   Recursive : Boolean;
+   --  Use the reentrant templates to generate a recursive parser.
+   Reentrant : Boolean;
 
    --  '-m' minimalist option is used.
    Minimalist_With : Boolean;

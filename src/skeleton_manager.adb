@@ -74,9 +74,9 @@ package body Skeleton_Manager is
    begin
       if Use_External_Skeleton then
          Write_Template (Ada.Text_IO.Current_Output);
-      elsif Recursive then
+      elsif Reentrant then
          Template_Manager.Write_Template (Ada.Text_IO.Current_Output,
-                                          Template_Manager.Templates.body_recursive_lex,
+                                          Template_Manager.Templates.body_reentrant_lex,
                                           Body_Current_Line);
       else
          Template_Manager.Write_Template (Ada.Text_IO.Current_Output,

@@ -141,7 +141,7 @@ package body Template_Manager is
                             S_IF_YYWRAP,
                             S_IF_YYACTION,
                             S_IF_YYTYPE,
-                            S_IF_RECURSIVE,
+                            S_IF_REENTRANT,
                             S_IF_MINIMALIST_WITH,
                             S_IF_UNPUT);
       Current    : Section_Type := S_COMMON;
@@ -180,8 +180,8 @@ package body Template_Manager is
                   Current := S_IF_YYTYPE;
                elsif Line = "%if echo" then
                   Current := S_IF_ECHO;
-               elsif Line = "%if recursive" then
-                  Current := S_IF_RECURSIVE;
+               elsif Line = "%if reentrant" then
+                  Current := S_IF_REENTRANT;
                elsif Line = "%if minimalist" then
                   Current := S_IF_MINIMALIST_WITH;
                elsif Line = "%end" then
@@ -197,7 +197,7 @@ package body Template_Manager is
                   begin
                      if Decl'Length > 0 then
                         Text_IO.Put_Line (Outfile, Decl);
-                     elsif not Recursive then
+                     elsif not Reentrant then
                         Text_IO.Put_Line (Outfile, "   function YYLex return Token is");
                      else
                         Text_IO.Put (Outfile, "   function YYLex (");
@@ -230,7 +230,7 @@ package body Template_Manager is
                  or else (Current = S_IF_YYWRAP and then not No_YYWrap)
                  or else (Current = S_IF_YYACTION and then Has_Code (YYACTION_CODE))
                  or else (Current = S_IF_YYTYPE and then Has_Code (YYTYPE_CODE))
-                 or else (Current = S_IF_RECURSIVE and then Recursive)
+                 or else (Current = S_IF_REENTRANT and then Reentrant)
                  or else (Current = S_IF_ECHO and then not Spprdflt)
                  or else (Current = S_IF_MINIMALIST_WITH and then Minimalist_With)
                  or else (Current = S_IF_ERROR and then Ayacc_Extension_Flag);
@@ -271,7 +271,7 @@ package body Template_Manager is
    begin
       External_File_Manager.Get_Dfa_File (Dfa_Out_File, True);
       Write_Template (Dfa_Out_File,
-                      (if Recursive then Templates.spec_recursive_dfa else Templates.spec_dfa),
+                      (if Reentrant then Templates.spec_reentrant_dfa else Templates.spec_dfa),
                       Dfa_Line);
       Text_Io.Close (Dfa_Out_File);
 
@@ -280,7 +280,7 @@ package body Template_Manager is
 
       Dfa_Line := 1;
       Write_Template (Dfa_Out_File,
-                      (if Recursive then Templates.body_recursive_dfa else Templates.body_dfa),
+                      (if Reentrant then Templates.body_reentrant_dfa else Templates.body_dfa),
                       Dfa_Line);
    end Generate_Dfa_File;
 
@@ -291,14 +291,14 @@ package body Template_Manager is
       External_File_Manager.Get_Io_File (Io_Out_File, True);
 
       Write_Template (Io_Out_File,
-                      (if Recursive then Templates.spec_recursive_io else Templates.spec_io),
+                      (if Reentrant then Templates.spec_reentrant_io else Templates.spec_io),
                       IO_Line);
       Text_Io.Close (Io_Out_File);
 
       External_File_Manager.Get_Io_File (Io_Out_File, False);
       IO_Line := 1;
       Write_Template (Io_Out_File,
-                      (if Recursive then Templates.body_recursive_io else Templates.body_io),
+                      (if Reentrant then Templates.body_reentrant_io else Templates.body_io),
                       IO_Line);
    end Generate_Io_File;
 

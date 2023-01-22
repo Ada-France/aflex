@@ -285,6 +285,7 @@ package body Main_Body is
          "-P         Generate private Ada package for the scanner");
       Put_Line (Standard_Error, "-I         Generate an interactive scanner");
       Put_Line (Standard_Error, "-L         Do not generate #line directives");
+      Put_Line (Standard_Error, "-R         Generate a reentrant scanner");
       Put_Line (Standard_Error, "-T         Run in trace mode");
       Put_Line (Standard_Error, "-Sskeleton Specify the skeleton file");
    end Usage;
@@ -317,6 +318,7 @@ package body Main_Body is
       Useecs             := True;
       Use_Yylineno       := False;
       Private_Package    := False;
+      Reentrant          := False;
 
       Use_Stdout := False;
 
@@ -371,6 +373,8 @@ package body Main_Body is
                   Use_Stdout := True;
                when 'P' =>
                   Private_Package := True;
+               when 'R' =>
+                  Reentrant := True;
                when 'T' =>
                   Trace := True;
                when 'v' =>

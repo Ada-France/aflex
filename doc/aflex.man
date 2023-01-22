@@ -4,7 +4,7 @@ aflex - fast lexical analyzer generator for Ada
 .SH SYNOPSIS
 .B aflex
 [
-.B -bdfimpstvEILPT -Sskeleton_file
+.B -bdfimpstvEILPTR -Sskeleton_file
 ] [ 
 .I filename
 ]
@@ -167,6 +167,9 @@ This option is useful to prevent access to the lexer package variables
 and can be used when the main scanner package is also declared as a private Ada package
 in the input source file.
 .TP
+.B -R
+generate a reentrant Ada scanner.
+.TP
 .B -T
 makes aflex run in
 .I trace
@@ -245,8 +248,10 @@ Enable the debug mode in the scanner (similar to the
 .B -d
 option).
 .TP
-recursive
-Generate a recursive scanner.  When a recursive scanner is generated, two limited
+reentrant
+Generate a reentrant scanner (similar to the
+.B -R
+option).  When a reentrant scanner is generated, two limited
 Ada type record are generated in the
 .I _DFA
 and
