@@ -21,7 +21,6 @@ package ascan_IO is
    --  true when we've seen an EOF for the current input file
    yy_eof_has_been_seen  : Boolean;
 
-
    procedure YY_INPUT (buf      : out unbounded_character_array;
                        result   : out Integer;
                        max_size : in Integer);
@@ -37,6 +36,5 @@ package ascan_IO is
    procedure Close_Input;
    procedure Create_Output (fname : in String := "");
    procedure Close_Output;
-
 
 end ascan_IO;

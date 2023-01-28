@@ -9,6 +9,7 @@
 /^%if minimalist$/d
 /^%if private$/d
 /^%if output$/d
+/^%if input$/d
 /^%if interactive$/d
 /^%if error$/d
 /^%if debug$/d

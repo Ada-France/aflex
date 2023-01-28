@@ -13,7 +13,6 @@ package body ascan_IO is
       i   : Integer := 1;
       loc : Integer := buf'First;
    begin
-
       if Ada.Text_IO.Is_Open (user_input_file) then
          while i <= max_size loop
             --  Ada ate our newline, put it back on the end.
@@ -64,6 +63,7 @@ package body ascan_IO is
          result := i - 1;
          --  when we hit EOF we need to set yy_eof_has_been_seen
          yy_eof_has_been_seen := True;
+
    end YY_INPUT;
 
    --  yy_get_next_buffer - try to read in new buffer
@@ -292,6 +292,5 @@ package body ascan_IO is
          Ada.Text_IO.Close (user_output_file);
       end if;
    end Close_Output;
-
 
 end ascan_IO;

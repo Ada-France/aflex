@@ -62,7 +62,9 @@ package ${NAME}_IO is
    procedure yyUnput (c : Character; yy_bp : in out Integer);
    procedure Unput (c : Character);
 %end
+%if input
    function Input return Character;
+%end
 %if output
    procedure Output (c : Character);
    procedure Output_New_Line;

@@ -271,6 +271,7 @@ package body ${NAME}_IO is
    end Unput;
 
 %end
+%if input
    function Input return Character is
       c : Character;
    begin
@@ -321,6 +322,7 @@ package body ${NAME}_IO is
       return c;
    end Input;
 
+%end
 %if output
    procedure Output (c : Character) is
    begin
@@ -427,6 +429,6 @@ package body ${NAME}_IO is
    begin
       return Tok_End_Col;
    end Yy_End_Column;
-%end
 
+%end
 end ${NAME}_IO;

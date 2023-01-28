@@ -365,6 +365,10 @@ package body Misc is
          Misc_Defs.No_Output := True;
       elsif Option = "output" then
          Misc_Defs.No_Output := False;
+      elsif Option = "noinput" then
+         Misc_Defs.No_Input := True;
+      elsif Option = "input" then
+         Misc_Defs.No_Input := False;
       elsif Option = "noyywrap" then
          Misc_Defs.No_YYWrap := True;
       elsif Option = "yywrap" then

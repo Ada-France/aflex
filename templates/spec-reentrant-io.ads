@@ -76,7 +76,9 @@ package ${NAME}_IO is
    procedure Unput (Context : in out Context_Type;
                     c       : Character);
 %end
+%if input
    function Input (Context : in out Context_Type) return Character;
+%end
 %if output
    procedure Output (Context : in out Context_Type; c : Character);
    procedure Output_New_Line (Context : in out Context_Type);

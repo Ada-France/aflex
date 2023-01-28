@@ -133,6 +133,7 @@ package body Template_Manager is
       type Section_Type is (S_COMMON,
                             S_IF_DEBUG,
                             S_IF_OUTPUT,
+                            S_IF_INPUT,
                             S_IF_ERROR,
                             S_IF_PRIVATE,
                             S_IF_ECHO,
@@ -144,73 +145,117 @@ package body Template_Manager is
                             S_IF_REENTRANT,
                             S_IF_MINIMALIST_WITH,
                             S_IF_UNPUT);
+      type Stack_Location is new Natural range 0 .. 10;
+      type Stack_Condition is record
+         Section  : Section_Type;
+         Invert   : Boolean;
+         Visible  : Boolean;
+      end record;
+      type Session_Stack is array (Stack_Location range 1 .. 10) of Stack_Condition;
+
+      If_Stack   : Session_Stack;
+      If_Pos     : Stack_Location := 0;
       Current    : Section_Type := S_COMMON;
       Is_Visible : Boolean := True;
+      Parent_Visible : Boolean := True;
       Invert     : Boolean := False;
       Continue   : Boolean := True;
+
+      procedure Push_Condition (Kind : Section_Type) is
+      begin
+         if If_Pos = Stack_Location'Last then
+            raise Program_Error with "Template uses too many nested %if conditions";
+         end if;
+         If_Pos := If_Pos + 1;
+         If_Stack (If_Pos) := (Current, Invert, Is_Visible);
+         Current := Kind;
+         Invert := False;
+         Parent_Visible := Is_Visible;
+      end Push_Condition;
+
+      procedure Pop_Condition is
+      begin
+         if If_Pos = 0 then
+            raise Program_Error with "Template contains an unmatched %end";
+         end if;
+         Current := If_Stack (If_Pos).Section;
+         Invert := If_Stack (If_Pos).Invert;
+         Parent_Visible := If_Stack (If_Pos).Visible;
+         If_Pos := If_Pos - 1;
+      end Pop_Condition;
+
    begin
       while Continue and then Has_Line loop
          declare
             Line : constant String := Get_Line;
          begin
             if Line'Length = 0 then
-               if Is_Visible then
+               if Is_Visible and Parent_Visible then
                   Text_IO.New_Line (Outfile);
                end if;
             elsif Line (Line'First) = '%' then
                if Line = "%if output" then
-                  Current := S_IF_OUTPUT;
+                  Push_Condition (S_IF_OUTPUT);
+               elsif Line = "%if input" then
+                  Push_Condition (S_IF_INPUT);
                elsif Line = "%if yylineno" then
-                  Current := S_IF_YYLINENO;
+                  Push_Condition (S_IF_YYLINENO);
                elsif Line = "%if unput" then
-                  Current := S_IF_UNPUT;
+                  Push_Condition (S_IF_UNPUT);
                elsif Line = "%if debug" then
-                  Current := S_IF_DEBUG;
+                  Push_Condition (S_IF_DEBUG);
                elsif Line = "%if error" then
-                  Current := S_IF_ERROR;
+                  Push_Condition (S_IF_ERROR);
                elsif Line = "%if private" then
-                  Current := S_IF_PRIVATE;
+                  Push_Condition (S_IF_PRIVATE);
                elsif Line = "%if interactive" then
-                  Current := S_IF_INTERACTIVE;
+                  Push_Condition (S_IF_INTERACTIVE);
                elsif Line = "%if yywrap" then
-                  Current := S_IF_YYWRAP;
+                  Push_Condition (S_IF_YYWRAP);
                elsif Line = "%if yyaction" then
-                  Current := S_IF_YYACTION;
+                  Push_Condition (S_IF_YYACTION);
                elsif Line = "%if yytype" then
-                  Current := S_IF_YYTYPE;
+                  Push_Condition (S_IF_YYTYPE);
                elsif Line = "%if echo" then
-                  Current := S_IF_ECHO;
+                  Push_Condition (S_IF_ECHO);
                elsif Line = "%if reentrant" then
-                  Current := S_IF_REENTRANT;
+                  Push_Condition (S_IF_REENTRANT);
                elsif Line = "%if minimalist" then
-                  Current := S_IF_MINIMALIST_WITH;
+                  Push_Condition (S_IF_MINIMALIST_WITH);
                elsif Line = "%end" then
-                  Current := S_COMMON;
-                  Invert := False;
+                  Pop_Condition;
                elsif Line = "%else" then
                   Invert := True;
                elsif Line = "%yydecl" then
-                  --  Special instruction to emil the function declaration
-                  declare
-                     Decl : constant String := Misc.Get_YYLex_Declaration;
-                     Var  : constant String := Misc.Get_YYVar_Name;
-                  begin
-                     if Decl'Length > 0 then
-                        Text_IO.Put_Line (Outfile, Decl);
-                     elsif not Reentrant then
-                        Text_IO.Put_Line (Outfile, "   function YYLex return Token is");
-                     else
-                        Text_IO.Put (Outfile, "   function YYLex (");
-                        Text_IO.Put (Outfile, Var);
-                        Text_IO.Put_Line (Outfile, " : in out context_Type) is");
-                     end if;
-                  end;
+                  if Is_Visible and Parent_Visible then
+                     --  Special instruction to emil the function declaration
+                     declare
+                        Decl : constant String := Misc.Get_YYLex_Declaration;
+                        Var  : constant String := Misc.Get_YYVar_Name;
+                     begin
+                        if Decl'Length > 0 then
+                           Text_IO.Put_Line (Outfile, Decl);
+                        elsif not Reentrant then
+                           Text_IO.Put_Line (Outfile, "   function YYLex return Token is");
+                        else
+                           Text_IO.Put (Outfile, "   function YYLex (");
+                           Text_IO.Put (Outfile, Var);
+                           Text_IO.Put_Line (Outfile, " : in out context_Type) is");
+                        end if;
+                     end;
+                  end if;
                elsif Line = "%yytype" then
-                  Include_File (Outfile, YYTYPE_CODE_FILENAME);
+                  if Is_Visible and Parent_Visible then
+                     Include_File (Outfile, YYTYPE_CODE_FILENAME);
+                  end if;
                elsif Line = "%yyaction" then
-                  Include_File (Outfile, YYACTION_CODE_FILENAME);
+                  if Is_Visible and Parent_Visible then
+                     Include_File (Outfile, YYACTION_CODE_FILENAME);
+                  end if;
                elsif Line = "%yywrap" then
-                  Include_File (Outfile, YYWRAP_CODE_FILENAME);
+                  if Is_Visible and Parent_Visible then
+                     Include_File (Outfile, YYWRAP_CODE_FILENAME);
+                  end if;
                elsif Line'Length > 3 and then Line (Line'First + 1) = '%' then
                   Continue := False;
                   return;
@@ -227,6 +272,7 @@ package body Template_Manager is
                  or else (Current = S_IF_PRIVATE and then Private_Package)
                  or else (Current = S_IF_UNPUT and then not No_Unput)
                  or else (Current = S_IF_OUTPUT and then not No_Output)
+                 or else (Current = S_IF_INPUT and then not No_Input)
                  or else (Current = S_IF_YYWRAP and then not No_YYWrap)
                  or else (Current = S_IF_YYACTION and then Has_Code (YYACTION_CODE))
                  or else (Current = S_IF_YYTYPE and then Has_Code (YYTYPE_CODE))
@@ -238,7 +284,7 @@ package body Template_Manager is
                   Is_Visible := not Is_Visible;
                end if;
 
-            elsif Is_Visible then
+            elsif Is_Visible and Parent_Visible then
                Write_Line (Outfile, Line);
             end if;
          end;

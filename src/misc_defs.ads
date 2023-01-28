@@ -346,6 +346,9 @@ package Misc_Defs is
    --  When true, don't emit the Output methods in _IO package.
    No_Output : Boolean;
 
+   --  When true, don't emit the Input method in the _IO package.
+   No_Input  : Boolean;
+
    --  When true, don't emit the YYWrap support in _IO package.
    No_YYWrap : Boolean;
 
