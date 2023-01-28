@@ -25,7 +25,7 @@ This version brings a number of improvements:
 ## Version 1.6 - Under development
 
 - Fix #2: Missing `Input_Line` function when `-E` option is used
-- Support the flex options `%option output`, `%option nooutput`, `%option yywrap`,
+- Support the flex options `%option output`, `%option nooutput`, `%option yywrap`, `%option noinput`,
   `%option noyywrap`, `%option unput`, `%option nounput`, `%option bufsize=NNN` to better control the
   generated `_IO` package.
 - Aflex templates provide more control for tuning the code generation and
