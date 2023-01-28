@@ -184,7 +184,7 @@ aflex maintenance or development.
 .\"
 .SH SCANNER OPTIONS
 .I aflex
-support the
+supports the
 .I flex
 option directive in the input file but with only one name per line.  The syntax is
 .RS 5
@@ -230,6 +230,15 @@ no
 procedure, you should be able to use the
 .I nounput
 option.
+.\"
+.TP
+noinput or input
+Enable or disable the generation of the
+.I Input
+function in the
+.I _IO
+package.
+.\"
 .TP
 nooutput or output
 Enable or disable the generation of the
