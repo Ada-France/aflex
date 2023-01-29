@@ -6,7 +6,7 @@ aflex - fast lexical analyzer generator for Ada
 ## SYNOPSIS
 
 *aflex* [
-*-bdfimpstvEILPT -Sskeleton_file* ] [ 
+*-bdfimpstvEILPTR -Sskeleton_file* ] [ 
 *filename* ]
 
 ## DESCRIPTION
@@ -140,6 +140,9 @@ and can be used when the main scanner package is also declared as a private Ada 
 in the input source file.
 
 
+*-R* generate a reentrant Ada scanner.
+
+
 *-T* makes aflex run in
 *trace* mode.  It will generate a lot of messages to stdout concerning
 the form of the input and the resultant non-deterministic and deterministic
@@ -150,6 +153,134 @@ finite automatons.  This option is mostly for use in maintaining aflex.
 its scanners.  You'll probably never need this option unless you are doing
 aflex maintenance or development.
 
+## SCANNER OPTIONS
+
+*aflex* supports the
+*flex* option directive in the input file but with only one name per line.  The syntax is
+```
+
+%option name
+```
+
+The following options are supported:
+
+
+case-sensitive or casefull
+Generate a case sensitive scanner (this is the default).
+
+
+case-insensitive or caseless
+Generate a case insensitive scanner (similar to
+*-i* option)
+
+
+interactive
+Generate an interactive scanner (similar to
+*-I* option).
+
+
+full
+
+
+yylineno
+Enable the generaton of
+*yylineno* and
+*yylinecol* variables in the scanner to track the symbol current line and column.
+
+
+nounput or unput
+Disable or enable the generation of the
+*Unput* and
+*yyunput* function in the
+*_IO* package.  If you don't use the
+*yyunput* no
+*Unput* procedure, you should be able to use the
+*nounput* option.
+
+
+noinput or input
+Enable or disable the generation of the
+*Input* function in the
+*_IO* package.
+
+
+nooutput or output
+Enable or disable the generation of the
+*Output* support in the
+*_IO* package.
+
+
+noyywrap or yywrap
+Enable or disable the use and generation of the
+*yywrap* procedure to switch to another buffer or file when the end of a file is reached.
+
+
+debug
+Enable the debug mode in the scanner (similar to the
+*-d* option).
+
+
+reentrant
+Generate a reentrant scanner (similar to the
+*-R* option).  When a reentrant scanner is generated, two limited
+Ada type record are generated in the
+*_DFA* and
+*_IO* packages to keep track of the current scanner state and the generated scanner
+does not use global variables.  The
+*YYLex* function must be called with a context parameter with the type
+*Context_Type* defined in the
+*_IO* package.
+
+
+bufsize=NNN
+Controls the size of the read buffer used by the scanner.  The default value
+*75000* has been increased over time to handle large content in the
+*YYText* variable.  This option allows to control the buffer size.
+
+## SCANNER CODE BLOCKS
+
+*aflex* supports code block injection in the generated scanner at various places.
+This code injection is similar to the code injection provided by
+**flex**(1) but dedicated to Ada.  The code block can appear in the declaration section
+and uses the following syntax:
+```
+
+   %yyname {
+      -- Put your Ada code here
+   }
+```
+
+The following code blocks are supported:
+
+
+yydecl
+This code block is injected in the declaration section of the
+*YYLex* function body.  It allows you to declare variables, types, local function and procedues
+that are available to the scanner rules.
+
+
+yyinit
+This code block shall contain Ada statements which are executed the first time the
+*YYLex* function is called.  It can be used to setup an initial state for the scanner.
+
+
+yyaction
+When this code block is defined,
+*aflex* will generate the
+*YY_USER_ACTION* procedure that is called before executing each action.  It should contain
+Ada statements that are executed in the body of the generated procedure.
+
+
+yywrap
+When defined, this describes the Ada statements which are used for the generated
+*yywrap* function.  The Ada statements must return a boolean value.
+The
+*yywrap* function is called when an end-of-file is reached to decide whether the scanner must stop
+or continue to scan with a next file.  The Ada statements shall return
+*true* when the scanner must stop and
+*false* to proceed with the next input.  When this code block is not defined, the default
+*yywrap* function will return
+*true .* 
 ## INCOMPATIBILITIES WITH LEX
 
 *aflex* is fully compatible with
@@ -159,13 +290,13 @@ aflex maintenance or development.
 The input specification file for 
 *aflex* must use the following format.
 ```
-definitions section
-%%
-rules section
-%%
-user defined section
-##
-user defined section
+ definitions section
+ %%
+ rules section
+ %%
+ user defined section
+ ##
+ user defined section
 ```
 
 * lex's
@@ -278,7 +409,7 @@ them with '#'.
 
 * Ada style comments are supported instead of C style comments.
 
-* All template files are internalized.
+* All template files are internalized.  The recursive scanner uses specific templates.
 
 * The input source file must end with a ".l" extension.
 
