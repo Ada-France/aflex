@@ -188,7 +188,9 @@ package body ${NAME}_IO is
          end if;
 
          --  read in more data
-         YY_INPUT (Context, Context.dfa.yy_ch_buf (number_to_move .. Context.dfa.yy_ch_buf'Last), Context.yy_n_chars, num_to_read);
+         YY_INPUT (Context,
+                   Context.dfa.yy_ch_buf (number_to_move .. Context.dfa.yy_ch_buf'Last),
+                   Context.yy_n_chars, num_to_read);
       end if;
       if Context.yy_n_chars = 0 then
          if number_to_move = 1 then
@@ -227,7 +229,8 @@ package body ${NAME}_IO is
       tmp_yy_cp : Integer;
    begin
       tmp_yy_cp := Context.dfa.yy_c_buf_p;
-      Context.dfa.yy_ch_buf (tmp_yy_cp) := Context.dfa.yy_hold_char; --  undo effects of setting up yytext
+      --  undo effects of setting up yytext
+      Context.dfa.yy_ch_buf (tmp_yy_cp) := Context.dfa.yy_hold_char;
 
       if tmp_yy_cp < 2 then
          --  need to shift things up to make room
@@ -250,7 +253,9 @@ package body ${NAME}_IO is
          end if;
       end if;
 
-      if tmp_yy_cp > yy_bp and then Context.dfa.yy_ch_buf (tmp_yy_cp - 1) = ASCII.LF then
+      if tmp_yy_cp > yy_bp
+        and then Context.dfa.yy_ch_buf (tmp_yy_cp - 1) = ASCII.LF
+      then
          Context.dfa.yy_ch_buf (tmp_yy_cp - 2) := ASCII.LF;
       end if;
 
