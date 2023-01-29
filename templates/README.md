@@ -14,6 +14,7 @@ transformations are supported:
 - `%yydecl` pattern is expanded according to the `%yydecl` declaration in the scanner file
   or the default `YYLex` function declaration,
 - `%yytype` pattern is replaced by the content of the `%yytype {}` code block if there is one,
+- `%yyinit` pattern is replaced by the content of the `%yyinit {}` code block if there is one,
 - `%yyaction` pattern is replaced by the content of the `%yyaction {}` code block if there is one,
 - `%yywrap` pattern is replaced by the content of the `%yywrap {}` code block if there is one,
 - ${NAME} specific patterns are replaced by names that depend on the source grammar.

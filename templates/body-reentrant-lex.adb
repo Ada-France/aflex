@@ -218,7 +218,7 @@ with Ada.Text_IO; use Ada.Text_IO;
             case yy_get_next_buffer is
                when EOB_ACT_END_OF_FILE =>
 %if yywrap
-                  if yyWrap then
+                  if yyWrap (${YYVAR}) then
                      --  note: because we've taken care in
                      --  yy_get_next_buffer() to have set up yytext,
                      --  we can now set up yy_c_buf_p so that if some

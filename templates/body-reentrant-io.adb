@@ -363,7 +363,11 @@ package body ${NAME}_IO is
    --  default yywrap function - always treat EOF as an EOF
    function yyWrap (Context : in Context_Type) return Boolean is
    begin
+%if yywrapcode
+%yywrap
+%else
       return True;
+%end
    end yyWrap;
 
 %end

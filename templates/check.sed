@@ -16,6 +16,7 @@
 /^%if yylineno$/d
 /^%if unput$/d
 /^%if yywrap$/d
+/^%if yywrapcode$/d
 /^%if yytype$/d
 /^%if yyaction$/d
 /^%else$/d

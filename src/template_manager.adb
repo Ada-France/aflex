@@ -144,6 +144,7 @@ package body Template_Manager is
                             S_IF_INTERACTIVE,
                             S_IF_YYLINENO,
                             S_IF_YYWRAP,
+                            S_IF_YYWRAP_CODE,
                             S_IF_YYACTION,
                             S_IF_YYTYPE,
                             S_IF_REENTRANT,
@@ -216,6 +217,8 @@ package body Template_Manager is
                   Push_Condition (S_IF_INTERACTIVE);
                elsif Line = "%if yywrap" then
                   Push_Condition (S_IF_YYWRAP);
+               elsif Line = "%if yywrapcode" then
+                  Push_Condition (S_IF_YYWRAP_CODE);
                elsif Line = "%if yyaction" then
                   Push_Condition (S_IF_YYACTION);
                elsif Line = "%if yytype" then
@@ -282,6 +285,7 @@ package body Template_Manager is
                  or else (Current = S_IF_OUTPUT and then not No_Output)
                  or else (Current = S_IF_INPUT and then not No_Input)
                  or else (Current = S_IF_YYWRAP and then not No_YYWrap)
+                 or else (Current = S_IF_YYWRAP_CODE and then Has_Code (YYWRAP_CODE))
                  or else (Current = S_IF_YYACTION and then Has_Code (YYACTION_CODE))
                  or else (Current = S_IF_YYTYPE and then Has_Code (YYTYPE_CODE))
                  or else (Current = S_IF_REENTRANT and then Reentrant)
