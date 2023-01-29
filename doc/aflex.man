@@ -281,6 +281,59 @@ has been increased over time to handle large content in the
 .I YYText
 variable.  This option allows to control the buffer size.
 .\"
+.SH SCANNER CODE BLOCKS
+.I aflex
+supports code block injection in the generated scanner at various places.
+This code injection is similar to the code injection provided by
+.IR flex (1)
+but dedicated to Ada.  The code block can appear in the declaration section
+and uses the following syntax:
+.RS 5
+
+   %yy\fIname\fP {
+      -- Put your Ada code here
+   }
+.RE
+.PP
+The following code blocks are supported:
+.TP
+yydecl
+This code block is injected in the declaration section of the
+.I YYLex
+function body.  It allows you to declare variables, types, local function and procedues
+that are available to the scanner rules.
+.\"
+.TP
+yyinit
+This code block shall contain Ada statements which are executed the first time the
+.I YYLex
+function is called.  It can be used to setup an initial state for the scanner.
+.\"
+.TP
+yyaction
+When this code block is defined,
+.I aflex
+will generate the
+.I YY_USER_ACTION
+procedure that is called before executing each action.  It should contain
+Ada statements that are executed in the body of the generated procedure.
+.TP
+yywrap
+When defined, this describes the Ada statements which are used for the generated
+.I yywrap
+function.  The Ada statements must return a boolean value.
+The
+.I yywrap
+function is called when an end-of-file is reached to decide whether the scanner must stop
+or continue to scan with a next file.  The Ada statements shall return
+.I true
+when the scanner must stop and
+.I false
+to proceed with the next input.  When this code block is not defined, the default
+.I yywrap
+function will return
+.I true .
+.\"
 .SH INCOMPATIBILITIES WITH LEX
 .I aflex
 is fully compatible with
@@ -294,13 +347,13 @@ The input specification file for
 .I aflex
 must use the following format.
 .RS 5
-definitions section
-%%
-rules section
-%%
-user defined section
-##
-user defined section
+ definitions section
+ %%
+ rules section
+ %%
+ user defined section
+ ##
+ user defined section
 .RE
 .\"
 .IP \(bu 4
