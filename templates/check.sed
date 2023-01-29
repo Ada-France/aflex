@@ -21,6 +21,7 @@
 /^%else$/d
 /^%end$/d
 /^%yydecl$/d
+/^%yyinit$/d
 /^%yytype$/d
 /^%yyaction$/d
 /^%yywrap$/d

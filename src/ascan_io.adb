@@ -270,6 +270,7 @@ package body ascan_IO is
    begin
       yy_init := True;
       Ada.Text_IO.Open (user_input_file, Ada.Text_IO.In_File, fname);
+      yylineno  := 1;
    end Open_Input;
 
    procedure Create_Output (fname : in String := "") is

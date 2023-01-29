@@ -278,7 +278,7 @@ package body Gen is
             Indent_Puts ("if yy_ch_buf (yy_cp) = ASCII.LF then");
             Indent_Up;
             Indent_Puts ("yylineno := yylineno + 1;");
-            Indent_Puts ("yylinecol := 1;");
+            Indent_Puts ("yylinecol := 0;");
             Indent_Down;
             Indent_Puts ("else");
             Indent_Up;
@@ -311,7 +311,7 @@ package body Gen is
             Indent_Puts ("if yy_ch_buf (yy_cp) = ASCII.LF then");
             Indent_Up;
             Indent_Puts ("yylineno := yylineno + 1;");
-            Indent_Puts ("yylinecol := 1;");
+            Indent_Puts ("yylinecol := 0;");
             Indent_Down;
             Indent_Puts ("else");
             Indent_Up;

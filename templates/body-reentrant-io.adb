@@ -371,6 +371,10 @@ package body ${NAME}_IO is
    begin
       Context.dfa.yy_init := True;
       Ada.Text_IO.Open (Context.user_input_file, Ada.Text_IO.In_File, fname);
+%if yylineno
+      Context.dfa.yylineno  := 1;
+      Context.dfa.yylinecol := 0;
+%end
    end Open_Input;
 
 %if output

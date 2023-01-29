@@ -371,6 +371,9 @@ package body ${NAME}_IO is
    begin
       yy_init := True;
       Ada.Text_IO.Open (user_input_file, Ada.Text_IO.In_File, fname);
+%if yylineno
+      yylineno  := 1;
+%end
    end Open_Input;
 
 %if output

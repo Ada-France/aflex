@@ -88,6 +88,7 @@ with Ada.Text_IO; use Ada.Text_IO;
       --  yyWrap () indicating that we should continue processing
 
       if yy_init then
+%yyinit
          if yy_start = 0 then
             yy_start := 1;      -- first start state
          end if;

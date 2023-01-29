@@ -87,6 +87,10 @@ ESCSEQ      \\([^\n]|[0-9]{1,3})
                   Open_Code_Block (Template_Manager.Get_Filename (Template_Manager.YYWRAP_CODE));
                   ENTER(CODEBLOCK_MATCH_BRACE);
 }
+^%yyinit{WS}?"{"{WS}? {
+                  Open_Code_Block (Template_Manager.Get_Filename (Template_Manager.YYINIT_CODE));
+                  ENTER(CODEBLOCK_MATCH_BRACE);
+}
 
 ^"%%".*         {
             sectnum := 2;

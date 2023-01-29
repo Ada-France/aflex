@@ -43,6 +43,7 @@ package body Template_Manager is
    Has_Code : array (Code_Filename) of Boolean := (others => False);
 
    YYTYPE_CODE_FILENAME   : constant String := "yytype.miq";
+   YYINIT_CODE_FILENAME   : constant String := "yyinit.miq";
    YYACTION_CODE_FILENAME : constant String := "yyaction.miq";
    YYWRAP_CODE_FILENAME   : constant String := "yywrap.miq";
 
@@ -52,6 +53,9 @@ package body Template_Manager is
       case Code is
          when YYTYPE_CODE =>
             return YYTYPE_CODE_FILENAME;
+
+         when YYINIT_CODE =>
+            return YYINIT_CODE_FILENAME;
 
          when YYACTION_CODE =>
             return YYACTION_CODE_FILENAME;
@@ -256,6 +260,10 @@ package body Template_Manager is
                   if Is_Visible and Parent_Visible then
                      Include_File (Outfile, YYWRAP_CODE_FILENAME);
                   end if;
+               elsif Line = "%yyinit" then
+                  if Is_Visible and Parent_Visible then
+                     Include_File (Outfile, YYINIT_CODE_FILENAME);
+                  end if;
                elsif Line'Length > 3 and then Line (Line'First + 1) = '%' then
                   Continue := False;
                   return;
@@ -352,6 +360,9 @@ package body Template_Manager is
    begin
       if Ada.Directories.Exists (YYTYPE_CODE_FILENAME) then
          Ada.Directories.Delete_File (YYTYPE_CODE_FILENAME);
+      end if;
+      if Ada.Directories.Exists (YYINIT_CODE_FILENAME) then
+         Ada.Directories.Delete_File (YYINIT_CODE_FILENAME);
       end if;
       if Ada.Directories.Exists (YYACTION_CODE_FILENAME) then
          Ada.Directories.Delete_File (YYACTION_CODE_FILENAME);

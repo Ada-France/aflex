@@ -33,7 +33,7 @@ package Template_Manager is
    type Content_Array is array (Positive range <>) of access constant String;
    type Content_Access is access constant Content_Array;
 
-   type Code_Filename is (YYTYPE_CODE, YYACTION_CODE, YYWRAP_CODE);
+   type Code_Filename is (YYTYPE_CODE, YYINIT_CODE, YYACTION_CODE, YYWRAP_CODE);
 
    function Get_Filename (Code : in Code_Filename) return String;
 
