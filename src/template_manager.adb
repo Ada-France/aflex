@@ -132,6 +132,24 @@ package body Template_Manager is
       end loop;
    end Write_Line;
 
+   procedure Write_Indented (Outfile : in File_Type; Line : in String) is
+      Start : constant Natural := Ada.Strings.Fixed.Index (Line, "(") + 1;
+      Pos   : Natural := Line'First;
+      Sep   : Natural;
+   begin
+      while Pos <= Line'Last loop
+         Sep := Ada.Strings.Fixed.Index (Line, ";", Pos);
+         if Sep > 0 then
+            Text_IO.Put_Line (Outfile, Line (Pos .. Sep));
+            Pos := Sep + 1;
+            Text_IO.Set_Col (Outfile, Ada.Text_IO.Positive_Count (Start - Line'First));
+         else
+            Text_IO.Put_Line (Outfile, Line (Pos .. Line'Last));
+            return;
+         end if;
+      end loop;
+   end Write_Indented;
+
    procedure Template_Writer (Outfile  : in File_Type) is
 
       type Section_Type is (S_COMMON,
@@ -241,7 +259,7 @@ package body Template_Manager is
                         Var  : constant String := Misc.Get_YYVar_Name;
                      begin
                         if Decl'Length > 0 then
-                           Text_IO.Put_Line (Outfile, Decl);
+                           Write_Indented (Outfile, Decl);
                         elsif not Reentrant then
                            Text_IO.Put_Line (Outfile, "   function YYLex return Token is");
                         else
