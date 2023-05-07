@@ -26,6 +26,8 @@ This version brings a number of improvements:
   there is no need to use gnatchop to split the DFA and IO files.
 - Aflex uses the lex file name to generate the package name and
   it supports child package with the `%unit` directive.
+- Aflex supports reentrant scanner through the use of `%option reentrant`,
+  `%yyvar` and `%yydecl` directives.
 
 """
 
@@ -35,3 +37,6 @@ AFLEX_BUILD = ["distrib", "debug", "optimize", "profile", "coverage"]
 [configuration]
 disabled = true
 
+[environment]
+PATH.prepend = "${CRATE_ROOT}/bin"
+MANPATH.prepend = "${CRATE_ROOT}/man"

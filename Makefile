@@ -43,7 +43,7 @@ install:
 	mkdir -p $(DESTDIR)${bindir}
 	mkdir -p $(DESTDIR)$(mandir)/man1
 	$(INSTALL_PROGRAM) bin/aflex $(DESTDIR)${bindir}
-	$(INSTALL) doc/aflex.man $(DESTDIR)$(mandir)/man1/aflex.1
+	$(INSTALL) man/man1/aflex.1 $(DESTDIR)$(mandir)/man1/aflex.1
 
 
 # Targets to rebuild some files from ascan.l and parse.y
