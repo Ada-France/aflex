@@ -22,7 +22,7 @@ This version brings a number of improvements:
 - Aflex uses the lex file name to generate the package name and
   it supports child package.
 
-## Version 1.6 - Under development
+## Version 1.6 - May 2023
 
 - Fix #2: Missing `Input_Line` function when `-E` option is used
 - Support the flex options `%option output`, `%option nooutput`, `%option yywrap`, `%option noinput`,
