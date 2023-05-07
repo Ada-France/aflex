@@ -238,6 +238,28 @@ Controls the size of the read buffer used by the scanner.  The default value
 *75000* has been increased over time to handle large content in the
 *YYText* variable.  This option allows to control the buffer size.
 
+For the reentrant scanner, two specific directives are added to control the
+*YYLex* function declaration and the name of variable that represents the reentrant
+context.
+```
+
+   %yyname content
+```
+
+
+yydecl
+This name controls the declaration section of the
+*YYLex* function body.  The reentrant scanner assumes that the
+*YYLex* function has at least one parameter of type
+*Lexer_IO.Context_Type* that describes the scanner context.  This context will be passed to some generated
+operation.
+
+
+yyvar
+This name controls the name of variable representing the scanner context
+passed to the
+*YYLex* function.  The default name is
+**Context**. 
 ## SCANNER CODE BLOCKS
 
 *aflex* supports code block injection in the generated scanner at various places.
@@ -254,10 +276,11 @@ and uses the following syntax:
 The following code blocks are supported:
 
 
-yydecl
+yytype
 This code block is injected in the declaration section of the
-*YYLex* function body.  It allows you to declare variables, types, local function and procedues
-that are available to the scanner rules.
+*YYLex* function body.  It allows you
+to declare variables, types, local function and procedues that are available
+to the scanner rules.
 
 
 yyinit

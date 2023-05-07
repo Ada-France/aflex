@@ -283,6 +283,35 @@ has been increased over time to handle large content in the
 .I YYText
 variable.  This option allows to control the buffer size.
 .\"
+.PP
+For the reentrant scanner, two specific directives are added to control the
+.I YYLex
+function declaration and the name of variable that represents the reentrant
+context.
+.RS 5
+
+   %yy\fIname\fP \fIcontent\fP
+.RE
+.\"
+.TP
+yydecl
+This name controls the declaration section of the
+.I YYLex
+function body.  The reentrant scanner assumes that the
+.I YYLex
+function has at least one parameter of type
+.I Lexer_IO.Context_Type
+that describes the scanner context.  This context will be passed to some generated
+operation.
+.\"
+.TP
+yyvar
+This name controls the name of variable representing the scanner context
+passed to the
+.I YYLex
+function.  The default name is
+.IR Context .
+.\"
 .SH SCANNER CODE BLOCKS
 .I aflex
 supports code block injection in the generated scanner at various places.
@@ -298,12 +327,14 @@ and uses the following syntax:
 .RE
 .PP
 The following code blocks are supported:
+.\"
 .TP
-yydecl
+yytype
 This code block is injected in the declaration section of the
 .I YYLex
-function body.  It allows you to declare variables, types, local function and procedues
-that are available to the scanner rules.
+function body.  It allows you
+to declare variables, types, local function and procedues that are available
+to the scanner rules.
 .\"
 .TP
 yyinit
