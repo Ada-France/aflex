@@ -32,7 +32,7 @@ This version brings a number of improvements:
   they are embedded with [Advanced Resource Embedder](https://gitlab.com/stcarrez/resource-embedder)
 - Support to define Ada code block in the scanner that is inserted in the generated scanner
 - New option -P to generate a private Ada package for DFA and IO
-- New directive `%option recursive` and `%yyvar` to generate a recursive scanner
+- New directive `%option reentrant` and `%yyvar` to generate a recursive scanner
 - New directive `%yydecl` to allow passing parameters to `YYLex`
   or change the default function name
 - Reformat code using `gnatpp`

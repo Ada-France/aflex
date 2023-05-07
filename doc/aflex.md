@@ -229,7 +229,8 @@ Ada type record are generated in the
 does not use global variables.  The
 *YYLex* function must be called with a context parameter with the type
 *Context_Type* defined in the
-*_IO* package.
+*_IO* package.  The name of context variable can be configured by using the
+*%yyvar* directive.
 
 
 bufsize=NNN
@@ -365,9 +366,10 @@ which scan portions of the input that are syntactically different
 from the rest (e.g., comments).
 *End-of-file rules.* The special rule "<<EOF>>" indicates
 actions which are to be taken when an end-of-file is
-encountered and yywrap() returns non-zero (i.e., indicates
+encountered and
+*yywrap* returns non-zero (i.e., indicates
 no further files to process).  The action can either
-**Ada.Text_IO.Set_Input**() to a new file to process, in which case the
+*Ada.Text_IO.Set_Input* to a new file to process, in which case the
 action should finish with
 *YY_NEW_FILE* (this is a branch, so subsequent code in the action won't
 be executed), or it should finish with a
@@ -408,7 +410,7 @@ them with '#'.
 
 * Ada style comments are supported instead of C style comments.
 
-* All template files are internalized.  The recursive scanner uses specific templates.
+* All template files are internalized.  The reentrant scanner uses specific templates.
 
 * The input source file must end with a ".l" extension.
 
@@ -511,8 +513,8 @@ In which the pushed-back text is "([0-9] -- a digit)".
 Due to both buffering of input and read-ahead, you cannot intermix
 calls to
 *Ada.Text_IO* routines, such as, for example,
-**Ada.Text_IO.Get**() with aflex rules and expect it to work.  Call
-**input**() instead.
+*Ada.Text_IO.Get* with aflex rules and expect it to work.  Call
+*input* instead.
 
 There are still more features that could be implemented (especially REJECT) 
 Also the speed of the compressed scanners could be improved.

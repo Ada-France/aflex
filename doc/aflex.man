@@ -1,4 +1,4 @@
-.TH AFLEX 1 "January 2023" "Version 1.6"
+.TH AFLEX 1 "May 2023" "Version 1.6"
 .SH NAME
 aflex - fast lexical analyzer generator for Ada
 .SH SYNOPSIS
@@ -272,7 +272,9 @@ function must be called with a context parameter with the type
 .I Context_Type
 defined in the
 .I _IO
-package.
+package.  The name of context variable can be configured by using the
+.I %yyvar
+directive.
 .TP
 bufsize=NNN
 Controls the size of the read buffer used by the scanner.  The default value
@@ -447,9 +449,11 @@ from the rest (e.g., comments).
 .I End-of-file rules.
 The special rule "<<EOF>>" indicates
 actions which are to be taken when an end-of-file is
-encountered and yywrap() returns non-zero (i.e., indicates
+encountered and
+.I yywrap
+returns non-zero (i.e., indicates
 no further files to process).  The action can either
-.IR Ada.Text_IO.Set_Input ()
+.I Ada.Text_IO.Set_Input
 to a new file to process, in which case the
 action should finish with
 .I YY_NEW_FILE
@@ -502,7 +506,7 @@ them with '#'.
 Ada style comments are supported instead of C style comments.
 .\"
 .IP \(bu 4
-All template files are internalized.  The recursive scanner uses specific templates.
+All template files are internalized.  The reentrant scanner uses specific templates.
 .\"
 .IP \(bu 4
 The input source file must end with a ".l" extension.
@@ -611,9 +615,9 @@ Due to both buffering of input and read-ahead, you cannot intermix
 calls to
 .I Ada.Text_IO
 routines, such as, for example,
-.IR Ada.Text_IO.Get ()
+.I Ada.Text_IO.Get
 with aflex rules and expect it to work.  Call
-.IR input ()
+.I input
 instead.
 .LP
 There are still more features that could be implemented (especially REJECT) 
