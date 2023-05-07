@@ -323,8 +323,7 @@ and the precedence is such that the '?' is associated with
 "[A-Z0-9]*".  With aflex, the rule will be expanded to
 "foo([A-z][A-Z0-9]*)?" and so the string "foo" will match.
 Note that because of this, the
-*^, $, <s>,* and
-*/* operators cannot be used in a definition.
+^, $, \<s\>, and / operators cannot be used in a definition.
 
 * Input can be controlled by redefining the
 *YY_INPUT* function.
