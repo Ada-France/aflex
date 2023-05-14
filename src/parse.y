@@ -640,18 +640,18 @@ string		:  string CHAR
 
 %%
 
-package parser is
+package Lex_Parser is
   procedure build_eof_action;
   procedure yyerror(msg: string);
   procedure YYParse;
   def_rule:integer;
-end parser;
+end Lex_Parser;
 
 with Parse_Tokens, Parse_Goto, Parse_Shift_Reduce, Text_IO;
 with NFA, ccl, misc, misc_defs, sym, ecs, aflex_scanner;
 with tstring, int_io, main_body;
 use aflex_scanner;
-package body parser is
+package body Lex_Parser is
    -- build_eof_action - build the "<<EOF>>" action for the active start
    --                    conditions
 
@@ -693,4 +693,4 @@ package body parser is
    end yyerror;
 
 ##
-end parser;
+end Lex_Parser;

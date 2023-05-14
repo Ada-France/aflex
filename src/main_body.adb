@@ -22,7 +22,7 @@
 -- high level routines from other packages.
 -- $Header: /dc/uc/self/arcadia/aflex/ada/src/RCS/mainB.a,v 1.26 1992/12/29 22:46:15 self Exp self $
 
-with Misc_Defs, Misc, Command_Line_Interface, Ecs, Text_Io, Parser;
+with Misc_Defs, Misc, Command_Line_Interface, Ecs, Text_Io, Lex_Parser;
 with Main_Body, Tstring, Parse_Tokens, Skeleton_Manager, External_File_Manager;
 with Template_Manager;
 with Int_Io;
@@ -532,7 +532,7 @@ package body Main_Body is
       end if;
       Misc.Line_Directive_Out;
 
-      Parser.Yyparse;
+      Lex_Parser.Yyparse;
 
       if (Useecs) then
          Ecs.Cre8ecs (Nextecm, Ecgroup, Csize, Numecs);
