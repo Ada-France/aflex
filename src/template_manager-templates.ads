@@ -285,14 +285,16 @@ private
        & "p_Line (1 .. i - 1);";
    L_164 : aliased constant String := "      Line_Number_Of_Saved_Tok_Line2 := L"
        & "ine_Number_Of_Saved_Tok_Line1 + 1;";
-   L_165 : aliased constant String := "      Put_Line (""Input line """;
-   L_166 : aliased constant String := "                & Integer'Image ( Line_Nu"
-       & "mber_Of_Saved_Tok_Line2 )";
-   L_167 : aliased constant String := "                & ""has more than """;
-   L_168 : aliased constant String := "                & Integer'Image ( max_siz"
-       & "e )";
-   L_169 : aliased constant String := "                & "" characters, ... trun"
-       & "cated."" );";
+   L_165 : aliased constant String := "      Ada.Text_IO.Put_Line (""Input line "
+       & """";
+   L_166 : aliased constant String := "                            & Integer'Ima"
+       & "ge ( Line_Number_Of_Saved_Tok_Line2 )";
+   L_167 : aliased constant String := "                            & ""has more "
+       & "than """;
+   L_168 : aliased constant String := "                            & Integer'Ima"
+       & "ge ( max_size )";
+   L_169 : aliased constant String := "                            & "" characte"
+       & "rs, ... truncated."" );";
    L_170 : aliased constant String := "%end";
    L_171 : aliased constant String := "   exception";
    L_172 : aliased constant String := "      when Ada.Text_IO.End_Error =>";
