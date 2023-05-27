@@ -4,19 +4,19 @@ UPPER    [A-Z]
 %%
 
 {LOWER}+       { Lower_Case := Lower_Case + 1;
-                 Text_IO.Put (To_Upper_Case(Example_DFA.YYText)); }
+                 Ada.Text_IO.Put (To_Upper_Case(Example_DFA.YYText)); }
 
           -- convert all alphabetic words in lower case
           -- to upper case
 
 {UPPER}+       { Upper_Case := Upper_Case + 1;
-                 Text_IO.Put (Example_DFA.YYText); }
+                 Ada.Text_IO.Put (Example_DFA.YYText); }
 
           -- write uppercase word as is
 
-\n             { Text_IO.New_Line;}
+\n             { Ada.Text_IO.New_Line;}
 
-.              { Text_IO.Put (Example_DFA.YYText); }
+.              { Ada.Text_IO.Put (Example_DFA.YYText); }
                  -- write anything else as is
 
 %%
@@ -50,9 +50,9 @@ begin
       exit Read_Input when Tok = End_of_Input;
    end loop Read_Input;
 
-   Text_IO.New_Line;
-   Text_IO.Put_Line ("Number of lowercase words is => " &
-                     Integer'Image (Lower_Case));
-   Text_IO.Put_Line ("Number of uppercase words is => " &
-                     Integer'Image (Upper_Case));
+   Ada.Text_IO.New_Line;
+   Ada.Text_IO.Put_Line ("Number of lowercase words is => " &
+                         Integer'Image (Lower_Case));
+   Ada.Text_IO.Put_Line ("Number of uppercase words is => " &
+                         Integer'Image (Upper_Case));
 end Example;
