@@ -122,11 +122,11 @@ package body ${NAME}_IO is
       Saved_Tok_Line2 := new String (1 .. i - 1);
       Saved_Tok_Line2 (1 .. i - 1) := Temp_Line (1 .. i - 1);
       Line_Number_Of_Saved_Tok_Line2 := Line_Number_Of_Saved_Tok_Line1 + 1;
-      Put_Line ("Input line "
-                & Integer'Image ( Line_Number_Of_Saved_Tok_Line2 )
-                & "has more than "
-                & Integer'Image ( max_size )
-                & " characters, ... truncated." );
+      Ada.Text_IO.Put_Line ("Input line "
+                            & Integer'Image ( Line_Number_Of_Saved_Tok_Line2 )
+                            & "has more than "
+                            & Integer'Image ( max_size )
+                            & " characters, ... truncated." );
 %end
    exception
       when Ada.Text_IO.End_Error =>
