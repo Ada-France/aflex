@@ -93,7 +93,7 @@ package ${NAME}_IO is
    procedure Open_Input (Context : in out Context_Type; fname : in String);
    procedure Close_Input (Context : in out Context_Type);
 %if output
-   procedure Create_Output (Context : in out Context_Type) fname : in String := "");
+   procedure Create_Output (Context : in out Context_Type; fname : in String := "");
    procedure Close_Output (Context : in out Context_Type);
 %end
 
