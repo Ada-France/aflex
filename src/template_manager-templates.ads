@@ -1,4 +1,4 @@
---  Advanced Resource Embedder 1.3.0
+--  Advanced Resource Embedder 1.4.0
 package Template_Manager.Templates is
 
    body_dfa : aliased constant Content_Array;
@@ -4193,7 +4193,7 @@ private
        & "t Context_Type);";
    L_1796: aliased constant String := "%if output";
    L_1797: aliased constant String := "   procedure Create_Output (Context : in "
-       & "out Context_Type) fname : in String := """");";
+       & "out Context_Type; fname : in String := """");";
    L_1798: aliased constant String := "   procedure Close_Output (Context : in o"
        & "ut Context_Type);";
    L_1799: aliased constant String := "%end";
