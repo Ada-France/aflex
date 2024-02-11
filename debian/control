@@ -6,8 +6,6 @@ Build-Depends: debhelper (>= 10), autotools-dev, gnat,
  gprbuild (>= 2015-2),
 Standards-Version: 4.1.4
 Homepage: https://github.com/Ada-France/aflex
-#Vcs-Git: https://github.com/Ada-France/aflex.git
-Vcs-Browser: https://github.com/Ada-France/aflex/tree/debian-gnat-8
 
 Package: aflex
 Architecture: any

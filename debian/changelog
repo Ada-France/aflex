@@ -1,3 +1,9 @@
+aflex (1.7) unstable; urgency=low
+
+  * Version 1.7
+
+ -- Stephane Carrez <Stephane.Carrez@gmail.com>  Sun, 11 Feb 2024 9:24:06 +0100
+
 aflex (1.5.2021) unstable; urgency=low
 
   * Second package release
