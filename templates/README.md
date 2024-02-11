@@ -14,6 +14,7 @@ transformations are supported:
 - `%yydecl` pattern is expanded according to the `%yydecl` declaration in the scanner file
   or the default `YYLex` function declaration,
 - `%yytype` pattern is replaced by the content of the `%yytype {}` code block if there is one,
+- `%yydfa` pattern is replaced by the content of the `%yydfa {}` code block if there is one,
 - `%yyinit` pattern is replaced by the content of the `%yyinit {}` code block if there is one,
 - `%yyaction` pattern is replaced by the content of the `%yyaction {}` code block if there is one,
 - `%yywrap` pattern is replaced by the content of the `%yywrap {}` code block if there is one,
@@ -43,6 +44,7 @@ The following conditions are supported:
 | %if unput        | Support `Unput` in `_IO` package (can be disabled by using the `%option nounput`) |
 | %if yywrap       | Support `yyWrap` in `_IO` package (can be disabled by using the `%option noyywrap`) |
 | %if yytype       | Define if the source file contains a `%yytype {}` code block |
+| %if yydfa        | Define if the source file contains a `%yydfa {}` code block |
 | %if yyaction     | Define if the source file contains a `%yyaction {}` code block |
 
 Note:
@@ -62,6 +64,7 @@ The following string patterns are replaced:
 | ${YYLEX}  | The name of the scanner function.  The default is `YYLex` and it can be overriden by using the `%yydecl` definition in the scanner file |
 | ${YYVAR}  | The name of the YYLex context variable for a reentrant scanner |
 | ${YYBUFSIZE} | The value of `YY_READ_BUF_SIZE` configured with `%option bufsize=NNN` (default 75_000) |
+| ${YYLINENOTYPE} | The type of `yylineno` variable configured with `%option yylinenotype=XXX` (default `Natural`) |
 
 ## Build
 

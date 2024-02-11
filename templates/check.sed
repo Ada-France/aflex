@@ -18,12 +18,14 @@
 /^%if yywrap$/d
 /^%if yywrapcode$/d
 /^%if yytype$/d
+/^%if yydfa$/d
 /^%if yyaction$/d
 /^%else$/d
 /^%end$/d
 /^%yydecl$/d
 /^%yyinit$/d
 /^%yytype$/d
+/^%yydfa$/d
 /^%yyaction$/d
 /^%yywrap$/d
 /^%%[12345678] [a-z]*$/d

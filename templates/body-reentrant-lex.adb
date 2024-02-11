@@ -18,9 +18,9 @@ with Ada.Text_IO; use Ada.Text_IO;
       yy_current_state : yy_state_type;
 
       yylinecol : Integer renames ${YYVAR}.dfa.yylinecol;
-      yylineno  : Integer renames ${YYVAR}.dfa.yylineno;
+      yylineno  : ${YYLINENOTYPE} renames ${YYVAR}.dfa.yylineno;
       yy_last_yylinecol : Integer renames ${YYVAR}.dfa.yy_last_yylinecol;
-      yy_last_yylineno  : Integer renames ${YYVAR}.dfa.yy_last_yylineno;
+      yy_last_yylineno  : ${YYLINENOTYPE} renames ${YYVAR}.dfa.yy_last_yylineno;
       yy_eof_has_been_seen : Boolean renames ${YYVAR}.yy_eof_has_been_seen;
       aflex_debug : Boolean renames ${YYVAR}.dfa.aflex_debug;
       yy_init  : Boolean renames ${YYVAR}.dfa.yy_init;

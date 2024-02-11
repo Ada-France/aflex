@@ -7,15 +7,16 @@ package ${NAME}_DFA is
 package ${NAME}_DFA is
 %end
 
+%yydfa
 %if debug
    aflex_debug       : Boolean := True;
 %else
    aflex_debug       : Boolean := False;
 %end
 %if yylineno
-   yylineno          : Natural := 0;
+   yylineno          : ${YYLINENOTYPE} := 0;
    yylinecol         : Natural := 0;
-   yy_last_yylineno  : Natural := 0;
+   yy_last_yylineno  : ${YYLINENOTYPE} := 0;
    yy_last_yylinecol : Natural := 0;
 %end
    yytext_ptr        : Integer; --  points to start of yytext in buffer
