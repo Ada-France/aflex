@@ -23,6 +23,7 @@ This version brings a number of improvements:
   it supports child package.
 
 ## Version 1.7 - Feb 2024
+- Fix #5: Ada.Text_IO. missing in a template
 - Feature #6: Maybe support larger integer types for `yylineno`
   Add `%option yylinenotype=TYPE` and `%yydfa` code block to customize the type
   of the `yylineno` variable.
