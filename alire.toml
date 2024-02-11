@@ -1,6 +1,6 @@
 description = "An Ada Lexical Analyzer Generator"
 name = "aflex"
-version = "1.6"
+version = "1.7"
 licenses = "Unlicense"
 authors = ["John Self"]
 maintainers = ["Stephane.Carrez@gmail.com"]

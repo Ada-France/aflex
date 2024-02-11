@@ -22,6 +22,12 @@ This version brings a number of improvements:
 - Aflex uses the lex file name to generate the package name and
   it supports child package.
 
+## Version 1.7 - Feb 2024
+- Feature #6: Maybe support larger integer types for `yylineno`
+  Add `%option yylinenotype=TYPE` and `%yydfa` code block to customize the type
+  of the `yylineno` variable.
+- Fix #8: %reentrant causes a syntax error in parser-lexer_io.ads
+
 ## Version 1.6 - May 2023
 
 - Fix #2: Missing `Input_Line` function when `-E` option is used
