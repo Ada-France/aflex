@@ -1,4 +1,4 @@
-.TH AFLEX 1 "May 2023" "Version 1.6"
+.TH AFLEX 1 "Feb 2024" "Version 1.7"
 .SH NAME
 aflex - fast lexical analyzer generator for Ada
 .SH SYNOPSIS
@@ -215,6 +215,11 @@ Enable the generaton of
 and
 .I yylinecol
 variables in the scanner to track the symbol current line and column.
+The type of the
+.I yylineno
+variable can be controlled by using the
+.I yylinenotype
+option.
 .TP
 nounput or unput
 Disable or enable the generation of the
@@ -282,6 +287,18 @@ Controls the size of the read buffer used by the scanner.  The default value
 has been increased over time to handle large content in the
 .I YYText
 variable.  This option allows to control the buffer size.
+.TP
+yylinenotype=\fItype\fP
+Allows to use a specific type for the declaration of the
+.I yylineno
+variable to record line number.  The default type is
+.I Natural
+and you can change it to another Ada integer type as long as the initial
+value is 0.  You can use the
+.I %yydfa
+code block to declare such type in the
+.I _DFA
+package.
 .\"
 .PP
 For the reentrant scanner, two specific directives are added to control the
@@ -335,6 +352,18 @@ This code block is injected in the declaration section of the
 function body.  It allows you
 to declare variables, types, local function and procedues that are available
 to the scanner rules.
+.\"
+.TP
+yydfa
+This code block is injected in the declaration section of the
+.I _DFA
+package specification.  It allows you
+to declare variables, types, local function and procedues that are available
+to the
+.I _DFA
+package.  A typical use is when you need to use a specific type for the
+.I yylineno
+variable.
 .\"
 .TP
 yyinit
