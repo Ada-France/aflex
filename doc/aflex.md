@@ -186,6 +186,9 @@ yylineno
 Enable the generaton of
 *yylineno* and
 *yylinecol* variables in the scanner to track the symbol current line and column.
+The type of the
+*yylineno* variable can be controlled by using the
+*yylinenotype* option.
 
 
 nounput or unput
@@ -238,6 +241,15 @@ Controls the size of the read buffer used by the scanner.  The default value
 *75000* has been increased over time to handle large content in the
 *YYText* variable.  This option allows to control the buffer size.
 
+
+yylinenotype=**type**
+Allows to use a specific type for the declaration of the
+*yylineno* variable to record line number.  The default type is
+*Natural* and you can change it to another Ada integer type as long as the initial
+value is 0.  You can use the
+*%yydfa* code block to declare such type in the
+*_DFA* package.
+
 For the reentrant scanner, two specific directives are added to control the
 *YYLex* function declaration and the name of variable that represents the reentrant
 context.
@@ -281,6 +293,15 @@ This code block is injected in the declaration section of the
 *YYLex* function body.  It allows you
 to declare variables, types, local function and procedues that are available
 to the scanner rules.
+
+
+yydfa
+This code block is injected in the declaration section of the
+*_DFA* package specification.  It allows you
+to declare variables, types, local function and procedues that are available
+to the
+*_DFA* package.  A typical use is when you need to use a specific type for the
+*yylineno* variable.
 
 
 yyinit
