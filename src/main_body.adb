@@ -250,7 +250,7 @@ package body Main_Body is
    --  Print aflex usage.
    procedure Usage is
    begin
-      Put_Line (Standard_Error, "aflex version 1.6");
+      Put_Line (Standard_Error, "aflex version 1.7");
       Put_Line (Standard_Error, "");
       Put_Line
         (Standard_Error,

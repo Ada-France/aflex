@@ -55,7 +55,7 @@ DOT     "."
 UNAME       {NAME}({DOT}{NAME})+
 
 SCNAME      {NAME}
-OPTVAR      {NAME}={NUM}
+OPTVAR      {NAME}=({NUM}|{NAME})
 
 ESCSEQ      \\([^\n]|[0-9]{1,3})
 
@@ -75,6 +75,10 @@ ESCSEQ      \\([^\n]|[0-9]{1,3})
 
 {WS}            { return WHITESPACE; }
 {OPTVAR}        { nmstr := vstr(yytext(1..YYLength)); return OPTVAR; }
+^%yydfa{WS}?"{"{WS}? {
+                  Open_Code_Block (Template_Manager.Get_Filename (Template_Manager.YYDFA_CODE));
+                  ENTER(CODEBLOCK_MATCH_BRACE);
+}
 ^%yytype{WS}?"{"{WS}? {
                   Open_Code_Block (Template_Manager.Get_Filename (Template_Manager.YYTYPE_CODE));
                   ENTER(CODEBLOCK_MATCH_BRACE);

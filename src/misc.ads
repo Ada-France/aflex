@@ -74,4 +74,5 @@ package Misc is
    function Get_YYLex_Declaration return String;
    function Get_YYLex_Name return String;
    function Get_YYVar_Name return String;
+   function Get_YYLineno_Type_Name return String;
 end Misc;

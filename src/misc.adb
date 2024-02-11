@@ -39,6 +39,7 @@ package body Misc is
    Lex_Filename     : Vstring;
    YYDecl_Name      : Vstring;
    YYVar_Name       : Vstring;
+   YYLineno_Type_Name : Vstring;
 
    procedure Action_Out is
       Buf : Vstring;
@@ -340,6 +341,8 @@ package body Misc is
       if Pos > 0 then
          if Option (Option'First .. Pos) = "bufsize=" then
             Misc_Defs.YYBuf_Size := Natural'Value (Option (Pos + 1 .. Option'Last));
+         elsif Option (Option'First .. Pos) = "yylinenotype=" then
+            YYLineno_Type_Name := Vstr (Option (Pos + 1 .. Option'Last));
          else
             Synerr ("variable option '" & Option & "' is not recognized");
          end if;
@@ -439,6 +442,16 @@ package body Misc is
          return Name;
       end if;
    end Get_YYVar_Name;
+
+   function Get_YYLineno_Type_Name return String is
+      Name : constant String := Str (YYLineno_Type_Name);
+   begin
+      if Name'Length = 0 then
+         return "Natural";
+      else
+         return Name;
+      end if;
+   end Get_YYLineno_Type_Name;
 
    -- basename - find the basename of a file
    function Package_Name return String is

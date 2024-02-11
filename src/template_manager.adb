@@ -43,6 +43,7 @@ package body Template_Manager is
    Has_Code : array (Code_Filename) of Boolean := (others => False);
 
    YYTYPE_CODE_FILENAME   : constant String := "yytype.miq";
+   YYDFA_CODE_FILENAME    : constant String := "yydfa.miq";
    YYINIT_CODE_FILENAME   : constant String := "yyinit.miq";
    YYACTION_CODE_FILENAME : constant String := "yyaction.miq";
    YYWRAP_CODE_FILENAME   : constant String := "yywrap.miq";
@@ -53,6 +54,9 @@ package body Template_Manager is
       case Code is
          when YYTYPE_CODE =>
             return YYTYPE_CODE_FILENAME;
+
+         when YYDFA_CODE =>
+            return YYDFA_CODE_FILENAME;
 
          when YYINIT_CODE =>
             return YYINIT_CODE_FILENAME;
@@ -122,6 +126,12 @@ package body Template_Manager is
                Text_IO.Put (Outfile, Bufsize (Bufsize'First + 1 .. Bufsize'Last));
                Start := Pos + 12;
             end;
+
+         elsif Line (Pos .. Pos + 14) = "${YYLINENOTYPE}" then
+            Text_IO.Put (Outfile, Line (Start .. Pos - 1));
+            Text_IO.Put (Outfile, Misc.Get_YYLineno_Type_Name);
+            Start := Pos + 15;
+
          else
             Text_IO.Put_Line (Outfile, Line (Start .. Line'Last));
             exit;
@@ -165,6 +175,7 @@ package body Template_Manager is
                             S_IF_YYWRAP_CODE,
                             S_IF_YYACTION,
                             S_IF_YYTYPE,
+                            S_IF_YYDFA,
                             S_IF_REENTRANT,
                             S_IF_MINIMALIST_WITH,
                             S_IF_UNPUT);
@@ -241,6 +252,8 @@ package body Template_Manager is
                   Push_Condition (S_IF_YYACTION);
                elsif Line = "%if yytype" then
                   Push_Condition (S_IF_YYTYPE);
+               elsif Line = "%if yydfa" then
+                  Push_Condition (S_IF_YYDFA);
                elsif Line = "%if echo" then
                   Push_Condition (S_IF_ECHO);
                elsif Line = "%if reentrant" then
@@ -272,6 +285,10 @@ package body Template_Manager is
                elsif Line = "%yytype" then
                   if Is_Visible and Parent_Visible then
                      Include_File (Outfile, YYTYPE_CODE_FILENAME);
+                  end if;
+               elsif Line = "%yydfa" then
+                  if Is_Visible and Parent_Visible then
+                     Include_File (Outfile, YYDFA_CODE_FILENAME);
                   end if;
                elsif Line = "%yyaction" then
                   if Is_Visible and Parent_Visible then
@@ -306,6 +323,7 @@ package body Template_Manager is
                  or else (Current = S_IF_YYWRAP_CODE and then Has_Code (YYWRAP_CODE))
                  or else (Current = S_IF_YYACTION and then Has_Code (YYACTION_CODE))
                  or else (Current = S_IF_YYTYPE and then Has_Code (YYTYPE_CODE))
+                 or else (Current = S_IF_YYDFA and then Has_Code (YYDFA_CODE))
                  or else (Current = S_IF_REENTRANT and then Reentrant)
                  or else (Current = S_IF_ECHO and then not Spprdflt)
                  or else (Current = S_IF_MINIMALIST_WITH and then Minimalist_With)
@@ -382,6 +400,9 @@ package body Template_Manager is
    begin
       if Ada.Directories.Exists (YYTYPE_CODE_FILENAME) then
          Ada.Directories.Delete_File (YYTYPE_CODE_FILENAME);
+      end if;
+      if Ada.Directories.Exists (YYDFA_CODE_FILENAME) then
+         Ada.Directories.Delete_File (YYDFA_CODE_FILENAME);
       end if;
       if Ada.Directories.Exists (YYINIT_CODE_FILENAME) then
          Ada.Directories.Delete_File (YYINIT_CODE_FILENAME);
