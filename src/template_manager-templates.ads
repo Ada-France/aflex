@@ -1,4 +1,4 @@
---  Advanced Resource Embedder 1.4.0
+--  Advanced Resource Embedder 1.5.1
 package Template_Manager.Templates is
 
    body_dfa : aliased constant Content_Array;
@@ -285,8 +285,7 @@ private
        & "p_Line (1 .. i - 1);";
    L_164 : aliased constant String := "      Line_Number_Of_Saved_Tok_Line2 := L"
        & "ine_Number_Of_Saved_Tok_Line1 + 1;";
-   L_165 : aliased constant String := "      Ada.Text_IO.Put_Line (""Input line "
-       & """";
+   L_165 : aliased constant String := "      Ada.Text_IO.Put_Line (""Input line """;
    L_166 : aliased constant String := "                            & Integer'Ima"
        & "ge ( Line_Number_Of_Saved_Tok_Line2 )";
    L_167 : aliased constant String := "                            & ""has more "
@@ -1421,8 +1420,8 @@ private
        & "t_buffer()";
    L_698 : aliased constant String := "";
    L_699 : aliased constant String := "         when others =>";
-   L_700 : aliased constant String := "            Ada.Text_IO.Put (""action # """
-       & ");";
+   L_700 : aliased constant String := "            Ada.Text_IO.Put (""action # "
+       & """);";
    L_701 : aliased constant String := "            Ada.Text_IO.Put (Integer'Imag"
        & "e (yy_act));";
    L_702 : aliased constant String := "            Ada.Text_IO.New_Line;";
@@ -2354,16 +2353,16 @@ private
    L_1171: aliased constant String := "         Context.Yy_Line_Length := Contex"
        & "t.Saved_Tok_Line1.all'length;";
    L_1172: aliased constant String := "         Context.Yy_Line_String ( Context"
-       & ".Yy_Line_String'First .. ( Context.Yy_Line_String'First + Context.Saved_"
-       & "Tok_Line1.all'length - 1 ))";
+       & ".Yy_Line_String'First .. ( Context.Yy_Line_String'First + Context.Save"
+       & "d_Tok_Line1.all'length - 1 ))";
    L_1173: aliased constant String := "           := Context.Saved_Tok_Line1 ( 1"
        & " .. Context.Saved_Tok_Line1.all'length );";
    L_1174: aliased constant String := "      else";
    L_1175: aliased constant String := "         Context.Yy_Line_Length := Contex"
        & "t.Saved_Tok_Line2.all'length;";
    L_1176: aliased constant String := "         Context.Yy_Line_String ( Context"
-       & ".Yy_Line_String'First .. ( Context.Yy_Line_String'First + Context.Saved_"
-       & "Tok_Line2.all'length - 1 ))";
+       & ".Yy_Line_String'First .. ( Context.Yy_Line_String'First + Context.Save"
+       & "d_Tok_Line2.all'length - 1 ))";
    L_1177: aliased constant String := "           := Context.Saved_Tok_Line2 ( 1"
        & " .. Context.Saved_Tok_Line2.all'length );";
    L_1178: aliased constant String := "      end if;";
@@ -2886,14 +2885,14 @@ private
        & "fa.yy_bp;";
    L_1228: aliased constant String := "      yytext_ptr   : Index renames ${YYVA"
        & "R}.dfa.yytext_ptr;";
-   L_1229: aliased constant String := "      yy_last_accepting_state : Lexer_DFA"
-       & ".yy_state_type renames ${YYVAR}.dfa.yy_last_accepting_state;";
+   L_1229: aliased constant String := "      yy_last_accepting_state : ${NAME}_D"
+       & "FA.yy_state_type renames ${YYVAR}.dfa.yy_last_accepting_state;";
    L_1230: aliased constant String := "      yy_last_accepting_cpos  : Index ren"
        & "ames ${YYVAR}.dfa.yy_last_accepting_cpos;";
    L_1231: aliased constant String := "      yy_hold_char  : Character renames $"
        & "{YYVAR}.dfa.yy_hold_char;";
-   L_1232: aliased constant String := "      yy_ch_buf     : Lexer_DFA.ch_buf_ty"
-       & "pe renames ${YYVAR}.dfa.yy_ch_buf;";
+   L_1232: aliased constant String := "      yy_ch_buf     : ${NAME}_DFA.ch_buf_"
+       & "type renames ${YYVAR}.dfa.yy_ch_buf;";
    L_1233: aliased constant String := "      yy_n_chars    : Index renames ${YYV"
        & "AR}.yy_n_chars;";
    L_1234: aliased constant String := "      YYLVal : YYSType renames ${YYVAR}.Y"
@@ -2902,18 +2901,18 @@ private
        & "YVal;";
    L_1236: aliased constant String := "";
    L_1237: aliased constant String := "      function yy_get_next_buffer return "
-       & "Lexer_IO.eob_action_type";
-   L_1238: aliased constant String := "        is (Lexer_IO.yy_get_next_buffer ("
-       & "${YYVAR}));";
+       & "${NAME}_IO.eob_action_type";
+   L_1238: aliased constant String := "        is (${NAME}_IO.yy_get_next_buffer"
+       & " (${YYVAR}));";
    L_1239: aliased constant String := "";
    L_1240: aliased constant String := "      function YYText return String";
-   L_1241: aliased constant String := "        is (Lexer_DFA.YYText (${YYVAR}.df"
-       & "a));";
+   L_1241: aliased constant String := "        is (${NAME}_DFA.YYText (${YYVAR}."
+       & "dfa));";
    L_1242: aliased constant String := "";
    L_1243: aliased constant String := "      procedure YY_DO_BEFORE_ACTION is";
    L_1244: aliased constant String := "      begin";
-   L_1245: aliased constant String := "        Lexer_DFA.YY_DO_BEFORE_ACTION (${"
-       & "YYVAR}.dfa);";
+   L_1245: aliased constant String := "        ${NAME}_DFA.YY_DO_BEFORE_ACTION ("
+       & "${YYVAR}.dfa);";
    L_1246: aliased constant String := "      end YY_DO_BEFORE_ACTION;";
    L_1247: aliased constant String := "";
    L_1248: aliased constant String := "%%2 tables";
@@ -3215,8 +3214,8 @@ private
        & "t_buffer()";
    L_1465: aliased constant String := "";
    L_1466: aliased constant String := "         when others =>";
-   L_1467: aliased constant String := "            Ada.Text_IO.Put (""action # """
-       & ");";
+   L_1467: aliased constant String := "            Ada.Text_IO.Put (""action # "
+       & """);";
    L_1468: aliased constant String := "            Ada.Text_IO.Put (Integer'Imag"
        & "e (yy_act));";
    L_1469: aliased constant String := "            Ada.Text_IO.New_Line;";
