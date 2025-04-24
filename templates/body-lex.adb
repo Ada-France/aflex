@@ -183,6 +183,7 @@ with Ada.Text_IO; use Ada.Text_IO;
 
             case yy_get_next_buffer is
                when EOB_ACT_END_OF_FILE =>
+%if yywrap
                   if yyWrap then
                      --  note: because we've taken care in
                      --  yy_get_next_buffer() to have set up yytext,
@@ -202,6 +203,21 @@ with Ada.Text_IO; use Ada.Text_IO;
                      yy_init := True;
                      goto new_file;
                   end if;
+%else
+                  --  note: because we've taken care in
+                  --  yy_get_next_buffer() to have set up yytext,
+                  --  we can now set up yy_c_buf_p so that if some
+                  --  total hoser (like aflex itself) wants
+                  --  to call the scanner after we return the
+                  --  End_Of_Input, it'll still work - another
+                  --  End_Of_Input will get returned.
+
+                  yy_c_buf_p := yytext_ptr;
+
+                  yy_act := YY_STATE_EOF ((yy_start - 1) / 2);
+
+                  goto do_action;
+%end
 
                when EOB_ACT_RESTART_SCAN =>
                   yy_c_buf_p := yytext_ptr;
