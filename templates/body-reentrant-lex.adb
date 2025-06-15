@@ -17,10 +17,12 @@ with Ada.Text_IO; use Ada.Text_IO;
       subtype yy_state_type is Integer;
       yy_current_state : yy_state_type;
 
+%if yylineno
       yylinecol : Integer renames ${YYVAR}.dfa.yylinecol;
       yylineno  : ${YYLINENOTYPE} renames ${YYVAR}.dfa.yylineno;
       yy_last_yylinecol : Integer renames ${YYVAR}.dfa.yy_last_yylinecol;
       yy_last_yylineno  : ${YYLINENOTYPE} renames ${YYVAR}.dfa.yy_last_yylineno;
+%end
       yy_eof_has_been_seen : Boolean renames ${YYVAR}.yy_eof_has_been_seen;
       aflex_debug : Boolean renames ${YYVAR}.dfa.aflex_debug;
       yy_init  : Boolean renames ${YYVAR}.dfa.yy_init;
@@ -29,23 +31,23 @@ with Ada.Text_IO; use Ada.Text_IO;
       yy_cp    : Index renames ${YYVAR}.dfa.yy_cp;
       yy_bp    : Index renames ${YYVAR}.dfa.yy_bp;
       yytext_ptr   : Index renames ${YYVAR}.dfa.yytext_ptr;
-      yy_last_accepting_state : Lexer_DFA.yy_state_type renames ${YYVAR}.dfa.yy_last_accepting_state;
+      yy_last_accepting_state : ${NAME}_DFA.yy_state_type renames ${YYVAR}.dfa.yy_last_accepting_state;
       yy_last_accepting_cpos  : Index renames ${YYVAR}.dfa.yy_last_accepting_cpos;
       yy_hold_char  : Character renames ${YYVAR}.dfa.yy_hold_char;
-      yy_ch_buf     : Lexer_DFA.ch_buf_type renames ${YYVAR}.dfa.yy_ch_buf;
+      yy_ch_buf     : ${NAME}_DFA.ch_buf_type renames ${YYVAR}.dfa.yy_ch_buf;
       yy_n_chars    : Index renames ${YYVAR}.yy_n_chars;
       YYLVal : YYSType renames ${YYVAR}.YYLVal;
       YYVal  : YYSType renames ${YYVAR}.YYVal;
 
-      function yy_get_next_buffer return Lexer_IO.eob_action_type
-        is (Lexer_IO.yy_get_next_buffer (${YYVAR}));
+      function yy_get_next_buffer return ${NAME}_IO.eob_action_type
+        is (${NAME}_IO.yy_get_next_buffer (${YYVAR}));
 
       function YYText return String
-        is (Lexer_DFA.YYText (${YYVAR}.dfa));
+        is (${NAME}_DFA.YYText (${YYVAR}.dfa));
 
       procedure YY_DO_BEFORE_ACTION is
       begin
-        Lexer_DFA.YY_DO_BEFORE_ACTION (${YYVAR}.dfa);
+        ${NAME}_DFA.YY_DO_BEFORE_ACTION (${YYVAR}.dfa);
       end YY_DO_BEFORE_ACTION;
 
 %%2 tables
