@@ -1,7 +1,8 @@
 description = "An Ada Lexical Analyzer Generator"
 name = "aflex"
 version = "1.7"
-licenses = "BSD-4.3TAHOE"
+# licenses = "BSD-4.3TAHOE"
+licenses = "Unlicense"
 authors = ["John Self"]
 maintainers = ["Stephane.Carrez@gmail.com"]
 maintainers-logins = ["stcarrez"]
